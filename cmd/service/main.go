@@ -2,26 +2,21 @@ package main
 
 import (
 	"fmt"
-	"github.com/s21platform/community-service/internal/config"
-	"github.com/s21platform/community-service/internal/repository/postgres"
-)
-import (
-	"fmt"
 	community_proto "github.com/s21platform/community-proto/community-proto"
 	"github.com/s21platform/community-service/internal/config"
 	"github.com/s21platform/community-service/internal/service"
 	"google.golang.org/grpc"
-	"log"
 	"net"
+)
+import (
+	"log"
 )
 
 func main() {
+	cfg := config.MustLoad()
+	//_ = postgres.New(cfg)
 
-	cfg := config.MustLoad()
-	db := postgres.New(cfg)
-	_ = db
-	fmt.Println(cfg)
-	cfg := config.MustLoad()
+	log.Println(cfg)
 
 	thisService := service.New()
 
