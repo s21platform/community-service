@@ -23,13 +23,13 @@ func main() {
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", cfg.Service.Port))
 	if err != nil {
-		log.Fatalf("Cannnot listen port: %s; Error: %s", cfg.Service.Port, err)
+		log.Fatalf("Cannnot listen port. Error: %s", err)
 	}
 
-	log.Printf("Listening on port %s", cfg.Service.Port)
+	log.Println("Server is listening")
 
 	if err := s.Serve(lis); err != nil {
-		log.Fatalf("Cannnot start server: %s; Error: %s", cfg.Service.Port, err)
+		log.Fatalf("Cannnot start server. Error: %s", err)
 	}
 
 }
