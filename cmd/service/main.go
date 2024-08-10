@@ -16,8 +16,6 @@ func main() {
 	cfg := config.MustLoad()
 	//_ = postgres.New(cfg)
 
-	log.Println(cfg)
-
 	thisService := service.New()
 
 	s := grpc.NewServer()
@@ -27,6 +25,9 @@ func main() {
 	if err != nil {
 		log.Fatalf("Cannnot listen port: %s; Error: %s", cfg.Service.Port, err)
 	}
+
+	log.Printf("Listening on port %s", cfg.Service.Port)
+
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("Cannnot start server: %s; Error: %s", cfg.Service.Port, err)
 	}
