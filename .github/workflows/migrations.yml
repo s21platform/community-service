@@ -1,0 +1,46 @@
+name: Migration Workflows
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to run the migration on (staging or production)'
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+      action:
+        description: 'Migration action (apply one version, apply all versions, rollback one version)'
+        required: true
+        type: choice
+        options:
+          - apply_one_version
+          - apply_all_versions
+          - rollback_one_version
+
+jobs:
+  migrate-staging:
+    if: ${{ github.event.inputs.environment == 'staging' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: executing remote ssh commands to deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST_DEVELOP }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.PRIVATE_SSH_KEY_DEVELOP }}
+          passphrase: ${{ secrets.PASSPHRASE_DEVELOP }}
+          script: |
+            docker pull ${{ secrets.CR_REGISTRY }}/${{ secrets.CR_NAME }}-migrate:develop
+            case "${{ github.event.inputs.action }}" in
+            apply_one_version)
+            docker-compose -f ~/space21/staging/migrations/community-service.yml --env-file ~/space21/staging/.env up -d community-service-migrate-up-one-dev
+            ;;
+            apply_all_versions)
+            docker-compose -f ~/space21/staging/migrations/community-service.yml --env-file ~/space21/staging/.env up -d community-service-migrate-up-all-dev
+            ;;
+            rollback_one_version)
+            docker-compose -f ~/space21/staging/migrations/community-service.yml --env-file ~/space21/staging/.env up -d community-service-migrate-down-one-dev
+            ;;
+            esac
