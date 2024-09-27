@@ -31,5 +31,5 @@ func New(cfg *config.Config) *Repository {
 }
 
 func (r *Repository) Close() {
-	r.conn.Close()
+	_ = r.conn.Close()
 }
