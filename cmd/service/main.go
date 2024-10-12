@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net"
 
 	"google.golang.org/grpc"
@@ -10,9 +11,6 @@ import (
 	"github.com/s21platform/community-service/internal/config"
 	"github.com/s21platform/community-service/internal/repository/postgres"
 	"github.com/s21platform/community-service/internal/service"
-)
-import (
-	"log"
 )
 
 func main() {
