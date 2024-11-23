@@ -8,22 +8,23 @@ import (
 	sq "github.com/Masterminds/squirrel"
 )
 
-func (r *Repository) IsPeerExist(ctx context.Context, email string) (string, error) {
+func (r *Repository) GetPeerStatus(ctx context.Context, email string) (string, error) {
 	var status string
 	query, args, err := sq.Select("status").
 		From("participant").
 		Where(sq.Eq{"login": email}).
+		PlaceholderFormat(sq.Dollar).
 		ToSql()
 	if err != nil {
 		return "", fmt.Errorf("cannot configure query, err: %v", err)
 	}
 
-	err = r.conn.QueryRowContext(ctx, query, args...).Scan(&status)
+	err = r.conn.GetContext(ctx, &status, query, args...)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return "", nil
 		}
-		return "", fmt.Errorf("cannot get peer status, err: %v", err)
+		return "", err
 	}
 	return status, nil
 }
