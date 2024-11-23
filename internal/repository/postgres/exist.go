@@ -10,12 +10,12 @@ import (
 
 func (r *Repository) IsPeerExist(ctx context.Context, email string) (string, error) {
 	var status string
-	query, args, err := sq.Select("status").Where(sq.Eq{"email": email}).ToSql()
+	query, _, err := sq.Select("status").Where(sq.Eq{"email": email}).ToSql()
 	if err != nil {
 		return "", fmt.Errorf("cannot configure query, err: %v", err)
 	}
 
-	err = r.conn.QueryRowContext(ctx, query, args...).Scan(&status)
+	err = r.conn.QueryRowContext(ctx, query).Scan(&status)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return "", nil
