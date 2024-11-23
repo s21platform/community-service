@@ -12,7 +12,7 @@ func (r *Repository) IsPeerExist(ctx context.Context, email string) (string, err
 	var status string
 	query, args, err := sq.Select("status").
 		From("participant").
-		Where(sq.Eq{"email": email}).
+		Where(sq.Eq{"login": email}).
 		ToSql()
 	if err != nil {
 		return "", fmt.Errorf("cannot configure query, err: %v", err)
