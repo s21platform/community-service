@@ -14,8 +14,15 @@ type Service struct {
 }
 
 func (s *Service) IsPeerExist(ctx context.Context, in *communityproto.EmailIn) (*communityproto.EmailOut, error) {
-	log.Println("Input E-mail: ", in.Email)
-	return &communityproto.EmailOut{IsExist: true}, nil
+	peerStatus, err := s.dbR.IsPeerExist(ctx, in.Email)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "cannot check peer error: %s", err)
+	}
+
+	if peerStatus == "active" {
+		return &communityproto.EmailOut{IsExist: true}, nil
+	}
+	return &communityproto.EmailOut{IsExist: false}, nil
 }
 
 func (s *Service) SearchPeers(ctx context.Context, in *communityproto.SearchPeersIn) (*communityproto.SearchPeersOut, error) {
