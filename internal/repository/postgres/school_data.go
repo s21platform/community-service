@@ -9,10 +9,11 @@ import (
 
 func (r *Repository) GetPeerSchoolData(ctx context.Context, nickName string) (model.PeerSchoolData, error) {
 	var schoolData model.PeerSchoolData
+	login := fmt.Sprintf("%s@student.21-school.ru", nickName)
 
 	query, args, err := sq.Select("class_name", "parallel_name").
 		From("participant").
-		Where("login LIKE ?", "%"+nickName+"%").
+		Where(sq.Eq{"login": login}).
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 	if err != nil {
@@ -21,7 +22,7 @@ func (r *Repository) GetPeerSchoolData(ctx context.Context, nickName string) (mo
 
 	err = r.conn.GetContext(ctx, &schoolData, query, args...)
 	if err != nil {
-		return model.PeerSchoolData{}, fmt.Errorf("cannot configure query, err: %v", err)
+		return model.PeerSchoolData{}, err
 	}
 	return schoolData, nil
 }
