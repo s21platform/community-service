@@ -7,4 +7,5 @@ import (
 
 type DbRepo interface {
 	SearchPeersBySubstring(ctx context.Context, substring string) ([]*communityproto.SearchPeer, error)
+	GetPeerStatus(ctx context.Context, email string) (string, error)
 }
