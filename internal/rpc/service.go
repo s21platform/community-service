@@ -23,7 +23,16 @@ func (s *Service) GetPeerSchoolData(ctx context.Context, in *communityproto.GetS
 }
 
 func (s *Service) IsPeerExist(ctx context.Context, in *communityproto.EmailIn) (*communityproto.EmailOut, error) {
-	log.Println("Input E-mail: ", in.Email)
+	peerStatus, err := s.dbR.GetPeerStatus(ctx, in.Email)
+	if err != nil {
+		log.Printf("cannot get peer status, err: %v\n", err)
+		return nil, status.Errorf(codes.Internal, "cannot check peer error: %s", err)
+	}
+
+	if peerStatus != "ACTIVE" {
+		log.Printf("peer status: %s\n", peerStatus)
+		return &communityproto.EmailOut{IsExist: false}, nil
+	}
 	return &communityproto.EmailOut{IsExist: true}, nil
 }
 
