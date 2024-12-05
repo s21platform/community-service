@@ -10,6 +10,8 @@ import (
 func main() {
 	// Создаём контекст с отменой
 	ctx, cancel := context.WithCancel(context.Background())
+	// Завершаем работу воркера через контекст
+	defer cancel()
 	var wg sync.WaitGroup
 
 	campusWorker := campus.New()
@@ -20,9 +22,6 @@ func main() {
 	go func() {
 		campusWorker.Run(ctx, &wg)
 	}()
-
-	// Завершаем работу воркера через контекст
-	cancel()
 
 	// Даем время воркеру завершиться
 	wg.Wait()
