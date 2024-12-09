@@ -11,11 +11,11 @@ ADD COLUMN badges JSONB;
 
 -- +goose Down
 Alter TABLE participant
-DROP COLUMN exp_value INT,
-DROP COLUMN level INT,
-DROP COLUMN exp_to_next_level INT,
-DROP COLUMN crp INT,
-DROP COLUMN skills JSONB,
-DROP COLUMN prp INT,
-DROP COLUMN coins INT,
-DROP COLUMN badges JSONB;
+DROP COLUMN exp_value,
+DROP COLUMN level,
+DROP COLUMN exp_to_next_level,
+DROP COLUMN crp,
+DROP COLUMN skills,
+DROP COLUMN prp,
+DROP COLUMN coins,
+DROP COLUMN badges;
