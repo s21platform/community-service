@@ -1,22 +1,21 @@
 -- +goose Up
-CREATE TABLE IF NOT EXISTS participant
-(
-    id SERIAL PRIMARY KEY,
-    login VARCHAR NOT NULL,
-    campus_id INTEGER NOT NULL,
-    class_name VARCHAR NOT NULL,
-    parallel_name VARCHAR NOT NULL,
-    tribe_id INT NOT NULL,
-    status VARCHAR NOT NULL,
-    created_at TIMESTAMP DEFAULT NOW(),
-    exp_value INT,
-    level INT,
-    exp_to_next_level INT,
-    skills JSONB,
-    crp INT,
-    prp INT,
-    coins INT,
-    badges JSONB,
-    CONSTRAINT fk_participant_campus_id FOREIGN KEY (campus_id) REFERENCES campus(id),
-    CONSTRAINT fk_participant_tribe_id FOREIGN KEY (tribe_id) REFERENCES tribe(id)
-    );
+Alter TABLE participant
+ADD COLUMN exp_value INT,
+ADD COLUMN level INT,
+ADD COLUMN exp_to_next_level INT,
+ADD COLUMN skills JSONB,
+ADD COLUMN crp INT,
+ADD COLUMN prp INT,
+ADD COLUMN coins INT,
+ADD COLUMN badges JSONB;
+
+-- +goose Down
+Alter TABLE participant
+DROP COLUMN exp_value INT,
+DROP COLUMN level INT,
+DROP COLUMN exp_to_next_level INT,
+DROP COLUMN crp INT,
+DROP COLUMN skills JSONB,
+DROP COLUMN prp INT,
+DROP COLUMN coins INT,
+DROP COLUMN badges JSONB;
