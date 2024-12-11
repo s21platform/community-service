@@ -93,3 +93,42 @@ func TestServer_IsPeerExist(t *testing.T) {
 		assert.Contains(t, st.Message(), "select err")
 	})
 }
+
+// limit и offset сейчас не используются
+func TestServer_SearchPeers(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+
+	controller := gomock.NewController(t)
+	defer controller.Finish()
+	mockRepo := rpc.NewMockDbRepo(controller)
+
+	t.Run("search_peers_ok", func(t *testing.T) {
+		expectedData := []*community_proto.SearchPeer{
+			{Login: "aboba"},
+			{Login: "abobaoba"},
+			{Login: "aboo"},
+		}
+		substring := "ab"
+		mockRepo.EXPECT().SearchPeersBySubstring(gomock.Any(), substring).Return(expectedData, nil)
+
+		s := rpc.New(mockRepo)
+		data, err := s.SearchPeers(ctx, &community_proto.SearchPeersIn{Substring: substring})
+		assert.NoError(t, err)
+		assert.Equal(t, data, &community_proto.SearchPeersOut{SearchPeers: expectedData})
+	})
+
+	t.Run("search_peers_err", func(t *testing.T) {
+		expectedErr := errors.New("select err")
+		substring := "ab"
+		mockRepo.EXPECT().SearchPeersBySubstring(gomock.Any(), substring).Return(nil, expectedErr)
+		s := rpc.New(mockRepo)
+
+		data, err := s.SearchPeers(ctx, &community_proto.SearchPeersIn{Substring: substring})
+		assert.Nil(t, data)
+		st, ok := status.FromError(err)
+		assert.True(t, ok)
+		assert.Equal(t, codes.Internal, st.Code())
+		assert.Contains(t, st.Message(), "select err")
+	})
+}
