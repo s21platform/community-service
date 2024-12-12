@@ -28,6 +28,8 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/s21platform/community-proto v0.0.2 h1:h/0dYPWWTlBt8F9CDAXbNBys1h7hsCsGKMMOUx5EKpc=
 github.com/s21platform/community-proto v0.0.2/go.mod h1:V65PB3oIWKaeUTY4USkAe5rlYz748N8K1ZCQ/Eb7lPY=
+github.com/s21platform/school-proto v0.0.4 h1:ylYv0/4oyyAOj4hEW30+ieJokOhwO7eJ5G2enp5Kg4c=
+github.com/s21platform/school-proto v0.0.4/go.mod h1:OHdop/i6tGCF6TfX1Wgh9rcjlJaX5OK8AMD5XnBYtm8=
 github.com/stretchr/testify v1.2.2 h1:bSDNvY7ZPG5RlJ8otE/7V6gMiyenm9RtJ7IUVIAoJ1w=
 github.com/stretchr/testify v1.2.2/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=
 golang.org/x/net v0.26.0 h1:soB7SVo0PWrY4vPW/+ay0jKDNScG2X9wFeYlXIvJsOQ=
