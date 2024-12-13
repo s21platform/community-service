@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func UnaryInterceptor(
+func AuthInterceptor(
 	ctx context.Context,
 	req interface{},
 	info *grpc.UnaryServerInfo,
