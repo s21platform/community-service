@@ -16,7 +16,9 @@ func UnaryInterceptor(
 	info *grpc.UnaryServerInfo,
 	handler grpc.UnaryHandler,
 ) (interface{}, error) {
-	_ = info
+	if info.FullMethod == "/CommunityService/IsPeerExist" {
+		return handler(ctx, req)
+	}
 	md, ok := metadata.FromIncomingContext(ctx)
 
 	if !ok {
