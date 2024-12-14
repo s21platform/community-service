@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"github.com/s21platform/community-service/internal/infra"
+	"github.com/s21platform/metrics-lib/pkg"
 	"log"
 	"net"
 
@@ -19,7 +21,18 @@ func main() {
 
 	thisService := rpc.New(dbRepo)
 
-	s := grpc.NewServer()
+	metris, err := pkg.NewMetrics(cfg.Metrics.Host, cfg.Metrics.Port, "community", cfg.Platform.Env)
+	if err != nil {
+		log.Fatalf("cannot init metrics, err: %v", err)
+	}
+	defer metris.Disconnect()
+
+	s := grpc.NewServer(
+		grpc.ChainUnaryInterceptor(
+			infra.AuthInterceptor,
+			infra.MetricsInterceptor(metris),
+		),
+	)
 	communityproto.RegisterCommunityServiceServer(s, thisService)
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", cfg.Service.Port))
