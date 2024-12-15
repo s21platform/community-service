@@ -22,18 +22,18 @@ jobs:
       - name: Run tests
         run: go test -coverprofile=coverage.out -tags=test -v ./...
 
-      #      - name: Check coverage
-      #        run: |
-      #          go tool cover -func=coverage.out -o=coverage.txt
-      #          coverage=$(go tool cover -func=coverage.out | grep total | awk '{print substr($3, 1, length($3)-1)}')
-      #          echo "Coverage is $coverage%"
-      #          if (( $(echo "$coverage < 80.0" | bc -l) )); then
-      #          echo "Coverage is below 80%"
-      #          exit 1
-      #          fi
+      - name: Check coverage
+        run: |
+          go tool cover -func=coverage.out -o=coverage.txt
+          coverage=$(go tool cover -func=coverage.out | grep total | awk '{print substr($3, 1, length($3)-1)}')
+          echo "Coverage is $coverage%"
+          if (( $(echo "$coverage < 80.0" | bc -l) )); then
+            echo "Coverage is below 80%"
+            exit 1
+          fi
 
       - name: Upload coverage report
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: coverage-report
           path: coverage.txt
