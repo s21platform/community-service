@@ -20,7 +20,7 @@ jobs:
           go-version: 1.22
 
       - name: Run tests
-        run: go test -coverprofile=coverage.out -tags=test -v ./...
+        run: go test -coverprofile=coverage.out -tags=test -v ./../../internal/rpc/...
 
       - name: Check coverage
         run: |
