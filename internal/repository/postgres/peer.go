@@ -2,10 +2,28 @@ package postgres
 
 import (
 	"context"
+	"fmt"
+	sq "github.com/Masterminds/squirrel"
 )
 
 func (r *Repository) AddPeerLogins(ctx context.Context, peerLogins []string) error {
-	// в таблице participant есть foreign key на трайб и кампус что в них заносить? скорее всего нельзя будет добавить поля без добавления этих значений
-	//или нужно сначала взять логины потом подтянуть остальную информацию с платформы и после уже добавлять в таблицу participant?
+	queryBase := sq.Insert("logins").
+		Columns("login").
+		Suffix("ON CONFLICT (login) DO NOTHING").
+		PlaceholderFormat(sq.Dollar)
+
+	for _, login := range peerLogins {
+		queryBase = queryBase.Values(login)
+	}
+
+	query, args, err := queryBase.ToSql()
+	if err != nil {
+		return fmt.Errorf("cannot configure query, err: %v", err)
+	}
+	_, err = r.conn.ExecContext(ctx, query, args...)
+	if err != nil {
+		return fmt.Errorf("cannot execute query, err: %v", err)
+	}
+
 	return nil
 }

@@ -38,8 +38,9 @@ func (s *School) RunPeerWorker(ctx context.Context, wg *sync.WaitGroup) {
 				log.Fatalf("cannot get campuses, err: %v", err)
 			}
 
+			var offset int64
 			for _, campus := range campuses {
-				var offset int64 = 0
+				offset = 0
 
 				for {
 					peerLogins, err := s.sC.GetPeersByCampusUuid(ctx, campus, peerLimit, offset)
@@ -53,11 +54,10 @@ func (s *School) RunPeerWorker(ctx context.Context, wg *sync.WaitGroup) {
 					}
 
 					if len(peerLogins) < peerLimit {
-						offset = 0
 						break
-					} else {
-						offset += peerLimit
 					}
+
+					offset += peerLimit
 				}
 
 			}
