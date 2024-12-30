@@ -15,6 +15,7 @@ type Config struct {
 	Postgres Postgres
 	Metrics  Metrics
 	Platform Platform
+	School   School
 }
 
 type Service struct {
@@ -36,6 +37,11 @@ type Metrics struct {
 
 type Platform struct {
 	Env string `env:"ENV"`
+}
+
+type School struct {
+	Host string `env:"SCHOOL_SERVICE_HOST"`
+	Port string `env:"SCHOOL_SERVICE_PORT"`
 }
 
 func MustLoad() *Config {
