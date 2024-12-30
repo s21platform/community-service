@@ -11,4 +11,5 @@ type DbRepo interface {
 	SearchPeersBySubstring(ctx context.Context, substring string) ([]*communityproto.SearchPeer, error)
 	GetPeerStatus(ctx context.Context, email string) (string, error)
 	GetPeerSchoolData(ctx context.Context, nickName string) (model.PeerSchoolData, error)
+	AddPeerLogins(ctx context.Context, peerLogins []string) error
 }
