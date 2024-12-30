@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/s21platform/community-service/internal/clients/school"
 	"github.com/s21platform/community-service/internal/config"
+	"github.com/s21platform/community-service/internal/repository/postgres"
 	"github.com/s21platform/community-service/internal/service/school"
 	"sync"
 )
@@ -14,7 +15,8 @@ func main() {
 
 	cfg := config.MustLoad()
 	schoolClient := school.MustConnect(cfg)
-	peerWorker := service.New(schoolClient)
+	dbRepo := postgres.New(cfg)
+	peerWorker := service.New(schoolClient, dbRepo)
 
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
