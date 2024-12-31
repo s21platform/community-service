@@ -7,8 +7,8 @@ import (
 )
 
 func (r *Repository) AddPeerLogins(ctx context.Context, peerLogins []string) error {
-	queryBase := sq.Insert("logins").
-		Columns("login").
+	queryBase := sq.Insert("login").
+		Columns("nickname").
 		Suffix("ON CONFLICT (login) DO NOTHING").
 		PlaceholderFormat(sq.Dollar)
 

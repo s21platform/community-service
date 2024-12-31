@@ -1,8 +1,8 @@
 -- +goose Up
-CREATE TABLE IF NOT EXISTS logins
+CREATE TABLE IF NOT EXISTS login
 (
     id SERIAL PRIMARY KEY,
-    login VARCHAR NOT NULL UNIQUE,
+    nickname VARCHAR NOT NULL UNIQUE,
     created_at TIMESTAMP DEFAULT NOW()
 )
 
