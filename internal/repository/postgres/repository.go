@@ -2,10 +2,12 @@ package postgres
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
+
 	"github.com/s21platform/community-service/internal/config"
-	"log"
 )
 
 type Repository struct {

@@ -32,6 +32,8 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/s21platform/community-proto v0.0.2 h1:h/0dYPWWTlBt8F9CDAXbNBys1h7hsCsGKMMOUx5EKpc=
 github.com/s21platform/community-proto v0.0.2/go.mod h1:V65PB3oIWKaeUTY4USkAe5rlYz748N8K1ZCQ/Eb7lPY=
+github.com/s21platform/logger-lib v0.0.3 h1:FSrPaJCW+fodzX3Mkce85WsB0/03ZZHtSEXaHqHlJFo=
+github.com/s21platform/logger-lib v0.0.3/go.mod h1:DpD0CWM17ApEwayEZXhQqb3gos1TpumQfU+uRrpaSCI=
 github.com/s21platform/metrics-lib v0.0.6 h1:JcB/a/LsxTEdQf0ffT6wlxBirBWn1Dt8BP3fHEfMh4s=
 github.com/s21platform/metrics-lib v0.0.6/go.mod h1:9a9zIs4Yu7KgMLxNZt1O95q8jM9sNIatJRj+vIQiAPY=
 github.com/s21platform/school-proto v0.0.4 h1:ylYv0/4oyyAOj4hEW30+ieJokOhwO7eJ5G2enp5Kg4c=

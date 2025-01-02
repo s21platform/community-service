@@ -2,18 +2,23 @@ package main
 
 import (
 	"context"
+	"sync"
+
+	logger_lib "github.com/s21platform/logger-lib"
+
 	"github.com/s21platform/community-service/internal/clients/school"
 	"github.com/s21platform/community-service/internal/config"
 	"github.com/s21platform/community-service/internal/repository/postgres"
-	"github.com/s21platform/community-service/internal/service/school"
-	"sync"
+	service "github.com/s21platform/community-service/internal/service/school"
 )
 
 func main() {
+	cfg := config.MustLoad()
+	logger := logger_lib.New()
+
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	cfg := config.MustLoad()
 	schoolClient := school.MustConnect(cfg)
 	dbRepo := postgres.New(cfg)
 	peerWorker := service.New(schoolClient, dbRepo)

@@ -3,12 +3,13 @@ package school
 import (
 	"context"
 	"fmt"
-	"github.com/s21platform/community-service/internal/config"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 	"log"
 
 	school "github.com/s21platform/school-proto/school-proto"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+
+	"github.com/s21platform/community-service/internal/config"
 )
 
 type Handle struct {

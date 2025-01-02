@@ -2,12 +2,13 @@ package infra
 
 import (
 	"context"
-	"github.com/s21platform/community-service/internal/config"
 	"strings"
 	"time"
 
 	"github.com/s21platform/metrics-lib/pkg"
 	"google.golang.org/grpc"
+
+	"github.com/s21platform/community-service/internal/config"
 )
 
 func MetricsInterceptor(metrics *pkg.Metrics) func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo,

@@ -3,10 +3,12 @@ package postgres
 import (
 	"context"
 	"fmt"
+	"log"
+
 	sq "github.com/Masterminds/squirrel"
 	communityproto "github.com/s21platform/community-proto/community-proto"
+
 	"github.com/s21platform/community-service/internal/model"
-	"log"
 )
 
 func (r *Repository) SearchPeersBySubstring(ctx context.Context, substring string) ([]*communityproto.SearchPeer, error) {

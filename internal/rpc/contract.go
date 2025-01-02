@@ -3,7 +3,9 @@ package rpc
 
 import (
 	"context"
+
 	communityproto "github.com/s21platform/community-proto/community-proto"
+
 	"github.com/s21platform/community-service/internal/model"
 )
 

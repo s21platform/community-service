@@ -9,6 +9,7 @@ require (
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/lib/pq v1.10.9
 	github.com/s21platform/community-proto v0.0.2
+	github.com/s21platform/logger-lib v0.0.3
 	github.com/s21platform/metrics-lib v0.0.6
 	github.com/s21platform/school-proto v0.0.4
 	github.com/stretchr/testify v1.2.2
