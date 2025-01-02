@@ -36,12 +36,17 @@ func (s *School) RunPeerWorker(ctx context.Context, wg *sync.WaitGroup) {
 	logger := logger_lib.FromContext(ctx, config.KeyLogger)
 	logger.AddFuncName("RunPeerWorker")
 
+	ticker := time.NewTicker(time.Hour)
+	defer ticker.Stop()
+
 	for {
 		select {
 		case <-ctx.Done():
-			logger.Info("School service worker shutting down")
+			logger.Info("participant worker done")
 
-		case <-time.After(time.Hour * 24 * 30):
+		case <-ticker.C:
+
+			//case <-time.After(time.Hour * 24 * 30):
 			campuses, err := s.dbR.GetCampusUuids(ctx)
 			if err != nil {
 				logger.Error(fmt.Sprintf("cannot get campuses, err: %v", err))
@@ -74,9 +79,7 @@ func (s *School) RunPeerWorker(ctx context.Context, wg *sync.WaitGroup) {
 
 					offset += peerLimit
 				}
-
 			}
 		}
 	}
-
 }
