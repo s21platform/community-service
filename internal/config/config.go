@@ -12,7 +12,7 @@ const (
 	KeyMetrics                = key("metrics")
 	KeyUUID                   = key("uuid")
 	KeyLogger                 = key("logger")
-	KeyParticipantLastUpdated = key("participant_last_updated")
+	KeyParticipantLastUpdated = "participant_last_updated"
 )
 
 type Config struct {

@@ -51,10 +51,10 @@ func (r *Repository) Get(ctx context.Context) (string, error) {
 
 		val, err := r.conn.Get(ctx, randomKey).Result()
 		if errors.Is(err, redis.Nil) {
-			log.Printf("Ключ %s не найден\n", randomKey)
+			log.Printf("cannot find key %s \n", randomKey)
 			return "", err
 		} else if err != nil {
-			log.Printf("cannot get value by key: %s, err: %v", randomKey, err)
+			log.Printf("cannot get value by key: %s, err: %v\n", randomKey, err)
 			return "", fmt.Errorf("cannot get value by key: %s, err: %v", randomKey, err)
 		}
 		return val, nil

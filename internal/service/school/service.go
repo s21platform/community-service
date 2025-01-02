@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"fmt"
-	"log"
 	"sync"
 	"time"
 
@@ -36,50 +35,79 @@ func (s *School) RunPeerWorker(ctx context.Context, wg *sync.WaitGroup) {
 	logger := logger_lib.FromContext(ctx, config.KeyLogger)
 	logger.AddFuncName("RunPeerWorker")
 
-	ticker := time.NewTicker(time.Hour)
+	ticker := time.NewTicker(time.Hour * 24)
 	defer ticker.Stop()
 
 	for {
 		select {
 		case <-ctx.Done():
-			logger.Info("participant worker done")
+			logger.Info("participant worker uploading done")
 
 		case <-ticker.C:
-
-			//case <-time.After(time.Hour * 24 * 30):
-			campuses, err := s.dbR.GetCampusUuids(ctx)
+			timeCheck, err := s.updateTimeCheck(ctx)
 			if err != nil {
-				logger.Error(fmt.Sprintf("cannot get campuses, err: %v", err))
-				log.Fatalf("cannot get campuses, err: %v", err)
-				return
+				logger.Error(fmt.Sprintf("cannot check time since last update, err: %v", err))
 			}
 
-			var offset int64
-			for _, campus := range campuses {
-				offset = 0
+			if timeCheck {
+				err := s.uploadParticipants(ctx)
+				if err != nil {
+					logger.Error(fmt.Sprintf("cannot upload participants, err: %v", err))
+				}
 
-				for {
-					peerLogins, err := s.sC.GetPeersByCampusUuid(ctx, campus, peerLimit, offset)
-					if err != nil {
-						logger.Error(fmt.Sprintf("cannot get peer logins from school client, err: %v", err))
-						log.Fatalf("cannot get peer logins from school client, err: %v", err)
-						return
-					}
-
-					err = s.dbR.AddPeerLogins(ctx, peerLogins)
-					if err != nil {
-						logger.Error(fmt.Sprintf("cannot save peer logins, err: %v", err))
-						log.Fatalf("cannot save peer logins, err: %v", err)
-						return
-					}
-
-					if len(peerLogins) < peerLimit {
-						break
-					}
-
-					offset += peerLimit
+				timeUpdated := time.Now().Format(time.RFC3339)
+				err = s.rR.Set(ctx, config.KeyParticipantLastUpdated, timeUpdated, time.Hour*24*60)
+				if err != nil {
+					logger.Error(fmt.Sprintf("cannot save participant last updated, err: %v", err))
 				}
 			}
 		}
 	}
+}
+
+// если прошел месяц после последнего обновления - возвращает тру
+func (s *School) updateTimeCheck(ctx context.Context) (bool, error) {
+	lastUpdate, err := s.rR.GetByKey(ctx, config.KeyParticipantLastUpdated)
+	if err != nil {
+		return false, fmt.Errorf("cannot get last update time, err: %v", err)
+	}
+	lastUpdateTime, err := time.Parse(time.RFC3339, lastUpdate)
+	if err != nil {
+		return false, fmt.Errorf("cannot parse time, err: %v", err)
+	}
+
+	if time.Now().After(lastUpdateTime.AddDate(0, 1, 0)) {
+		return true, nil
+	}
+	return false, nil
+}
+
+func (s *School) uploadParticipants(ctx context.Context) error {
+	campuses, err := s.dbR.GetCampusUuids(ctx)
+	if err != nil {
+		return fmt.Errorf("cannot get campuses, err: %v", err)
+	}
+
+	var offset int64
+	for _, campus := range campuses {
+		offset = 0
+
+		for {
+			peerLogins, err := s.sC.GetPeersByCampusUuid(ctx, campus, peerLimit, offset)
+			if err != nil {
+				return fmt.Errorf("cannot get peer logins from school client, err: %v", err)
+			}
+
+			err = s.dbR.AddPeerLogins(ctx, peerLogins)
+			if err != nil {
+				return fmt.Errorf("cannot save peer logins, err: %v", err)
+			}
+
+			if len(peerLogins) < peerLimit {
+				break
+			}
+			offset += peerLimit
+		}
+	}
+	return nil
 }
