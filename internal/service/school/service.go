@@ -3,11 +3,13 @@ package service
 import (
 	"context"
 	"fmt"
-	"github.com/s21platform/community-service/internal/config"
-	logger_lib "github.com/s21platform/logger-lib"
 	"log"
 	"sync"
 	"time"
+
+	logger_lib "github.com/s21platform/logger-lib"
+
+	"github.com/s21platform/community-service/internal/config"
 )
 
 const (
@@ -17,13 +19,14 @@ const (
 type School struct {
 	sC  SchoolC
 	dbR DbRepo
-	//add redis
+	rR  RedisRepo
 }
 
-func New(school SchoolC, dbR DbRepo) *School {
+func New(school SchoolC, dbR DbRepo, rR RedisRepo) *School {
 	return &School{
 		sC:  school,
 		dbR: dbR,
+		rR:  rR,
 	}
 }
 
@@ -43,6 +46,7 @@ func (s *School) RunPeerWorker(ctx context.Context, wg *sync.WaitGroup) {
 			if err != nil {
 				logger.Error(fmt.Sprintf("cannot get campuses, err: %v", err))
 				log.Fatalf("cannot get campuses, err: %v", err)
+				return
 			}
 
 			var offset int64
@@ -54,12 +58,14 @@ func (s *School) RunPeerWorker(ctx context.Context, wg *sync.WaitGroup) {
 					if err != nil {
 						logger.Error(fmt.Sprintf("cannot get peer logins from school client, err: %v", err))
 						log.Fatalf("cannot get peer logins from school client, err: %v", err)
+						return
 					}
 
 					err = s.dbR.AddPeerLogins(ctx, peerLogins)
 					if err != nil {
 						logger.Error(fmt.Sprintf("cannot save peer logins, err: %v", err))
 						log.Fatalf("cannot save peer logins, err: %v", err)
+						return
 					}
 
 					if len(peerLogins) < peerLimit {

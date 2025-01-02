@@ -9,9 +9,10 @@ import (
 type key string
 
 const (
-	KeyMetrics = key("metrics")
-	KeyUUID    = key("uuid")
-	KeyLogger  = key("logger")
+	KeyMetrics                = key("metrics")
+	KeyUUID                   = key("uuid")
+	KeyLogger                 = key("logger")
+	KeyParticipantLastUpdated = key("participant_last_updated")
 )
 
 type Config struct {
@@ -21,6 +22,12 @@ type Config struct {
 	Platform Platform
 	School   School
 	Logger   Logger
+	Cache    Cache
+}
+
+type Cache struct {
+	Host string `env:"COMMUNITY_SERVICE_REDIS_HOST"`
+	Port string `env:"COMMUNITY_SERVICE_REDIS_PORT"`
 }
 
 type Logger struct {

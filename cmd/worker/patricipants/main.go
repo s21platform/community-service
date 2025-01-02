@@ -2,12 +2,14 @@ package main
 
 import (
 	"context"
-	logger_lib "github.com/s21platform/logger-lib"
 	"sync"
+
+	logger_lib "github.com/s21platform/logger-lib"
 
 	"github.com/s21platform/community-service/internal/clients/school"
 	"github.com/s21platform/community-service/internal/config"
 	"github.com/s21platform/community-service/internal/repository/postgres"
+	"github.com/s21platform/community-service/internal/repository/redis"
 	service "github.com/s21platform/community-service/internal/service/school"
 )
 
@@ -22,7 +24,8 @@ func main() {
 
 	schoolClient := school.MustConnect(cfg)
 	dbRepo := postgres.New(cfg)
-	peerWorker := service.New(schoolClient, dbRepo)
+	redisRepo := redis.New(cfg)
+	peerWorker := service.New(schoolClient, dbRepo, redisRepo)
 
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
