@@ -55,14 +55,22 @@ func (s *School) RunPeerWorker(ctx context.Context, wg *sync.WaitGroup) {
 					logger.Error(fmt.Sprintf("cannot upload participants, err: %v", err))
 				}
 
-				timeUpdated := time.Now().Format(time.RFC3339)
-				err = s.rR.Set(ctx, config.KeyParticipantLastUpdated, timeUpdated, time.Hour*24*60)
+				err = s.setUpdateTime(ctx)
 				if err != nil {
 					logger.Error(fmt.Sprintf("cannot save participant last updated, err: %v", err))
 				}
 			}
 		}
 	}
+}
+
+func (s *School) setUpdateTime(ctx context.Context) error {
+	timeUpdated := time.Now().Format(time.RFC3339)
+	err := s.rR.Set(ctx, config.KeyParticipantLastUpdated, timeUpdated, time.Hour*24*60)
+	if err != nil {
+		return fmt.Errorf("cannot save participant last updated, err: %v", err)
+	}
+	return nil
 }
 
 // если прошел месяц после последнего обновления - возвращает тру
