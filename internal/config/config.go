@@ -8,8 +8,11 @@ import (
 
 type key string
 
-const KeyMetrics = key("metrics")
-const KeyUUID = key("uuid")
+const (
+	KeyMetrics = key("metrics")
+	KeyUUID    = key("uuid")
+	KeyLogger  = key("logger")
+)
 
 type Config struct {
 	Service  Service
@@ -17,10 +20,17 @@ type Config struct {
 	Metrics  Metrics
 	Platform Platform
 	School   School
+	Logger   Logger
+}
+
+type Logger struct {
+	Host string `env:"LOGGER_SERVICE_HOST"`
+	Port string `env:"LOGGER_SERVICE_PORT"`
 }
 
 type Service struct {
 	Port string `env:"COMMUNITY_SERVICE_PORT"`
+	Name string `env:"COMMUNITY_SERVICE_NAME"`
 }
 
 type Postgres struct {
