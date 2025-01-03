@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"fmt"
+	"log"
 
 	sq "github.com/Masterminds/squirrel"
 )
@@ -10,12 +11,14 @@ import (
 func (r *Repository) AddPeerLogins(ctx context.Context, peerLogins []string) error {
 	queryBase := sq.Insert("login").
 		Columns("nickname").
-		Suffix("ON CONFLICT (login) DO NOTHING").
+		Suffix("ON CONFLICT (nickname) DO NOTHING").
 		PlaceholderFormat(sq.Dollar)
 
 	for _, login := range peerLogins {
 		queryBase = queryBase.Values(login)
 	}
+
+	log.Println(queryBase)
 
 	query, args, err := queryBase.ToSql()
 	if err != nil {
