@@ -35,63 +35,34 @@ func (s *School) RunPeerWorker(ctx context.Context, wg *sync.WaitGroup) {
 	logger := logger_lib.FromContext(ctx, config.KeyLogger)
 	logger.AddFuncName("RunPeerWorker")
 
-	ticker := time.NewTicker(time.Hour * 24)
+	ticker := time.NewTicker(time.Hour)
 	defer ticker.Stop()
 
 	for {
 		select {
 		case <-ctx.Done():
-			logger.Info("participant worker uploading done")
+			logger.Info("participant uploading worker shutting down")
 
 		case <-ticker.C:
-			timeCheck, err := s.updateTimeCheck(ctx)
+			lastUpdate, err := s.rR.GetByKey(ctx, config.KeyParticipantLastUpdated)
 			if err != nil {
-				logger.Error(fmt.Sprintf("cannot check time since last update, err: %v", err))
+				logger.Error(fmt.Sprintf("cannot get last update time, err: %v", err))
 			}
 
-			if timeCheck {
+			if lastUpdate == "" {
 				err := s.uploadParticipants(ctx)
 				if err != nil {
 					logger.Error(fmt.Sprintf("cannot upload participants, err: %v", err))
 				}
 
-				err = s.setUpdateTime(ctx)
+				err = s.rR.Set(ctx, config.KeyParticipantLastUpdated, "upd", time.Hour*24*60)
 				if err != nil {
 					logger.Error(fmt.Sprintf("cannot save participant last updated, err: %v", err))
 				}
 			}
+			logger.Info("participant worker done")
 		}
 	}
-}
-
-func (s *School) setUpdateTime(ctx context.Context) error {
-	timeUpdated := time.Now().Format(time.RFC3339)
-	err := s.rR.Set(ctx, config.KeyParticipantLastUpdated, timeUpdated, time.Hour*24*60)
-	if err != nil {
-		return fmt.Errorf("cannot save participant last updated, err: %v", err)
-	}
-	return nil
-}
-
-// если прошел месяц после последнего обновления - возвращает тру или если записей еще не было
-func (s *School) updateTimeCheck(ctx context.Context) (bool, error) {
-	lastUpdate, err := s.rR.GetByKey(ctx, config.KeyParticipantLastUpdated)
-	if err != nil {
-		return false, fmt.Errorf("cannot get last update time, err: %v", err)
-	}
-	if lastUpdate == "" {
-		return true, nil //если последнее время еще не добавлено
-	}
-
-	lastUpdateTime, err := time.Parse(time.RFC3339, lastUpdate)
-	if err != nil {
-		return false, fmt.Errorf("cannot parse time, err: %v", err)
-	}
-
-	if time.Now().After(lastUpdateTime.AddDate(0, 1, 0)) {
-		return true, nil
-	}
-	return false, nil
 }
 
 func (s *School) uploadParticipants(ctx context.Context) error {

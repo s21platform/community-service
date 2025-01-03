@@ -6,15 +6,6 @@ import (
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
-type key string
-
-const (
-	KeyMetrics                = key("metrics")
-	KeyUUID                   = key("uuid")
-	KeyLogger                 = key("logger")
-	KeyParticipantLastUpdated = "participant_last_updated"
-)
-
 type Config struct {
 	Service  Service
 	Postgres Postgres

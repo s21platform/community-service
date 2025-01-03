@@ -15,7 +15,6 @@ type DbRepo interface {
 }
 
 type RedisRepo interface {
-	Get(ctx context.Context) (string, error)
 	GetByKey(ctx context.Context, key string) (string, error)
 	Set(ctx context.Context, key string, value string, expiration time.Duration) error
 }
