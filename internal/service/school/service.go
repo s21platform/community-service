@@ -73,12 +73,16 @@ func (s *School) setUpdateTime(ctx context.Context) error {
 	return nil
 }
 
-// если прошел месяц после последнего обновления - возвращает тру
+// если прошел месяц после последнего обновления - возвращает тру или если записей еще не было
 func (s *School) updateTimeCheck(ctx context.Context) (bool, error) {
 	lastUpdate, err := s.rR.GetByKey(ctx, config.KeyParticipantLastUpdated)
 	if err != nil {
 		return false, fmt.Errorf("cannot get last update time, err: %v", err)
 	}
+	if lastUpdate == "" {
+		return true, nil //если последнее время еще не добавлено
+	}
+
 	lastUpdateTime, err := time.Parse(time.RFC3339, lastUpdate)
 	if err != nil {
 		return false, fmt.Errorf("cannot parse time, err: %v", err)
