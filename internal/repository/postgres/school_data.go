@@ -3,7 +3,9 @@ package postgres
 import (
 	"context"
 	"fmt"
+
 	sq "github.com/Masterminds/squirrel"
+
 	"github.com/s21platform/community-service/internal/model"
 )
 

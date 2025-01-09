@@ -2,10 +2,11 @@ package rpc
 
 import (
 	"context"
+	"log"
+
 	communityproto "github.com/s21platform/community-proto/community-proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"log"
 )
 
 type Service struct {
