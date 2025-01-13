@@ -4,6 +4,9 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
+	"github.com/s21platform/community-service/internal/config"
+	logger_lib "github.com/s21platform/logger-lib"
 	"log"
 
 	communityproto "github.com/s21platform/community-proto/community-proto"
@@ -17,9 +20,13 @@ type Service struct {
 }
 
 func (s *Service) IsUserStaff(ctx context.Context, in *communityproto.LoginIn) (*communityproto.IsUserStaffOut, error) {
-	staffId, err := s.dbR.IsUserStaff(ctx, in.Login)
+	logger := logger_lib.FromContext(ctx, config.KeyLogger)
+	logger.AddFuncName("IsUserStaff")
+
+	staffId, err := s.dbR.GetStaffId(ctx, in.Login)
 	if err != nil {
 		if !errors.Is(err, sql.ErrNoRows) {
+			logger.Error(fmt.Sprintf("cannot check is user staff, err: %v", err))
 			return nil, status.Errorf(codes.Internal, "cannot check is user staff, err: %v", err)
 		}
 	}

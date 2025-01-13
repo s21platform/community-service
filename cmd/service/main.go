@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	logger_lib "github.com/s21platform/logger-lib"
 	"log"
 	"net"
 
@@ -17,6 +18,8 @@ import (
 
 func main() {
 	cfg := config.MustLoad()
+	logger := logger_lib.New(cfg.Logger.Host, cfg.Logger.Port, cfg.Service.Name, cfg.Platform.Env)
+
 	dbRepo := postgres.New(cfg)
 
 	thisService := rpc.New(dbRepo)
@@ -29,7 +32,8 @@ func main() {
 
 	s := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
-			infra.AuthInterceptor,
+			infra.Logger(logger),
+			infra.AuthInterceptor(cfg.Platform.Env),
 			infra.MetricsInterceptor(metrics),
 		),
 	)

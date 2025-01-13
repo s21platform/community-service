@@ -7,7 +7,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 )
 
-func (r *Repository) IsUserStaff(ctx context.Context, login string) (int64, error) {
+func (r *Repository) GetStaffId(ctx context.Context, login string) (int64, error) {
 	query, args, err := sq.Select("id").
 		From("staff").
 		Where(sq.Eq{"login": login}).
