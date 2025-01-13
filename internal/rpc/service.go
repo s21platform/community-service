@@ -2,6 +2,8 @@ package rpc
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"log"
 
 	communityproto "github.com/s21platform/community-proto/community-proto"
@@ -12,6 +14,21 @@ import (
 type Service struct {
 	communityproto.UnimplementedCommunityServiceServer
 	dbR DbRepo
+}
+
+func (s *Service) IsUserStaff(ctx context.Context, in *communityproto.LoginIn) (*communityproto.IsUserStaffOut, error) {
+	staffId, err := s.dbR.IsUserStaff(ctx, in.Login)
+	if err != nil {
+		if !errors.Is(err, sql.ErrNoRows) {
+			return nil, status.Errorf(codes.Internal, "cannot check is user staff, err: %v", err)
+		}
+	}
+
+	if errors.Is(err, sql.ErrNoRows) || staffId <= 0 {
+		return &communityproto.IsUserStaffOut{IsStaff: false}, nil
+	}
+
+	return &communityproto.IsUserStaffOut{IsStaff: true}, nil
 }
 
 func (s *Service) GetPeerSchoolData(ctx context.Context, in *communityproto.GetSchoolDataIn) (*communityproto.GetSchoolDataOut, error) {
