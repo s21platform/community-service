@@ -2,6 +2,10 @@ package infra
 
 import (
 	"context"
+	"database/sql"
+	"errors"
+	communityproto "github.com/s21platform/community-proto/community-proto"
+	"github.com/s21platform/community-service/internal/repository/postgres"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -11,7 +15,7 @@ import (
 	"github.com/s21platform/community-service/internal/config"
 )
 
-func AuthInterceptor(env string) func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo,
+func AuthInterceptor(env string, dbRepo postgres.Repository) func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo,
 	handler grpc.UnaryHandler) (interface{}, error) {
 	return func(
 		ctx context.Context,
@@ -19,9 +23,6 @@ func AuthInterceptor(env string) func(ctx context.Context, req interface{}, info
 		info *grpc.UnaryServerInfo,
 		handler grpc.UnaryHandler,
 	) (interface{}, error) {
-		if env == "stage" {
-			//передавать еще репозиторий сюда чтобы проверить права?
-		}
 
 		if info.FullMethod == "/CommunityService/IsPeerExist" {
 			return handler(ctx, req)
@@ -36,8 +37,20 @@ func AuthInterceptor(env string) func(ctx context.Context, req interface{}, info
 		if !ok || len(userIDs) != 1 {
 			return nil, status.Errorf(codes.Unauthenticated, "no uuid or more than one in metadata")
 		}
-
 		ctx = context.WithValue(ctx, config.KeyUUID, userIDs[0])
+
+		if env == "stage" {
+			staffId, err := dbRepo.GetStaffIdByUserUuid(ctx, userIDs[0])
+			if err != nil {
+				if !errors.Is(err, sql.ErrNoRows) {
+					return nil, status.Errorf(codes.Internal, "cannot check permission to the stage env, err: %v", err)
+				}
+			}
+
+			if errors.Is(err, sql.ErrNoRows) || staffId <= 0 {
+				return nil, status.Errorf(codes.PermissionDenied, "permission to the stage env denied")
+			}
+		}
 
 		return handler(ctx, req)
 	}

@@ -25,3 +25,12 @@ func (r *Repository) GetStaffId(ctx context.Context, login string) (int64, error
 
 	return id, nil
 }
+
+// TODO: понять как проверить является ли юзер стафом
+func (r *Repository) GetStaffIdByUserUuid(ctx context.Context, userUuid string) (int64, error) {
+	//query, args, err := sq.Select("id").
+	//	From("staff").
+	//	Join("participant on staff.login = participant.login").
+	//	Where(sq.Eq{"participant.uuid"})
+	return 0, nil
+}

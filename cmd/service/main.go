@@ -33,7 +33,7 @@ func main() {
 	s := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
 			infra.Logger(logger),
-			infra.AuthInterceptor(cfg.Platform.Env),
+			infra.AuthInterceptor(cfg.Platform.Env, *dbRepo),
 			infra.MetricsInterceptor(metrics),
 		),
 	)
