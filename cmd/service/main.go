@@ -33,7 +33,7 @@ func main() {
 	s := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
 			infra.Logger(logger),
-			infra.AuthInterceptor(cfg.Platform.Env, *dbRepo),
+			infra.AuthInterceptor,
 			infra.MetricsInterceptor(metrics),
 		),
 	)
@@ -49,5 +49,4 @@ func main() {
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("Cannnot start server. Error: %s", err)
 	}
-
 }
