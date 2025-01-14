@@ -15,6 +15,8 @@ import (
 	"github.com/s21platform/community-service/internal/rpc"
 )
 
+var env = "prod"
+
 func TestService_IsPeerExist(t *testing.T) {
 	t.Parallel()
 	ctx := context.Background()
@@ -28,7 +30,7 @@ func TestService_IsPeerExist(t *testing.T) {
 
 		mockRepo.EXPECT().GetStaffId(gomock.Any(), login).Return(true, nil)
 
-		s := rpc.New(mockRepo)
+		s := rpc.New(mockRepo, env)
 		data, err := s.IsUserStaff(ctx, &community_proto.LoginIn{Login: login})
 		assert.NoError(t, err)
 		assert.Equal(t, data, &community_proto.IsUserStaffOut{IsStaff: true})
@@ -48,7 +50,7 @@ func TestServer_GetPeerSchoolData(t *testing.T) {
 		nickName := "aboba"
 		mockRepo.EXPECT().GetPeerSchoolData(gomock.Any(), nickName).Return(expectedData, nil)
 
-		s := rpc.New(mockRepo)
+		s := rpc.New(mockRepo, env)
 		data, err := s.GetPeerSchoolData(ctx, &community_proto.GetSchoolDataIn{NickName: nickName})
 		assert.NoError(t, err)
 		assert.Equal(t, data, &community_proto.GetSchoolDataOut{ClassName: expectedData.ClassName, ParallelName: expectedData.ParallelName})
@@ -59,7 +61,7 @@ func TestServer_GetPeerSchoolData(t *testing.T) {
 		expectedErr := errors.New("select err")
 		mockRepo.EXPECT().GetPeerSchoolData(gomock.Any(), nickName).Return(model.PeerSchoolData{}, expectedErr)
 
-		s := rpc.New(mockRepo)
+		s := rpc.New(mockRepo, env)
 
 		data, err := s.GetPeerSchoolData(ctx, &community_proto.GetSchoolDataIn{NickName: nickName})
 		assert.Nil(t, data)
@@ -83,7 +85,7 @@ func TestServer_IsPeerExist(t *testing.T) {
 		email := "aboba@student.21-school.ru"
 		mockRepo.EXPECT().GetPeerStatus(gomock.Any(), email).Return(expectedStatus, nil)
 
-		s := rpc.New(mockRepo)
+		s := rpc.New(mockRepo, env)
 		isExist, err := s.IsPeerExist(ctx, &community_proto.EmailIn{Email: email})
 		assert.NoError(t, err)
 		assert.True(t, isExist.IsExist)
@@ -94,7 +96,7 @@ func TestServer_IsPeerExist(t *testing.T) {
 		email := "aboba@student.21-school.ru"
 		mockRepo.EXPECT().GetPeerStatus(gomock.Any(), email).Return(expectedStatus, nil)
 
-		s := rpc.New(mockRepo)
+		s := rpc.New(mockRepo, env)
 		isExist, err := s.IsPeerExist(ctx, &community_proto.EmailIn{Email: email})
 		assert.NoError(t, err)
 		assert.False(t, isExist.IsExist)
@@ -105,7 +107,7 @@ func TestServer_IsPeerExist(t *testing.T) {
 		expectedErr := errors.New("select err")
 		mockRepo.EXPECT().GetPeerStatus(gomock.Any(), email).Return("", expectedErr)
 
-		s := rpc.New(mockRepo)
+		s := rpc.New(mockRepo, env)
 		isExist, err := s.IsPeerExist(ctx, &community_proto.EmailIn{Email: email})
 
 		assert.Nil(t, isExist)
@@ -134,7 +136,7 @@ func TestServer_SearchPeers(t *testing.T) {
 		substring := "ab"
 		mockRepo.EXPECT().SearchPeersBySubstring(gomock.Any(), substring).Return(expectedData, nil)
 
-		s := rpc.New(mockRepo)
+		s := rpc.New(mockRepo, env)
 		data, err := s.SearchPeers(ctx, &community_proto.SearchPeersIn{Substring: substring})
 		assert.NoError(t, err)
 		assert.Equal(t, data, &community_proto.SearchPeersOut{SearchPeers: expectedData})
@@ -144,7 +146,7 @@ func TestServer_SearchPeers(t *testing.T) {
 		expectedErr := errors.New("select err")
 		substring := "ab"
 		mockRepo.EXPECT().SearchPeersBySubstring(gomock.Any(), substring).Return(nil, expectedErr)
-		s := rpc.New(mockRepo)
+		s := rpc.New(mockRepo, env)
 
 		data, err := s.SearchPeers(ctx, &community_proto.SearchPeersIn{Substring: substring})
 		assert.Nil(t, data)

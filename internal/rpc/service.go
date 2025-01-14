@@ -5,13 +5,14 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/s21platform/community-service/internal/config"
-	logger_lib "github.com/s21platform/logger-lib"
 	"log"
 
 	communityproto "github.com/s21platform/community-proto/community-proto"
+	logger_lib "github.com/s21platform/logger-lib"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	"github.com/s21platform/community-service/internal/config"
 )
 
 type Service struct {
