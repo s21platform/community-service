@@ -15,6 +15,26 @@ import (
 	"github.com/s21platform/community-service/internal/rpc"
 )
 
+func TestService_IsPeerExist(t *testing.T) {
+	t.Parallel()
+	ctx := context.Background()
+
+	controller := gomock.NewController(t)
+	defer controller.Finish()
+	mockRepo := rpc.NewMockDbRepo(controller)
+
+	t.Run("is_peer_exist_ok", func(t *testing.T) {
+		login := "staff_login"
+
+		mockRepo.EXPECT().GetStaffId(gomock.Any(), login).Return(true, nil)
+
+		s := rpc.New(mockRepo)
+		data, err := s.IsUserStaff(ctx, &community_proto.LoginIn{Login: login})
+		assert.NoError(t, err)
+		assert.Equal(t, data, &community_proto.IsUserStaffOut{IsStaff: true})
+	})
+}
+
 func TestServer_GetPeerSchoolData(t *testing.T) {
 	t.Parallel()
 	ctx := context.Background()
