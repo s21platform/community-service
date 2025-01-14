@@ -22,7 +22,7 @@ func main() {
 
 	dbRepo := postgres.New(cfg)
 
-	thisService := rpc.New(dbRepo)
+	thisService := rpc.New(dbRepo, cfg.Platform.Env)
 
 	metrics, err := pkg.NewMetrics(cfg.Metrics.Host, cfg.Metrics.Port, "community", cfg.Platform.Env)
 	if err != nil {
