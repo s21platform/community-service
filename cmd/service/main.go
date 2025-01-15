@@ -17,11 +17,13 @@ import (
 
 func main() {
 	cfg := config.MustLoad()
+	//logger := logger_lib.New(cfg.Logger.Host, cfg.Logger.Port, cfg.Service.Name, cfg.Platform.Env)
+
 	dbRepo := postgres.New(cfg)
 
-	thisService := rpc.New(dbRepo)
+	thisService := rpc.New(dbRepo, cfg.Platform.Env)
 
-	metrics, err := pkg.NewMetrics(cfg.Metrics.Host, cfg.Metrics.Port, "community", cfg.Platform.Env)
+	metrics, err := pkg.NewMetrics(cfg.Metrics.Host, cfg.Metrics.Port, cfg.Service.Name, cfg.Platform.Env)
 	if err != nil {
 		log.Fatalf("cannot init metrics, err: %v", err)
 	}
@@ -29,6 +31,7 @@ func main() {
 
 	s := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
+			//infra.Logger(logger),
 			infra.AuthInterceptor,
 			infra.MetricsInterceptor(metrics),
 		),
@@ -45,5 +48,4 @@ func main() {
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("Cannnot start server. Error: %s", err)
 	}
-
 }

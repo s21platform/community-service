@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"fmt"
+
 	sq "github.com/Masterminds/squirrel"
 )
 
