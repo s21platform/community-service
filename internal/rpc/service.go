@@ -71,7 +71,7 @@ func (s *Service) IsPeerExist(ctx context.Context, in *communityproto.EmailIn) (
 
 		if errors.Is(err, sql.ErrNoRows) || staffId <= 0 {
 			//logger.Info(fmt.Sprintf("user %s is not allowed to the stage enviroment", in.Email))
-			return nil, status.Errorf(codes.PermissionDenied, "user %s is not allowed to the stage enviroment", in.Email)
+			return nil, status.Errorf(codes.PermissionDenied, "user %s is not allowed to the stage environment", in.Email)
 		}
 	}
 
