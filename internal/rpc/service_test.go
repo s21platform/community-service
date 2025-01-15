@@ -2,6 +2,7 @@ package rpc_test
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -27,10 +28,14 @@ func TestService_IsPeerExist(t *testing.T) {
 
 	t.Run("is_peer_exist_ok", func(t *testing.T) {
 		login := "staff_login"
+		var id int64 = 1
 
-		mockRepo.EXPECT().GetStaffId(gomock.Any(), login).Return(true, nil)
+		mockRepo.EXPECT().GetStaffId(gomock.Any(), login).Return(id, nil)
 
-		s := rpc.New(mockRepo, env)
+		s := rpc.New(mockRepo, "prod")
+
+		fmt.Println(s, env)
+
 		data, err := s.IsUserStaff(ctx, &community_proto.LoginIn{Login: login})
 		assert.NoError(t, err)
 		assert.Equal(t, data, &community_proto.IsUserStaffOut{IsStaff: true})

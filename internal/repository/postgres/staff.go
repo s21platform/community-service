@@ -20,7 +20,7 @@ func (r *Repository) GetStaffId(ctx context.Context, login string) (int64, error
 	var id int64
 	err = r.conn.GetContext(ctx, &id, query, args...)
 	if err != nil {
-		return 0, fmt.Errorf("cannot get staff id, err: %v", err)
+		return 0, err
 	}
 
 	return id, nil
