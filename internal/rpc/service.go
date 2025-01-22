@@ -4,6 +4,9 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
+	"github.com/s21platform/community-service/internal/config"
+	logger_lib "github.com/s21platform/logger-lib"
 	"log"
 
 	communityproto "github.com/s21platform/community-proto/community-proto"
@@ -18,13 +21,13 @@ type Service struct {
 }
 
 func (s *Service) IsUserStaff(ctx context.Context, in *communityproto.LoginIn) (*communityproto.IsUserStaffOut, error) {
-	//logger := logger_lib.FromContext(ctx, config.KeyLogger)
-	//logger.AddFuncName("IsUserStaff")
+	logger := logger_lib.FromContext(ctx, config.KeyLogger)
+	logger.AddFuncName("IsUserStaff")
 
 	staffId, err := s.dbR.GetStaffId(ctx, in.Login)
 	if err != nil {
 		if !errors.Is(err, sql.ErrNoRows) {
-			//logger.Error(fmt.Sprintf("cannot check is user staff, err: %v", err))
+			logger.Error(fmt.Sprintf("cannot check is user staff, err: %v", err))
 			return nil, status.Errorf(codes.Internal, "cannot check is user staff, err: %v", err)
 		}
 	}
@@ -46,17 +49,17 @@ func (s *Service) GetPeerSchoolData(ctx context.Context, in *communityproto.GetS
 }
 
 func (s *Service) IsPeerExist(ctx context.Context, in *communityproto.EmailIn) (*communityproto.EmailOut, error) {
-	//logger := logger_lib.FromContext(ctx, config.KeyLogger)
-	//logger.AddFuncName("IsPeerExist")
+	logger := logger_lib.FromContext(ctx, config.KeyLogger)
+	logger.AddFuncName("IsPeerExist")
 
 	peerStatus, err := s.dbR.GetPeerStatus(ctx, in.Email)
 	if err != nil {
-		log.Printf("cannot get peer status, err: %v\n", err)
-		return nil, status.Errorf(codes.Internal, "cannot check peer error: %s", err)
+		logger.Error(fmt.Sprintf("cannot get peer status, err: %v", err))
+		return nil, status.Errorf(codes.Internal, "cannot get peer error: %v", err)
 	}
 
 	if peerStatus != "ACTIVE" {
-		log.Printf("peer status: %s\n", peerStatus)
+		logger.Info(fmt.Sprintf("peer=%s has status: %s", in.Email, peerStatus))
 		return &communityproto.EmailOut{IsExist: false}, nil
 	}
 
@@ -64,13 +67,13 @@ func (s *Service) IsPeerExist(ctx context.Context, in *communityproto.EmailIn) (
 		staffId, err := s.dbR.GetStaffId(ctx, in.Email)
 		if err != nil {
 			if !errors.Is(err, sql.ErrNoRows) {
-				//logger.Error(fmt.Sprintf("cannot check is user staff, err: %v", err))
+				logger.Error(fmt.Sprintf("cannot check is user staff, err: %v", err))
 				return nil, status.Errorf(codes.Internal, "cannot check is user staff, err: %v", err)
 			}
 		}
 
 		if errors.Is(err, sql.ErrNoRows) || staffId <= 0 {
-			//logger.Info(fmt.Sprintf("user %s is not allowed to the stage enviroment", in.Email))
+			logger.Info(fmt.Sprintf("user %s is not allowed to the stage enviroment", in.Email))
 			return nil, status.Errorf(codes.PermissionDenied, "user %s is not allowed to the stage environment", in.Email)
 		}
 	}

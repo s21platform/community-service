@@ -3,6 +3,9 @@ package rpc_test
 import (
 	"database/sql"
 	"errors"
+	"fmt"
+	"github.com/s21platform/community-service/internal/config"
+	logger_lib "github.com/s21platform/logger-lib"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -24,12 +27,17 @@ func TestService_IsUserStaff(t *testing.T) {
 
 	controller := gomock.NewController(t)
 	defer controller.Finish()
+
 	mockRepo := rpc.NewMockDbRepo(controller)
+
+	mockLogger := logger_lib.NewMockLoggerInterface(controller)
+	ctx = context.WithValue(ctx, config.KeyLogger, mockLogger)
 
 	t.Run("is_user_staff_ok", func(t *testing.T) {
 		login := "staff_login"
 		var id int64 = 1
 
+		mockLogger.EXPECT().AddFuncName("IsUserStaff")
 		mockRepo.EXPECT().GetStaffId(gomock.Any(), login).Return(id, nil)
 
 		s := rpc.New(mockRepo, env)
@@ -43,6 +51,7 @@ func TestService_IsUserStaff(t *testing.T) {
 		login := "not_staff_login"
 		var id int64 = 0
 
+		mockLogger.EXPECT().AddFuncName("IsUserStaff")
 		mockRepo.EXPECT().GetStaffId(gomock.Any(), login).Return(id, sql.ErrNoRows)
 
 		s := rpc.New(mockRepo, env)
@@ -57,6 +66,8 @@ func TestService_IsUserStaff(t *testing.T) {
 		var id int64 = 0
 		expectedErr := errors.New("select err")
 
+		mockLogger.EXPECT().AddFuncName("IsUserStaff")
+		mockLogger.EXPECT().Error(fmt.Sprintf("cannot check is user staff, err: %v", expectedErr))
 		mockRepo.EXPECT().GetStaffId(gomock.Any(), login).Return(id, expectedErr)
 
 		s := rpc.New(mockRepo, env)
@@ -113,11 +124,15 @@ func TestServer_IsPeerExist(t *testing.T) {
 	defer controller.Finish()
 	mockRepo := rpc.NewMockDbRepo(controller)
 
+	mockLogger := logger_lib.NewMockLoggerInterface(controller)
+	ctx = context.WithValue(ctx, config.KeyLogger, mockLogger)
+
 	t.Run("get_peer_status_ok", func(t *testing.T) {
 		expectedStatus := "ACTIVE"
 		email := "aboba@student.21-school.ru"
 
 		mockRepo.EXPECT().GetPeerStatus(gomock.Any(), email).Return(expectedStatus, nil)
+		mockLogger.EXPECT().AddFuncName("IsPeerExist")
 
 		s := rpc.New(mockRepo, env)
 		isExist, err := s.IsPeerExist(ctx, &community_proto.EmailIn{Email: email})
@@ -132,6 +147,7 @@ func TestServer_IsPeerExist(t *testing.T) {
 
 		mockRepo.EXPECT().GetPeerStatus(gomock.Any(), email).Return(expectedStatus, nil)
 		mockRepo.EXPECT().GetStaffId(gomock.Any(), email).Return(id, nil)
+		mockLogger.EXPECT().AddFuncName("IsPeerExist")
 
 		s := rpc.New(mockRepo, "stage")
 		isExist, err := s.IsPeerExist(ctx, &community_proto.EmailIn{Email: email})
@@ -147,6 +163,8 @@ func TestServer_IsPeerExist(t *testing.T) {
 
 		mockRepo.EXPECT().GetPeerStatus(gomock.Any(), email).Return(expectedStatus, nil)
 		mockRepo.EXPECT().GetStaffId(gomock.Any(), email).Return(id, sql.ErrNoRows)
+		mockLogger.EXPECT().AddFuncName("IsPeerExist")
+		mockLogger.EXPECT().Info(fmt.Sprintf("user %s is not allowed to the stage enviroment", email))
 
 		s := rpc.New(mockRepo, "stage")
 		isExist, err := s.IsPeerExist(ctx, &community_proto.EmailIn{Email: email})
@@ -157,10 +175,33 @@ func TestServer_IsPeerExist(t *testing.T) {
 		assert.Contains(t, st.Message(), "user aboba@student.21-school.ru is not allowed to the stage environment")
 	})
 
+	t.Run("get_peer_status_stage_err", func(t *testing.T) {
+		expectedStatus := "ACTIVE"
+		email := "aboba@student.21-school.ru"
+		var id int64 = 0
+		expectedErr := errors.New("select err")
+
+		mockRepo.EXPECT().GetPeerStatus(gomock.Any(), email).Return(expectedStatus, nil)
+		mockRepo.EXPECT().GetStaffId(gomock.Any(), email).Return(id, expectedErr)
+		mockLogger.EXPECT().AddFuncName("IsPeerExist")
+		mockLogger.EXPECT().Error(fmt.Sprintf("cannot check is user staff, err: %v", expectedErr))
+
+		s := rpc.New(mockRepo, "stage")
+		isExist, err := s.IsPeerExist(ctx, &community_proto.EmailIn{Email: email})
+		assert.Nil(t, isExist)
+		st, ok := status.FromError(err)
+		assert.True(t, ok)
+		assert.Equal(t, codes.Internal, st.Code())
+		assert.Contains(t, st.Message(), "select err")
+	})
+
 	t.Run("get_peer_status_not_found", func(t *testing.T) {
 		expectedStatus := "NOT ACTIVE"
 		email := "aboba@student.21-school.ru"
+
 		mockRepo.EXPECT().GetPeerStatus(gomock.Any(), email).Return(expectedStatus, nil)
+		mockLogger.EXPECT().AddFuncName("IsPeerExist")
+		mockLogger.EXPECT().Info(fmt.Sprintf("peer=%s has status: %s", email, expectedStatus))
 
 		s := rpc.New(mockRepo, env)
 		isExist, err := s.IsPeerExist(ctx, &community_proto.EmailIn{Email: email})
@@ -171,7 +212,10 @@ func TestServer_IsPeerExist(t *testing.T) {
 	t.Run("get_peer_status_err", func(t *testing.T) {
 		email := "aboba@student.21-school.ru"
 		expectedErr := errors.New("select err")
+
 		mockRepo.EXPECT().GetPeerStatus(gomock.Any(), email).Return("", expectedErr)
+		mockLogger.EXPECT().AddFuncName("IsPeerExist")
+		mockLogger.EXPECT().Error(fmt.Sprintf("cannot get peer status, err: %v", expectedErr))
 
 		s := rpc.New(mockRepo, env)
 		isExist, err := s.IsPeerExist(ctx, &community_proto.EmailIn{Email: email})
