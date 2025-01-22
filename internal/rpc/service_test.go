@@ -4,17 +4,17 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/s21platform/community-service/internal/config"
-	logger_lib "github.com/s21platform/logger-lib"
 	"testing"
 
 	"github.com/golang/mock/gomock"
 	community_proto "github.com/s21platform/community-proto/community-proto"
+	logger_lib "github.com/s21platform/logger-lib"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/s21platform/community-service/internal/config"
 	"github.com/s21platform/community-service/internal/model"
 	"github.com/s21platform/community-service/internal/rpc"
 )

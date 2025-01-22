@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
-	logger_lib "github.com/s21platform/logger-lib"
 	"log"
 	"net"
 
 	communityproto "github.com/s21platform/community-proto/community-proto"
+	logger_lib "github.com/s21platform/logger-lib"
 	"github.com/s21platform/metrics-lib/pkg"
 	"google.golang.org/grpc"
 
