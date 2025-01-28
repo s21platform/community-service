@@ -25,16 +25,16 @@ func (s *Service) IsUserStaff(ctx context.Context, in *communityproto.LoginIn) (
 	logger := logger_lib.FromContext(ctx, config.KeyLogger)
 	logger.AddFuncName("IsUserStaff")
 
-	staffId, err := s.dbR.GetStaffId(ctx, in.Login)
+	_, err := s.dbR.GetStaffId(ctx, in.Login)
 	if err != nil {
 		if !errors.Is(err, sql.ErrNoRows) {
 			logger.Error(fmt.Sprintf("cannot check is user staff, err: %v", err))
 			return nil, status.Errorf(codes.Internal, "cannot check is user staff, err: %v", err)
 		}
-	}
 
-	if errors.Is(err, sql.ErrNoRows) || staffId <= 0 {
-		return &communityproto.IsUserStaffOut{IsStaff: false}, nil
+		if errors.Is(err, sql.ErrNoRows) {
+			return &communityproto.IsUserStaffOut{IsStaff: false}, nil
+		}
 	}
 
 	return &communityproto.IsUserStaffOut{IsStaff: true}, nil
@@ -65,7 +65,7 @@ func (s *Service) IsPeerExist(ctx context.Context, in *communityproto.EmailIn) (
 	}
 
 	if s.env == "stage" {
-		staffId, err := s.dbR.GetStaffId(ctx, in.Email)
+		_, err := s.dbR.GetStaffId(ctx, in.Email)
 		if err != nil {
 			if !errors.Is(err, sql.ErrNoRows) {
 				logger.Error(fmt.Sprintf("cannot check is user staff, err: %v", err))
@@ -73,7 +73,7 @@ func (s *Service) IsPeerExist(ctx context.Context, in *communityproto.EmailIn) (
 			}
 		}
 
-		if errors.Is(err, sql.ErrNoRows) || staffId <= 0 {
+		if errors.Is(err, sql.ErrNoRows) {
 			logger.Info(fmt.Sprintf("user %s is not allowed to the stage enviroment", in.Email))
 			return nil, status.Errorf(codes.PermissionDenied, "user %s is not allowed to the stage environment", in.Email)
 		}
