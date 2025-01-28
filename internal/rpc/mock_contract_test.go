@@ -66,6 +66,21 @@ func (mr *MockDbRepoMockRecorder) GetPeerStatus(ctx, email interface{}) *gomock.
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPeerStatus", reflect.TypeOf((*MockDbRepo)(nil).GetPeerStatus), ctx, email)
 }
 
+// GetStaffId mocks base method.
+func (m *MockDbRepo) GetStaffId(ctx context.Context, login string) (int64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetStaffId", ctx, login)
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetStaffId indicates an expected call of GetStaffId.
+func (mr *MockDbRepoMockRecorder) GetStaffId(ctx, login interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetStaffId", reflect.TypeOf((*MockDbRepo)(nil).GetStaffId), ctx, login)
+}
+
 // SearchPeersBySubstring mocks base method.
 func (m *MockDbRepo) SearchPeersBySubstring(ctx context.Context, substring string) ([]*community_proto.SearchPeer, error) {
 	m.ctrl.T.Helper()
