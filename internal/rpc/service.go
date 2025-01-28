@@ -71,11 +71,11 @@ func (s *Service) IsPeerExist(ctx context.Context, in *communityproto.EmailIn) (
 				logger.Error(fmt.Sprintf("cannot check is user staff, err: %v", err))
 				return nil, status.Errorf(codes.Internal, "cannot check is user staff, err: %v", err)
 			}
-		}
 
-		if errors.Is(err, sql.ErrNoRows) {
-			logger.Info(fmt.Sprintf("user %s is not allowed to the stage enviroment", in.Email))
-			return nil, status.Errorf(codes.PermissionDenied, "user %s is not allowed to the stage environment", in.Email)
+			if errors.Is(err, sql.ErrNoRows) {
+				logger.Info(fmt.Sprintf("user %s is not allowed to the stage enviroment", in.Email))
+				return nil, status.Errorf(codes.PermissionDenied, "user %s is not allowed to the stage environment", in.Email)
+			}
 		}
 	}
 
