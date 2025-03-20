@@ -6,7 +6,6 @@ import (
 	"github.com/s21platform/community-service/internal/config"
 	logger_lib "github.com/s21platform/logger-lib"
 	"github.com/s21platform/metrics-lib/pkg"
-	"log"
 	"sync"
 	"time"
 )
@@ -34,18 +33,15 @@ func (w *Worker) Run(ctx context.Context, wg *sync.WaitGroup) {
 	defer ticker.Stop()
 
 	for {
-		log.Println("in for")
 		select {
 		case <-ctx.Done():
 			logger.Info("campus uploading worker shutting down")
 
 		case <-ticker.C:
-			log.Println("in ticker")
 			lastUpdate, err := w.rR.GetByKey(ctx, config.KeyCampusesLastUpdated)
 			if err != nil {
 				logger.Error(fmt.Sprintf("failed to get last update time, err: %v", err))
 			}
-			log.Println(lastUpdate)
 			if lastUpdate != "" {
 				continue
 			}
