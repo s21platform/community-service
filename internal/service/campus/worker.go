@@ -29,7 +29,7 @@ func (w *Worker) Run(ctx context.Context, wg *sync.WaitGroup) {
 	logger := logger_lib.FromContext(ctx, config.KeyLogger)
 	logger.AddFuncName("WorkerCampusRun")
 
-	ticker := time.NewTicker(time.Hour * 1)
+	ticker := time.NewTicker(time.Minute)
 	defer ticker.Stop()
 
 	for {
@@ -41,6 +41,7 @@ func (w *Worker) Run(ctx context.Context, wg *sync.WaitGroup) {
 			lastUpdate, err := w.rR.GetByKey(ctx, config.KeyCampusesLastUpdated)
 			if err != nil {
 				logger.Error(fmt.Sprintf("failed to get last update time, err: %v", err))
+				continue
 			}
 			if lastUpdate != "" {
 				continue
@@ -49,11 +50,13 @@ func (w *Worker) Run(ctx context.Context, wg *sync.WaitGroup) {
 			err = w.process(ctx)
 			if err != nil {
 				logger.Error(fmt.Sprintf("cannot upload campuses, err: %v", err))
+				continue
 			}
 
-			err = w.rR.Set(ctx, config.KeyCampusesLastUpdated, "upd", time.Hour*24*30)
+			err = w.rR.Set(ctx, config.KeyCampusesLastUpdated, "upd", time.Minute*5)
 			if err != nil {
 				logger.Error(fmt.Sprintf("failed to save campuses last updated, err: %v", err))
+				continue
 			}
 
 			logger.Info("campuses worker done")

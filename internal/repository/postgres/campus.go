@@ -2,6 +2,8 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 	"github.com/s21platform/community-service/internal/model"
 
@@ -39,6 +41,9 @@ func (r *Repository) GetCampusByUUID(ctx context.Context, campusUUID string) (*m
 
 	err = r.conn.GetContext(ctx, &campus, query, args...)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
 		return nil, fmt.Errorf("failed to get campus, err: %v", err)
 	}
 
