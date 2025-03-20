@@ -36,6 +36,7 @@ func main() {
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
 	go func() {
+		log.Println("start")
 		campusWorker.Run(ctx, wg)
 	}()
 	wg.Wait()
