@@ -3,6 +3,7 @@ package school
 import (
 	"context"
 	"fmt"
+	"github.com/s21platform/community-service/internal/model"
 	"log"
 
 	school "github.com/s21platform/school-proto/school-proto"
@@ -27,6 +28,22 @@ func (h *Handle) GetPeersByCampusUuid(ctx context.Context, campusUuid string, li
 	}
 
 	return peers.Peer, err
+}
+
+func (h *Handle) GetCampuses(ctx context.Context) ([]model.Campus, error) {
+	campuses, err := h.client.GetCampuses(ctx, &school.Empty{})
+	if err != nil {
+		return nil, fmt.Errorf("cannot get campuses: %v", err)
+	}
+	var result []model.Campus
+	for _, campus := range campuses.Campuses {
+		result = append(result, model.Campus{
+			Uuid:      campus.CampusUuid,
+			FullName:  campus.FullName,
+			ShortName: campus.ShortName,
+		})
+	}
+	return result, nil
 }
 
 func MustConnect(cfg *config.Config) *Handle {
