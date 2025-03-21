@@ -3,22 +3,22 @@ package school
 import (
 	"context"
 	"fmt"
-	"github.com/s21platform/community-service/internal/model"
 	"log"
 
-	school "github.com/s21platform/school-proto/school-proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
+	school "github.com/s21platform/school-proto/school-proto"
 	"github.com/s21platform/community-service/internal/config"
+	"github.com/s21platform/community-service/internal/model"
 )
 
-type Handle struct {
+type Client struct {
 	client school.SchoolServiceClient
 }
 
-func (h *Handle) GetPeersByCampusUuid(ctx context.Context, campusUuid string, limit, offset int64) ([]string, error) {
-	peers, err := h.client.GetPeers(ctx, &school.GetPeersIn{
+func (c *Client) GetPeersByCampusUuid(ctx context.Context, campusUuid string, limit, offset int64) ([]string, error) {
+	peers, err := c.client.GetPeers(ctx, &school.GetPeersIn{
 		CampusUuid: campusUuid,
 		Limit:      limit,
 		Offset:     offset,
@@ -30,8 +30,8 @@ func (h *Handle) GetPeersByCampusUuid(ctx context.Context, campusUuid string, li
 	return peers.Peer, err
 }
 
-func (h *Handle) GetCampuses(ctx context.Context) ([]model.Campus, error) {
-	campuses, err := h.client.GetCampuses(ctx, &school.Empty{})
+func (c *Client) GetCampuses(ctx context.Context) ([]model.Campus, error) {
+	campuses, err := c.client.GetCampuses(ctx, &school.Empty{})
 	if err != nil {
 		return nil, fmt.Errorf("cannot get campuses: %v", err)
 	}
@@ -46,11 +46,11 @@ func (h *Handle) GetCampuses(ctx context.Context) ([]model.Campus, error) {
 	return result, nil
 }
 
-func MustConnect(cfg *config.Config) *Handle {
+func MustConnect(cfg *config.Config) *Client {
 	conn, err := grpc.NewClient(fmt.Sprintf("%s:%s", cfg.School.Host, cfg.School.Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("Could not connect to school service: %v", err)
 	}
 	client := school.NewSchoolServiceClient(conn)
-	return &Handle{client: client}
+	return &Client{client: client}
 }

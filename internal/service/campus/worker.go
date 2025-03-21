@@ -3,20 +3,21 @@ package campus
 import (
 	"context"
 	"fmt"
+	"sync"
+	"time"
+
 	"github.com/s21platform/community-service/internal/config"
 	logger_lib "github.com/s21platform/logger-lib"
 	"github.com/s21platform/metrics-lib/pkg"
-	"sync"
-	"time"
 )
 
 type Worker struct {
-	sC  SchoolC
+	sC  SchoolClient
 	dbR DbRepo
 	rR  RedisRepo
 }
 
-func New(sC SchoolC, dbR DbRepo, rR RedisRepo) *Worker {
+func New(sC SchoolClient, dbR DbRepo, rR RedisRepo) *Worker {
 	return &Worker{
 		sC:  sC,
 		dbR: dbR,

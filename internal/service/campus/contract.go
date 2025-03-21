@@ -2,11 +2,12 @@ package campus
 
 import (
 	"context"
-	"github.com/s21platform/community-service/internal/model"
 	"time"
+
+	"github.com/s21platform/community-service/internal/model"
 )
 
-type SchoolC interface {
+type SchoolClient interface {
 	GetCampuses(ctx context.Context) ([]model.Campus, error)
 }
 

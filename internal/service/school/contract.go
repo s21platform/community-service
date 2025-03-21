@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-type SchoolC interface {
+type SchoolClient interface {
 	GetPeersByCampusUuid(ctx context.Context, campusUuid string, limit, offset int64) ([]string, error)
 }
 
