@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"github.com/s21platform/community-service/internal/clients/school"
+	"github.com/s21platform/community-service/internal/client/school"
 	"github.com/s21platform/community-service/internal/config"
 	"github.com/s21platform/community-service/internal/repository/postgres"
 	"github.com/s21platform/community-service/internal/repository/redis"
