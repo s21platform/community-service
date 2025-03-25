@@ -16,12 +16,12 @@ const (
 )
 
 type School struct {
-	sC  SchoolC
+	sC  SchoolClient
 	dbR DbRepo
 	rR  RedisRepo
 }
 
-func New(school SchoolC, dbR DbRepo, rR RedisRepo) *School {
+func New(school SchoolClient, dbR DbRepo, rR RedisRepo) *School {
 	return &School{
 		sC:  school,
 		dbR: dbR,
