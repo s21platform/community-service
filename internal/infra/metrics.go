@@ -21,13 +21,13 @@ func MetricsInterceptor(metrics *pkg.Metrics) func(ctx context.Context, req inte
 		interface{}, error) {
 		t := time.Now()
 		method := strings.Trim(strings.ReplaceAll(info.FullMethod, "/", "_"), "_")
-		metrics.Increment(method)
+		metrics.Increment("handler." + method)
 
 		ctx = context.WithValue(ctx, config.KeyMetrics, metrics)
 		resp, err := handler(ctx, req)
 
 		if err != nil {
-			metrics.Increment(method + "_error")
+			metrics.Increment("handler." + method + "_error")
 		}
 
 		metrics.Duration(time.Since(t).Milliseconds(), method)

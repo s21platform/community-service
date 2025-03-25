@@ -2,15 +2,15 @@ package main
 
 import (
 	"context"
-	"sync"
-
-	logger_lib "github.com/s21platform/logger-lib"
-
 	"github.com/s21platform/community-service/internal/client/school"
 	"github.com/s21platform/community-service/internal/config"
 	"github.com/s21platform/community-service/internal/repository/postgres"
 	"github.com/s21platform/community-service/internal/repository/redis"
-	service "github.com/s21platform/community-service/internal/service/school"
+	"github.com/s21platform/community-service/internal/service/campus"
+	logger_lib "github.com/s21platform/logger-lib"
+	"github.com/s21platform/metrics-lib/pkg"
+	"log"
+	"sync"
 )
 
 func main() {
@@ -22,15 +22,21 @@ func main() {
 	logger := logger_lib.New(cfg.Logger.Host, cfg.Logger.Port, cfg.Service.Name, cfg.Platform.Env)
 	ctx = context.WithValue(ctx, config.KeyLogger, logger)
 
+	metrics, err := pkg.NewMetrics(cfg.Metrics.Host, cfg.Metrics.Port, cfg.Service.Name, cfg.Platform.Env)
+	if err != nil {
+		log.Fatalf("failed to create metrics: %s", err)
+	}
+	ctx = context.WithValue(ctx, config.KeyMetrics, metrics)
+
 	schoolClient := school.MustConnect(cfg)
 	dbRepo := postgres.New(cfg)
 	redisRepo := redis.New(cfg)
-	peerWorker := service.New(schoolClient, dbRepo, redisRepo)
+	campusWorker := campus.New(schoolClient, dbRepo, redisRepo)
 
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
 	go func() {
-		peerWorker.RunPeerWorker(ctx, wg)
+		campusWorker.Run(ctx, wg)
 	}()
 	wg.Wait()
 }

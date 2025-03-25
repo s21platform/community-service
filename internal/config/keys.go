@@ -7,4 +7,5 @@ const (
 	KeyUUID                   = key("uuid")
 	KeyLogger                 = key("logger")
 	KeyParticipantLastUpdated = "participant_last_updated"
+	KeyCampusesLastUpdated    = "campuses_last_update"
 )
