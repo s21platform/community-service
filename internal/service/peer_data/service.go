@@ -43,6 +43,7 @@ func (s *School) RunPeerWorker(ctx context.Context, wg *sync.WaitGroup) {
 		case <-ctx.Done():
 			logger.Info("participant uploading worker shutting down")
 			return
+
 		case <-ticker.C:
 			lastUpdate, err := s.rR.GetByKey(ctx, config.KeyParticipantLastUpdated)
 			if err != nil {
@@ -50,7 +51,7 @@ func (s *School) RunPeerWorker(ctx context.Context, wg *sync.WaitGroup) {
 			}
 
 			if lastUpdate == "" {
-				err := s.uploadParticipants(ctx)
+				err := s.uploadParticipants(ctx) // заменить на новую функцию
 				if err != nil {
 					logger.Error(fmt.Sprintf("cannot upload participants, err: %v", err))
 				}
@@ -71,12 +72,11 @@ func (s *School) uploadParticipants(ctx context.Context) error {
 		return fmt.Errorf("cannot get campuses, err: %v", err)
 	}
 
-	var offset int64
-	for _, campus := range campuses {
-		offset = 0
+	for _, campus := range campuses {// по логинам
+		offset := int64(0)
 
 		for {
-			peerLogins, err := s.sC.GetPeersByCampusUuid(ctx, campus, peerLimit, offset)
+			peerLogins, err := s.sC.GetParticipantData(ctx, )
 			if err != nil {
 				return fmt.Errorf("cannot get peer logins from school client, err: %v", err)
 			}
@@ -84,6 +84,19 @@ func (s *School) uploadParticipants(ctx context.Context) error {
 			err = s.dbR.AddPeerLogins(ctx, peerLogins)
 			if err != nil {
 				return fmt.Errorf("cannot save peer logins, err: %v", err)
+			}
+
+			for _, login := range peerLogins {
+				participantData, err := s.sC.GetParticipantData(ctx, login)
+				if err != nil {
+					logger_lib.FromContext(ctx, config.KeyLogger).Error(fmt.Sprintf("failed to fetch participant data for %s: %v", login, err))
+					continue
+				}
+
+				err = s.dbR.SaveParticipantData(ctx, participantData)
+				if err != nil {
+					logger_lib.FromContext(ctx, config.KeyLogger).Error(fmt.Sprintf("failed to save participant data for %s: %v", login, err))
+				}
 			}
 
 			if len(peerLogins) < peerLimit {

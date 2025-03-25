@@ -6,6 +6,7 @@ import (
 	"log"
 
 	school "github.com/s21platform/school-proto/school-proto"
+	// "golang.org/x/tools/go/types/objectpath"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
@@ -29,6 +30,17 @@ func (h *Handle) GetPeersByCampusUuid(ctx context.Context, campusUuid string, li
 	return peers.Peer, err
 }
 
+func (h *Handle) GetParticipantData(ctx context.Context, peersLogin string) ( *school.GetParticipantDataOut , error) {
+	peerLogin, err := h.client.GetParticipantData(ctx, &school.GetParticipantDataIn{
+		Login: peersLogin,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("cannot get peers: %v", err)
+	}
+
+	return peerLogin, err
+}
+
 func MustConnect(cfg *config.Config) *Handle {
 	conn, err := grpc.NewClient(fmt.Sprintf("%s:%s", cfg.School.Host, cfg.School.Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
@@ -37,3 +49,4 @@ func MustConnect(cfg *config.Config) *Handle {
 	client := school.NewSchoolServiceClient(conn)
 	return &Handle{client: client}
 }
+
