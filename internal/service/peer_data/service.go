@@ -66,7 +66,7 @@ func (s *School) RunPeerWorker(ctx context.Context, wg *sync.WaitGroup) {
 	}
 }
 
-func (s *School) uploadParticipants(ctx context.Context) error {
+func (s *School) uploadInformationAboutParticipant(ctx context.Context) error {
 	campuses, err := s.dbR.GetCampusUuids(ctx)
 	if err != nil {
 		return fmt.Errorf("cannot get campuses, err: %v", err)
