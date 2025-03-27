@@ -12,9 +12,9 @@ type SchoolC interface {
 }
 
 type DbRepo interface {
-	SetParticipantData(ctx context.Context, participantData *school.GetParticipantDataOut )(error)
-	GetParticinatsLogin(ctx context.Context) ([]string, error)
-	SaveParticipantData(ctx context.Context, data *school.GetParticipantDataOut) error
+	GetParticipantData(ctx context.Context, participantData *school.GetParticipantDataOut )(*school.GetParticipantDataOut, error)
+	GetParticipantsLogin(ctx context.Context) ([]string, error)
+	SaveParticipantData(ctx context.Context, participantData *school.GetParticipantDataOut) error
 }
 
 type RedisRepo interface {

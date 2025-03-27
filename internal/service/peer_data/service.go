@@ -11,10 +11,6 @@ import (
 	"github.com/s21platform/community-service/internal/config"
 )
 
-const (
-	peerLimit = 1000
-)
-
 type School struct {
 	sC  SchoolC
 	dbR DbRepo
@@ -67,43 +63,24 @@ func (s *School) RunPeerWorker(ctx context.Context, wg *sync.WaitGroup) {
 }
 
 func (s *School) uploadDataParticipant(ctx context.Context) error {
-	logins, err := s.dbR.GetParticinatsLogin(ctx)
+	logins, err := s.dbR.GetParticipantsLogin(ctx)
 	if err != nil {
-		return fmt.Errorf("cannot get campuses, err: %v", err)
+		return fmt.Errorf("cannot get participant logins, err: %v", err)
 	}
-	
-	for _, login := range logins {// по логинам
-		offset := int64(0)
+	for _, login := range logins {
 
-		for {
-			participantData, err := s.sC.GetParticipantData(ctx, login)
-			if err != nil {
-				return fmt.Errorf("cannot get peer logins from school client, err: %v", err)
-			}
+		participantData, err := s.sC.GetParticipantData(ctx, login)
+		if err != nil {
+			logger_lib.FromContext(ctx, config.KeyLogger).Error(fmt.Sprintf("cannot get participant data for login %s, err: %v", login, err))
+			continue
+		}
 
-			err = s.dbR.SetParticipantData(ctx, participantData)
-			if err != nil {
-				return fmt.Errorf("cannot save peer logins, err: %v", err)
-			}
-
-			// for _, login := range participantData {
-			// 	participantData, err := s.sC.GetParticipantData(ctx, login)
-			// 	if err != nil {
-			// 		logger_lib.FromContext(ctx, config.KeyLogger).Error(fmt.Sprintf("failed to fetch participant data for %s: %v", login, err))
-			// 		continue
-			// 	}
-
-			// 	err = s.dbR.SaveParticipantData(ctx, participantData)
-			// 	if err != nil {
-			// 		logger_lib.FromContext(ctx, config.KeyLogger).Error(fmt.Sprintf("failed to save participant data for %s: %v", login, err))
-			// 	}
-			// }
-
-			// if len(participantData) < peerLimit {
-			// 	break
-			// }
-			offset += peerLimit
+		err = s.dbR.SaveParticipantData(ctx, participantData)
+		if err != nil {
+			logger_lib.FromContext(ctx, config.KeyLogger).Error(fmt.Sprintf("cannot save participant data for login %s, err: %v", login, err))
 		}
 	}
+
+
 	return nil
 }
