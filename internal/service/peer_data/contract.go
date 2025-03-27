@@ -8,13 +8,12 @@ import (
 )
 
 type SchoolC interface {
-	GetPeersByCampusUuid(ctx context.Context, campusUuid string, limit, offset int64) ([]string, error)
 	GetParticipantData(ctx context.Context, login string) (*school.GetParticipantDataOut, error)
 }
 
 type DbRepo interface {
-	AddPeerLogins(ctx context.Context, peerLogins []string) error
-	GetCampusUuids(ctx context.Context) ([]string, error)
+	SetParticipantData(ctx context.Context, participantData *school.GetParticipantDataOut )(error)
+	GetParticinatsLogin(ctx context.Context) ([]string, error)
 	SaveParticipantData(ctx context.Context, data *school.GetParticipantDataOut) error
 }
 

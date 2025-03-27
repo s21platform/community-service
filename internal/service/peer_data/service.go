@@ -51,7 +51,7 @@ func (s *School) RunPeerWorker(ctx context.Context, wg *sync.WaitGroup) {
 			}
 
 			if lastUpdate == "" {
-				err := s.uploadParticipants(ctx) // заменить на новую функцию
+				err := s.uploadDataParticipant(ctx) // заменить на новую функцию
 				if err != nil {
 					logger.Error(fmt.Sprintf("cannot upload participants, err: %v", err))
 				}
@@ -66,42 +66,42 @@ func (s *School) RunPeerWorker(ctx context.Context, wg *sync.WaitGroup) {
 	}
 }
 
-func (s *School) uploadInformationAboutParticipant(ctx context.Context) error {
-	campuses, err := s.dbR.GetCampusUuids(ctx)
+func (s *School) uploadDataParticipant(ctx context.Context) error {
+	logins, err := s.dbR.GetParticinatsLogin(ctx)
 	if err != nil {
 		return fmt.Errorf("cannot get campuses, err: %v", err)
 	}
-
-	for _, campus := range campuses {// по логинам
+	
+	for _, login := range logins {// по логинам
 		offset := int64(0)
 
 		for {
-			peerLogins, err := s.sC.GetParticipantData(ctx, )
+			participantData, err := s.sC.GetParticipantData(ctx, login)
 			if err != nil {
 				return fmt.Errorf("cannot get peer logins from school client, err: %v", err)
 			}
 
-			err = s.dbR.AddPeerLogins(ctx, peerLogins)
+			err = s.dbR.SetParticipantData(ctx, participantData)
 			if err != nil {
 				return fmt.Errorf("cannot save peer logins, err: %v", err)
 			}
 
-			for _, login := range peerLogins {
-				participantData, err := s.sC.GetParticipantData(ctx, login)
-				if err != nil {
-					logger_lib.FromContext(ctx, config.KeyLogger).Error(fmt.Sprintf("failed to fetch participant data for %s: %v", login, err))
-					continue
-				}
+			// for _, login := range participantData {
+			// 	participantData, err := s.sC.GetParticipantData(ctx, login)
+			// 	if err != nil {
+			// 		logger_lib.FromContext(ctx, config.KeyLogger).Error(fmt.Sprintf("failed to fetch participant data for %s: %v", login, err))
+			// 		continue
+			// 	}
 
-				err = s.dbR.SaveParticipantData(ctx, participantData)
-				if err != nil {
-					logger_lib.FromContext(ctx, config.KeyLogger).Error(fmt.Sprintf("failed to save participant data for %s: %v", login, err))
-				}
-			}
+			// 	err = s.dbR.SaveParticipantData(ctx, participantData)
+			// 	if err != nil {
+			// 		logger_lib.FromContext(ctx, config.KeyLogger).Error(fmt.Sprintf("failed to save participant data for %s: %v", login, err))
+			// 	}
+			// }
 
-			if len(peerLogins) < peerLimit {
-				break
-			}
+			// if len(participantData) < peerLimit {
+			// 	break
+			// }
 			offset += peerLimit
 		}
 	}
