@@ -75,7 +75,7 @@ func (s *School) uploadDataParticipant(ctx context.Context) error {
 			continue
 		}
 
-		err = s.dbR.SaveParticipantData(ctx, participantData)
+		err = s.dbR.SaveParticipantData(ctx, participantData, login)
 		if err != nil {
 			logger_lib.FromContext(ctx, config.KeyLogger).Error(fmt.Sprintf("cannot save participant data for login %s, err: %v", login, err))
 		}
