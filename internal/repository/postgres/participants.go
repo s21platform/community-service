@@ -4,38 +4,39 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
-
-	// "database/sql"
-	// "errors"
 	"fmt"
-	// `github.com/s21platform/community-service/internal/model`
 	sq "github.com/Masterminds/squirrel"
 	school "github.com/s21platform/school-proto/school-proto"
 )
 
-func (r *Repository) GetParticipantsLogin(ctx context.Context) ([]string, error) {
+func (r *Repository) GetParticipantsLogin(ctx context.Context, limit, offset int64) ([]string, error) {
 	var loginsParticipants []string
-	query, args, err := sq.Select("login").
+	query, args, err := sq.
+		Select("login").
 		From("participant").
+		OrderBy("id ASC").
+		Limit(uint64(limit)).
+		Offset(uint64(offset)).
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 	if err != nil {
-		return nil, fmt.Errorf("cannot configure query, err: %v", err)
+		return nil, fmt.Errorf("failed to configure query, err: %v", err)
 	}
 
 	err = r.conn.SelectContext(ctx, &loginsParticipants, query, args...)
 	if err != nil {
-		return nil, fmt.Errorf("cannot get participants' logins, err: %v", err)
+		return nil, fmt.Errorf("failed to get participants' logins, err: %v", err)
 	}
 
 	return loginsParticipants, nil
 }
 
 
+
 func (r *Repository) SetParticipantData(ctx context.Context, participantData *school.GetParticipantDataOut, login string) error {
 	tx, err := r.conn.BeginTx(ctx, &sql.TxOptions{})
 	if err != nil {
-		return fmt.Errorf("cannot start transaction: %v", err)
+		return fmt.Errorf("failed to start transaction: %v", err)
 	}
 	defer func() {
 		if err != nil {
@@ -45,12 +46,12 @@ func (r *Repository) SetParticipantData(ctx context.Context, participantData *sc
 
 	skillsJSON, err := json.Marshal(participantData.Skills)
 	if err != nil {
-		return fmt.Errorf("cannot marshal skills: %v", err)
+		return fmt.Errorf("failed to marshal skills: %v", err)
 	}
 
 	badgesJSON, err := json.Marshal(participantData.Badges)
 	if err != nil {
-		return fmt.Errorf("cannot marshal badges: %v", err)
+		return fmt.Errorf("failed to marshal badges: %v", err)
 	}
 
 	queryBase := sq.Insert("participant").
@@ -87,17 +88,17 @@ func (r *Repository) SetParticipantData(ctx context.Context, participantData *sc
 
 	query, args, err := queryBase.ToSql()
 	if err != nil {
-		return fmt.Errorf("cannot configure query: %v", err)
+		return fmt.Errorf("failed to configure query: %v", err)
 	}
 
 	_, err = tx.ExecContext(ctx, query, args...)
 	if err != nil {
-		return fmt.Errorf("cannot execute query: %v", err)
+		return fmt.Errorf("failed to execute query: %v", err)
 	}
 
 	err = tx.Commit()
 	if err != nil {
-		return fmt.Errorf("cannot commit transaction: %v", err)
+		return fmt.Errorf("failed to commit transaction: %v", err)
 	}
 
 	return nil

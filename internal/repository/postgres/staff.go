@@ -14,7 +14,7 @@ func (r *Repository) GetStaffId(ctx context.Context, login string) (int64, error
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 	if err != nil {
-		return 0, fmt.Errorf("cannot configure query, err: %v", err)
+		return 0, fmt.Errorf("failed to configure query, err: %v", err)
 	}
 
 	var id int64

@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"sync"
 	"time"
-
 	logger_lib "github.com/s21platform/logger-lib"
-
 	"github.com/s21platform/community-service/internal/config"
+)
+const (
+	limit = 1000
 )
 
 type School struct {
@@ -43,18 +44,18 @@ func (s *School) RunPeerWorker(ctx context.Context, wg *sync.WaitGroup) {
 		case <-ticker.C:
 			lastUpdate, err := s.rR.GetByKey(ctx, config.KeyParticipantLastUpdated)
 			if err != nil {
-				logger.Error(fmt.Sprintf("cannot get last update time, err: %v", err))
+				logger.Error(fmt.Sprintf("failed to get last update time, err: %v", err))
 			}
 
 			if lastUpdate == "" {
-				err := s.uploadDataParticipant(ctx) // заменить на новую функцию
+				err := s.uploadDataParticipant(ctx) 
 				if err != nil {
-					logger.Error(fmt.Sprintf("cannot upload participants, err: %v", err))
+					logger.Error(fmt.Sprintf("failed to upload participants, err: %v", err))
 				}
 
 				err = s.rR.Set(ctx, config.KeyParticipantLastUpdated, "upd", time.Hour*24*30)
 				if err != nil {
-					logger.Error(fmt.Sprintf("cannot save participant last updated, err: %v", err))
+					logger.Error(fmt.Sprintf("failed to save participant last updated, err: %v", err))
 				}
 			}
 			logger.Info("participant worker done")
@@ -63,24 +64,32 @@ func (s *School) RunPeerWorker(ctx context.Context, wg *sync.WaitGroup) {
 }
 
 func (s *School) uploadDataParticipant(ctx context.Context) error {
-	logins, err := s.dbR.GetParticipantsLogin(ctx)
-	if err != nil {
-		return fmt.Errorf("cannot get participant logins, err: %v", err)
-	}
-	for _, login := range logins {
-
-		participantData, err := s.sC.GetParticipantData(ctx, login)
+	var offset int64
+	for {
+		logins, err := s.dbR.GetParticipantsLogin(ctx, limit, offset)
 		if err != nil {
-			logger_lib.FromContext(ctx, config.KeyLogger).Error(fmt.Sprintf("cannot get participant data for login %s, err: %v", login, err))
-			continue
+			return fmt.Errorf("failed to get participant logins, err: %v", err)
 		}
+		if len(logins) == 0 {
+			break 
+		}
+		for _, login := range logins {
+			participantData, err := s.sC.GetParticipantData(ctx, login)
+			if err != nil {
+				logger_lib.FromContext(ctx, config.KeyLogger).
+					Error(fmt.Sprintf("failed to get participant data for login %s, err: %v", login, err))
+				continue
+			}
 
-		err = s.dbR.SaveParticipantData(ctx, participantData, login)
-		if err != nil {
-			logger_lib.FromContext(ctx, config.KeyLogger).Error(fmt.Sprintf("cannot save participant data for login %s, err: %v", login, err))
+			err = s.dbR.SaveParticipantData(ctx, participantData, login)
+			if err != nil {
+				logger_lib.FromContext(ctx, config.KeyLogger).
+					Error(fmt.Sprintf("failed to save participant data for login %s, err: %v", login, err))
+			}
 		}
+		offset += limit 
 	}
-
 
 	return nil
+
 }

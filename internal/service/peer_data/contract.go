@@ -13,7 +13,7 @@ type SchoolC interface {
 
 type DbRepo interface {
 	GetParticipantData(ctx context.Context, participantData *school.GetParticipantDataOut )(*school.GetParticipantDataOut, error)
-	GetParticipantsLogin(ctx context.Context) ([]string, error)
+	GetParticipantsLogin(ctx context.Context, limit, offset int64) ([]string, error)
 	SaveParticipantData(ctx context.Context, participantData *school.GetParticipantDataOut, login string) error
 }
 

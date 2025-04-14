@@ -19,11 +19,11 @@ func (r *Repository) AddPeerLogins(ctx context.Context, peerLogins []string) err
 
 	query, args, err := queryBase.ToSql()
 	if err != nil {
-		return fmt.Errorf("cannot configure query, err: %v", err)
+		return fmt.Errorf("failed to configure query, err: %v", err)
 	}
 	_, err = r.conn.ExecContext(ctx, query, args...)
 	if err != nil {
-		return fmt.Errorf("cannot execute query, err: %v", err)
+		return fmt.Errorf("failed to execute query, err: %v", err)
 	}
 
 	return nil
