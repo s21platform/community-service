@@ -38,7 +38,7 @@ func (w *Worker) RunPeerWorker(ctx context.Context, wg *sync.WaitGroup) {
 
 	metric := pkg.FromContext(ctx, config.KeyMetrics)
 
-	ticker := time.NewTicker(10 * time.Minute)
+	ticker := time.NewTicker(5 * time.Minute)
 	defer ticker.Stop()
 
 	for {
@@ -119,7 +119,7 @@ func (w *Worker) uploadLogins(ctx context.Context) error {
 			offset += peerLimit
 			counter += peerLimit
 			logger.Info(fmt.Sprintf("iteration complete: campus: %s", campus))
-			time.Sleep(3 * time.Second)
+			time.Sleep(2 * time.Second)
 		}
 		logger.Info(fmt.Sprintf("read: %d peers (for campus: %s)", counter, campus))
 	}

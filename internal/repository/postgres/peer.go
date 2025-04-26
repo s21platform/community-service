@@ -22,7 +22,7 @@ func (r *Repository) GetPeerByLogin(ctx context.Context, nickname string) (model
 		return model.Login{}, fmt.Errorf("failed to build query: %v", err)
 	}
 	var result model.Login
-	err = r.conn.GetContext(ctx, result, query, args)
+	err = r.conn.GetContext(ctx, &result, query, args)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return model.Login{}, nil
