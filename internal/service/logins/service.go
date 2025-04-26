@@ -1,4 +1,4 @@
-package service
+package logins
 
 import (
 	"context"
@@ -78,7 +78,7 @@ func (s *School) uploadParticipants(ctx context.Context) error {
 		for {
 			peerLogins, err := s.sC.GetPeersByCampusUuid(ctx, campus, peerLimit, offset)
 			if err != nil {
-				return fmt.Errorf("cannot get peer logins from school client, err: %v", err)
+				return fmt.Errorf("cannot get peer logins from logins client, err: %v", err)
 			}
 
 			err = s.dbR.AddPeerLogins(ctx, peerLogins)

@@ -9,8 +9,8 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
-	community_proto "github.com/s21platform/community-proto/community-proto"
 	model "github.com/s21platform/community-service/internal/model"
+	community "github.com/s21platform/community-service/pkg/community"
 )
 
 // MockDbRepo is a mock of DbRepo interface.
@@ -82,10 +82,10 @@ func (mr *MockDbRepoMockRecorder) GetStaffId(ctx, login interface{}) *gomock.Cal
 }
 
 // SearchPeersBySubstring mocks base method.
-func (m *MockDbRepo) SearchPeersBySubstring(ctx context.Context, substring string) ([]*community_proto.SearchPeer, error) {
+func (m *MockDbRepo) SearchPeersBySubstring(ctx context.Context, substring string) ([]*community.SearchPeer, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SearchPeersBySubstring", ctx, substring)
-	ret0, _ := ret[0].([]*community_proto.SearchPeer)
+	ret0, _ := ret[0].([]*community.SearchPeer)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

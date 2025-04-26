@@ -40,8 +40,6 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/redis/go-redis/v9 v9.7.0 h1:HhLSs+B6O021gwzl+locl0zEDnyNkxMtf/Z3NNBMa9E=
 github.com/redis/go-redis/v9 v9.7.0/go.mod h1:f6zhXITC7JUJIlPEiBOTXxJgPLdZcA93GewI7inzyWw=
-github.com/s21platform/community-proto v0.0.3 h1:AYivZ7tM0xkAfsx6nLsXUVlgOLwp+NhPiccsG+ZWxI0=
-github.com/s21platform/community-proto v0.0.3/go.mod h1:V65PB3oIWKaeUTY4USkAe5rlYz748N8K1ZCQ/Eb7lPY=
 github.com/s21platform/logger-lib v0.0.6 h1:Aa3wV7zsaUSUkLa4P8stKNKxmKpZEn9dNBsk00I7Ncw=
 github.com/s21platform/logger-lib v0.0.6/go.mod h1:KjnZvBFSCUriTW9QCp9y1LAPU4gUo3m8PmWNR3Th7MI=
 github.com/s21platform/metrics-lib v0.0.8 h1:w2AzbTcN8d9GYScUQrQL1D2bThUqRbsJTzkU8pD3APo=

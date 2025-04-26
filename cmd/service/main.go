@@ -5,7 +5,7 @@ import (
 	"log"
 	"net"
 
-	communityproto "github.com/s21platform/community-proto/community-proto"
+	"github.com/s21platform/community-service/pkg/community"
 	logger_lib "github.com/s21platform/logger-lib"
 	"github.com/s21platform/metrics-lib/pkg"
 	"google.golang.org/grpc"
@@ -37,7 +37,7 @@ func main() {
 			infra.MetricsInterceptor(metrics),
 		),
 	)
-	communityproto.RegisterCommunityServiceServer(s, thisService)
+	community.RegisterCommunityServiceServer(s, thisService)
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", cfg.Service.Port))
 	if err != nil {

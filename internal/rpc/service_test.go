@@ -1,4 +1,4 @@
-package rpc_test
+package rpc
 
 import (
 	"database/sql"
@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	community_proto "github.com/s21platform/community-proto/community-proto"
+	"github.com/s21platform/community-service/pkg/community"
 	logger_lib "github.com/s21platform/logger-lib"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/context"
@@ -16,7 +16,6 @@ import (
 
 	"github.com/s21platform/community-service/internal/config"
 	"github.com/s21platform/community-service/internal/model"
-	"github.com/s21platform/community-service/internal/rpc"
 )
 
 var env = "prod"
@@ -28,7 +27,7 @@ func TestService_IsUserStaff(t *testing.T) {
 	controller := gomock.NewController(t)
 	defer controller.Finish()
 
-	mockRepo := rpc.NewMockDbRepo(controller)
+	mockRepo := NewMockDbRepo(controller)
 
 	mockLogger := logger_lib.NewMockLoggerInterface(controller)
 	ctx = context.WithValue(ctx, config.KeyLogger, mockLogger)
@@ -40,9 +39,9 @@ func TestService_IsUserStaff(t *testing.T) {
 		mockLogger.EXPECT().AddFuncName("IsUserStaff")
 		mockRepo.EXPECT().GetStaffId(gomock.Any(), login).Return(id, nil)
 
-		s := rpc.New(mockRepo, env)
+		s := New(mockRepo, env)
 
-		data, err := s.IsUserStaff(ctx, &community_proto.LoginIn{Login: login})
+		data, err := s.IsUserStaff(ctx, &community.LoginIn{Login: login})
 		assert.NoError(t, err)
 		assert.True(t, data.IsStaff)
 	})
@@ -54,9 +53,9 @@ func TestService_IsUserStaff(t *testing.T) {
 		mockLogger.EXPECT().AddFuncName("IsUserStaff")
 		mockRepo.EXPECT().GetStaffId(gomock.Any(), login).Return(id, sql.ErrNoRows)
 
-		s := rpc.New(mockRepo, env)
+		s := New(mockRepo, env)
 
-		data, err := s.IsUserStaff(ctx, &community_proto.LoginIn{Login: login})
+		data, err := s.IsUserStaff(ctx, &community.LoginIn{Login: login})
 		assert.NoError(t, err)
 		assert.False(t, data.IsStaff)
 	})
@@ -70,9 +69,9 @@ func TestService_IsUserStaff(t *testing.T) {
 		mockLogger.EXPECT().Error(fmt.Sprintf("cannot check is user staff, err: %v", expectedErr))
 		mockRepo.EXPECT().GetStaffId(gomock.Any(), login).Return(id, expectedErr)
 
-		s := rpc.New(mockRepo, env)
+		s := New(mockRepo, env)
 
-		data, err := s.IsUserStaff(ctx, &community_proto.LoginIn{Login: login})
+		data, err := s.IsUserStaff(ctx, &community.LoginIn{Login: login})
 		assert.Nil(t, data)
 		st, ok := status.FromError(err)
 		assert.True(t, ok)
@@ -87,17 +86,17 @@ func TestServer_GetPeerSchoolData(t *testing.T) {
 
 	controller := gomock.NewController(t)
 	defer controller.Finish()
-	mockRepo := rpc.NewMockDbRepo(controller)
+	mockRepo := NewMockDbRepo(controller)
 
 	t.Run("get_peer_school_data_ok", func(t *testing.T) {
 		expectedData := model.PeerSchoolData{ClassName: "test-class", ParallelName: "test-parallel"}
 		nickName := "aboba"
 		mockRepo.EXPECT().GetPeerSchoolData(gomock.Any(), nickName).Return(expectedData, nil)
 
-		s := rpc.New(mockRepo, env)
-		data, err := s.GetPeerSchoolData(ctx, &community_proto.GetSchoolDataIn{NickName: nickName})
+		s := New(mockRepo, env)
+		data, err := s.GetPeerSchoolData(ctx, &community.GetSchoolDataIn{NickName: nickName})
 		assert.NoError(t, err)
-		assert.Equal(t, data, &community_proto.GetSchoolDataOut{ClassName: expectedData.ClassName, ParallelName: expectedData.ParallelName})
+		assert.Equal(t, data, &community.GetSchoolDataOut{ClassName: expectedData.ClassName, ParallelName: expectedData.ParallelName})
 	})
 
 	t.Run("get_peer_school_data_err", func(t *testing.T) {
@@ -105,9 +104,9 @@ func TestServer_GetPeerSchoolData(t *testing.T) {
 		expectedErr := errors.New("select err")
 		mockRepo.EXPECT().GetPeerSchoolData(gomock.Any(), nickName).Return(model.PeerSchoolData{}, expectedErr)
 
-		s := rpc.New(mockRepo, env)
+		s := New(mockRepo, env)
 
-		data, err := s.GetPeerSchoolData(ctx, &community_proto.GetSchoolDataIn{NickName: nickName})
+		data, err := s.GetPeerSchoolData(ctx, &community.GetSchoolDataIn{NickName: nickName})
 		assert.Nil(t, data)
 		st, ok := status.FromError(err)
 		assert.True(t, ok)
@@ -122,7 +121,7 @@ func TestServer_IsPeerExist(t *testing.T) {
 
 	controller := gomock.NewController(t)
 	defer controller.Finish()
-	mockRepo := rpc.NewMockDbRepo(controller)
+	mockRepo := NewMockDbRepo(controller)
 
 	mockLogger := logger_lib.NewMockLoggerInterface(controller)
 	ctx = context.WithValue(ctx, config.KeyLogger, mockLogger)
@@ -134,8 +133,8 @@ func TestServer_IsPeerExist(t *testing.T) {
 		mockRepo.EXPECT().GetPeerStatus(gomock.Any(), email).Return(expectedStatus, nil)
 		mockLogger.EXPECT().AddFuncName("IsPeerExist")
 
-		s := rpc.New(mockRepo, env)
-		isExist, err := s.IsPeerExist(ctx, &community_proto.EmailIn{Email: email})
+		s := New(mockRepo, env)
+		isExist, err := s.IsPeerExist(ctx, &community.EmailIn{Email: email})
 		assert.NoError(t, err)
 		assert.True(t, isExist.IsExist)
 	})
@@ -149,8 +148,8 @@ func TestServer_IsPeerExist(t *testing.T) {
 		mockRepo.EXPECT().GetStaffId(gomock.Any(), email).Return(id, nil)
 		mockLogger.EXPECT().AddFuncName("IsPeerExist")
 
-		s := rpc.New(mockRepo, "stage")
-		isExist, err := s.IsPeerExist(ctx, &community_proto.EmailIn{Email: email})
+		s := New(mockRepo, "stage")
+		isExist, err := s.IsPeerExist(ctx, &community.EmailIn{Email: email})
 		assert.NoError(t, err)
 		assert.True(t, isExist.IsExist)
 	})
@@ -166,8 +165,8 @@ func TestServer_IsPeerExist(t *testing.T) {
 		mockLogger.EXPECT().AddFuncName("IsPeerExist")
 		mockLogger.EXPECT().Info(fmt.Sprintf("user %s is not allowed to the stage enviroment", email))
 
-		s := rpc.New(mockRepo, "stage")
-		isExist, err := s.IsPeerExist(ctx, &community_proto.EmailIn{Email: email})
+		s := New(mockRepo, "stage")
+		isExist, err := s.IsPeerExist(ctx, &community.EmailIn{Email: email})
 		assert.Nil(t, isExist)
 		st, ok := status.FromError(err)
 		assert.True(t, ok)
@@ -186,8 +185,8 @@ func TestServer_IsPeerExist(t *testing.T) {
 		mockLogger.EXPECT().AddFuncName("IsPeerExist")
 		mockLogger.EXPECT().Error(fmt.Sprintf("cannot check is user staff, err: %v", expectedErr))
 
-		s := rpc.New(mockRepo, "stage")
-		isExist, err := s.IsPeerExist(ctx, &community_proto.EmailIn{Email: email})
+		s := New(mockRepo, "stage")
+		isExist, err := s.IsPeerExist(ctx, &community.EmailIn{Email: email})
 		assert.Nil(t, isExist)
 		st, ok := status.FromError(err)
 		assert.True(t, ok)
@@ -203,8 +202,8 @@ func TestServer_IsPeerExist(t *testing.T) {
 		mockLogger.EXPECT().AddFuncName("IsPeerExist")
 		mockLogger.EXPECT().Info(fmt.Sprintf("peer=%s has status: %s", email, expectedStatus))
 
-		s := rpc.New(mockRepo, env)
-		isExist, err := s.IsPeerExist(ctx, &community_proto.EmailIn{Email: email})
+		s := New(mockRepo, env)
+		isExist, err := s.IsPeerExist(ctx, &community.EmailIn{Email: email})
 		assert.NoError(t, err)
 		assert.False(t, isExist.IsExist)
 	})
@@ -217,8 +216,8 @@ func TestServer_IsPeerExist(t *testing.T) {
 		mockLogger.EXPECT().AddFuncName("IsPeerExist")
 		mockLogger.EXPECT().Error(fmt.Sprintf("cannot get peer status, err: %v", expectedErr))
 
-		s := rpc.New(mockRepo, env)
-		isExist, err := s.IsPeerExist(ctx, &community_proto.EmailIn{Email: email})
+		s := New(mockRepo, env)
+		isExist, err := s.IsPeerExist(ctx, &community.EmailIn{Email: email})
 
 		assert.Nil(t, isExist)
 		st, ok := status.FromError(err)
@@ -235,10 +234,10 @@ func TestServer_SearchPeers(t *testing.T) {
 
 	controller := gomock.NewController(t)
 	defer controller.Finish()
-	mockRepo := rpc.NewMockDbRepo(controller)
+	mockRepo := NewMockDbRepo(controller)
 
 	t.Run("search_peers_ok", func(t *testing.T) {
-		expectedData := []*community_proto.SearchPeer{
+		expectedData := []*community.SearchPeer{
 			{Login: "aboba"},
 			{Login: "abobaoba"},
 			{Login: "aboo"},
@@ -246,19 +245,19 @@ func TestServer_SearchPeers(t *testing.T) {
 		substring := "ab"
 		mockRepo.EXPECT().SearchPeersBySubstring(gomock.Any(), substring).Return(expectedData, nil)
 
-		s := rpc.New(mockRepo, env)
-		data, err := s.SearchPeers(ctx, &community_proto.SearchPeersIn{Substring: substring})
+		s := New(mockRepo, env)
+		data, err := s.SearchPeers(ctx, &community.SearchPeersIn{Substring: substring})
 		assert.NoError(t, err)
-		assert.Equal(t, data, &community_proto.SearchPeersOut{SearchPeers: expectedData})
+		assert.Equal(t, data, &community.SearchPeersOut{SearchPeers: expectedData})
 	})
 
 	t.Run("search_peers_err", func(t *testing.T) {
 		expectedErr := errors.New("select err")
 		substring := "ab"
 		mockRepo.EXPECT().SearchPeersBySubstring(gomock.Any(), substring).Return(nil, expectedErr)
-		s := rpc.New(mockRepo, env)
+		s := New(mockRepo, env)
 
-		data, err := s.SearchPeers(ctx, &community_proto.SearchPeersIn{Substring: substring})
+		data, err := s.SearchPeers(ctx, &community.SearchPeersIn{Substring: substring})
 		assert.Nil(t, data)
 		st, ok := status.FromError(err)
 		assert.True(t, ok)

@@ -10,7 +10,7 @@ import (
 	"github.com/s21platform/community-service/internal/config"
 	"github.com/s21platform/community-service/internal/repository/postgres"
 	"github.com/s21platform/community-service/internal/repository/redis"
-	service "github.com/s21platform/community-service/internal/service/school"
+	"github.com/s21platform/community-service/internal/service/logins"
 )
 
 func main() {
@@ -25,7 +25,7 @@ func main() {
 	schoolClient := school.MustConnect(cfg)
 	dbRepo := postgres.New(cfg)
 	redisRepo := redis.New(cfg)
-	peerWorker := service.New(schoolClient, dbRepo, redisRepo)
+	peerWorker := logins.New(schoolClient, dbRepo, redisRepo)
 
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
