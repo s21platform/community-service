@@ -3,6 +3,8 @@ package logins
 import (
 	"context"
 	"time"
+
+	"github.com/s21platform/community-service/internal/model"
 )
 
 type SchoolClient interface {
@@ -10,7 +12,8 @@ type SchoolClient interface {
 }
 
 type DbRepo interface {
-	AddPeerLogins(ctx context.Context, peerLogins []string) error
+	GetPeerByLogin(ctx context.Context, nickname string) (model.Login, error)
+	SetNickname(ctx context.Context, nickname string) error
 	GetCampusUuids(ctx context.Context) ([]string, error)
 }
 

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	logger_lib "github.com/s21platform/logger-lib"
+	"github.com/s21platform/metrics-lib/pkg"
 
 	"github.com/s21platform/community-service/internal/config"
 )
@@ -35,6 +36,8 @@ func (w *Worker) RunPeerWorker(ctx context.Context, wg *sync.WaitGroup) {
 	logger := logger_lib.FromContext(ctx, config.KeyLogger)
 	logger.AddFuncName("RunPeerWorker")
 
+	metric := pkg.FromContext(ctx, config.KeyMetrics)
+
 	ticker := time.NewTicker(10 * time.Minute)
 	defer ticker.Stop()
 
@@ -51,10 +54,12 @@ func (w *Worker) RunPeerWorker(ctx context.Context, wg *sync.WaitGroup) {
 
 			if lastUpdate == "" {
 				logger.Info(fmt.Sprintf("Update Logins is start at %s", time.Now().Format(time.RFC3339)))
+				start := time.Now()
 				err := w.uploadLogins(ctx)
 				if err != nil {
 					logger.Error(fmt.Sprintf("cannot upload participants, err: %v", err))
 				}
+				metric.Duration(time.Since(start).Milliseconds(), "upload_peers.duration.worker")
 
 				err = w.rR.Set(ctx, config.KeyLoginsLastUpdated, time.Now().Add(time.Hour*24*30).Format(time.RFC3339), time.Hour*24*30)
 				if err != nil {
@@ -68,7 +73,8 @@ func (w *Worker) RunPeerWorker(ctx context.Context, wg *sync.WaitGroup) {
 
 func (w *Worker) uploadLogins(ctx context.Context) error {
 	logger := logger_lib.FromContext(ctx, config.KeyLogger)
-	logger.AddFuncName("uploadLogins")
+	metric := pkg.FromContext(ctx, config.KeyMetrics)
+
 	campuses, err := w.dbR.GetCampusUuids(ctx)
 	if err != nil {
 		return fmt.Errorf("cannot get campuses, err: %v", err)
@@ -82,12 +88,28 @@ func (w *Worker) uploadLogins(ctx context.Context) error {
 		for {
 			peerLogins, err := w.sC.GetPeersByCampusUuid(ctx, campus, peerLimit, offset)
 			if err != nil {
-				return fmt.Errorf("cannot get peer logins from school client, err: %v", err)
+				logger.Error(fmt.Sprintf("failed to get chank of peer logins from school client - skip: %v", err))
+				continue
 			}
 
-			err = w.dbR.AddPeerLogins(ctx, peerLogins)
-			if err != nil {
-				return fmt.Errorf("cannot save peer logins, err: %v", err)
+			for _, nickname := range peerLogins {
+				login, err := w.dbR.GetPeerByLogin(ctx, nickname)
+				if err != nil {
+					metric.Increment("upload_peers.error")
+					logger.Error(fmt.Sprintf("failed to get nickname from login table: %v", err))
+					continue
+				}
+				if login.Nickname == "" {
+					err = w.dbR.SetNickname(ctx, nickname)
+					if err != nil {
+						metric.Increment("upload_peers.error")
+						logger.Error(fmt.Sprintf("failed to save peer nickname: %v", err))
+						continue
+					}
+					metric.Increment("upload_peers.new")
+					continue
+				}
+				metric.Increment("upload_peers.already_exist")
 			}
 
 			if len(peerLogins) < peerLimit {
@@ -97,7 +119,7 @@ func (w *Worker) uploadLogins(ctx context.Context) error {
 			offset += peerLimit
 			counter += peerLimit
 			logger.Info(fmt.Sprintf("iteration complete: campus: %s", campus))
-			time.Sleep(5 * time.Second)
+			time.Sleep(3 * time.Second)
 		}
 		logger.Info(fmt.Sprintf("read: %d peers (for campus: %s)", counter, campus))
 	}
