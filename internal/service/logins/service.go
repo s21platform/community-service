@@ -35,7 +35,7 @@ func (w *Worker) RunPeerWorker(ctx context.Context, wg *sync.WaitGroup) {
 	logger := logger_lib.FromContext(ctx, config.KeyLogger)
 	logger.AddFuncName("RunPeerWorker")
 
-	ticker := time.NewTicker(time.Hour)
+	ticker := time.NewTicker(5 * time.Minute)
 	defer ticker.Stop()
 
 	for {
@@ -50,6 +50,7 @@ func (w *Worker) RunPeerWorker(ctx context.Context, wg *sync.WaitGroup) {
 			}
 
 			if lastUpdate == "" {
+				logger.Info(fmt.Sprintf("Update Logins is start at %s", time.Now().Format(time.RFC3339)))
 				err := w.UploadParticipants(ctx)
 				if err != nil {
 					logger.Error(fmt.Sprintf("cannot upload participants, err: %v", err))
