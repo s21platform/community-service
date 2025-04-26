@@ -95,3 +95,38 @@ func (mr *MockDbRepoMockRecorder) SearchPeersBySubstring(ctx, substring interfac
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SearchPeersBySubstring", reflect.TypeOf((*MockDbRepo)(nil).SearchPeersBySubstring), ctx, substring)
 }
+
+// MockRedisRepo is a mock of RedisRepo interface.
+type MockRedisRepo struct {
+	ctrl     *gomock.Controller
+	recorder *MockRedisRepoMockRecorder
+}
+
+// MockRedisRepoMockRecorder is the mock recorder for MockRedisRepo.
+type MockRedisRepoMockRecorder struct {
+	mock *MockRedisRepo
+}
+
+// NewMockRedisRepo creates a new mock instance.
+func NewMockRedisRepo(ctrl *gomock.Controller) *MockRedisRepo {
+	mock := &MockRedisRepo{ctrl: ctrl}
+	mock.recorder = &MockRedisRepoMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockRedisRepo) EXPECT() *MockRedisRepoMockRecorder {
+	return m.recorder
+}
+
+// Delete mocks base method.
+func (m *MockRedisRepo) Delete(ctx context.Context, key string) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "Delete", ctx, key)
+}
+
+// Delete indicates an expected call of Delete.
+func (mr *MockRedisRepoMockRecorder) Delete(ctx, key interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockRedisRepo)(nil).Delete), ctx, key)
+}

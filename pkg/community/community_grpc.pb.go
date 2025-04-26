@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -19,10 +20,11 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	CommunityService_IsPeerExist_FullMethodName       = "/CommunityService/IsPeerExist"
-	CommunityService_SearchPeers_FullMethodName       = "/CommunityService/SearchPeers"
-	CommunityService_GetPeerSchoolData_FullMethodName = "/CommunityService/GetPeerSchoolData"
-	CommunityService_IsUserStaff_FullMethodName       = "/CommunityService/isUserStaff"
+	CommunityService_IsPeerExist_FullMethodName             = "/CommunityService/IsPeerExist"
+	CommunityService_SearchPeers_FullMethodName             = "/CommunityService/SearchPeers"
+	CommunityService_GetPeerSchoolData_FullMethodName       = "/CommunityService/GetPeerSchoolData"
+	CommunityService_IsUserStaff_FullMethodName             = "/CommunityService/isUserStaff"
+	CommunityService_RunLoginsWorkerManually_FullMethodName = "/CommunityService/RunLoginsWorkerManually"
 )
 
 // CommunityServiceClient is the client API for CommunityService service.
@@ -36,6 +38,7 @@ type CommunityServiceClient interface {
 	SearchPeers(ctx context.Context, in *SearchPeersIn, opts ...grpc.CallOption) (*SearchPeersOut, error)
 	GetPeerSchoolData(ctx context.Context, in *GetSchoolDataIn, opts ...grpc.CallOption) (*GetSchoolDataOut, error)
 	IsUserStaff(ctx context.Context, in *LoginIn, opts ...grpc.CallOption) (*IsUserStaffOut, error)
+	RunLoginsWorkerManually(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type communityServiceClient struct {
@@ -86,6 +89,16 @@ func (c *communityServiceClient) IsUserStaff(ctx context.Context, in *LoginIn, o
 	return out, nil
 }
 
+func (c *communityServiceClient) RunLoginsWorkerManually(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, CommunityService_RunLoginsWorkerManually_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CommunityServiceServer is the server API for CommunityService service.
 // All implementations must embed UnimplementedCommunityServiceServer
 // for forward compatibility.
@@ -97,6 +110,7 @@ type CommunityServiceServer interface {
 	SearchPeers(context.Context, *SearchPeersIn) (*SearchPeersOut, error)
 	GetPeerSchoolData(context.Context, *GetSchoolDataIn) (*GetSchoolDataOut, error)
 	IsUserStaff(context.Context, *LoginIn) (*IsUserStaffOut, error)
+	RunLoginsWorkerManually(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
 	mustEmbedUnimplementedCommunityServiceServer()
 }
 
@@ -118,6 +132,9 @@ func (UnimplementedCommunityServiceServer) GetPeerSchoolData(context.Context, *G
 }
 func (UnimplementedCommunityServiceServer) IsUserStaff(context.Context, *LoginIn) (*IsUserStaffOut, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method IsUserStaff not implemented")
+}
+func (UnimplementedCommunityServiceServer) RunLoginsWorkerManually(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RunLoginsWorkerManually not implemented")
 }
 func (UnimplementedCommunityServiceServer) mustEmbedUnimplementedCommunityServiceServer() {}
 func (UnimplementedCommunityServiceServer) testEmbeddedByValue()                          {}
@@ -212,6 +229,24 @@ func _CommunityService_IsUserStaff_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CommunityService_RunLoginsWorkerManually_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CommunityServiceServer).RunLoginsWorkerManually(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CommunityService_RunLoginsWorkerManually_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CommunityServiceServer).RunLoginsWorkerManually(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CommunityService_ServiceDesc is the grpc.ServiceDesc for CommunityService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -234,6 +269,10 @@ var CommunityService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "isUserStaff",
 			Handler:    _CommunityService_IsUserStaff_Handler,
+		},
+		{
+			MethodName: "RunLoginsWorkerManually",
+			Handler:    _CommunityService_RunLoginsWorkerManually_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

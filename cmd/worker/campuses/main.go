@@ -2,15 +2,17 @@ package main
 
 import (
 	"context"
+	"log"
+	"sync"
+
+	logger_lib "github.com/s21platform/logger-lib"
+	"github.com/s21platform/metrics-lib/pkg"
+
 	"github.com/s21platform/community-service/internal/client/school"
 	"github.com/s21platform/community-service/internal/config"
 	"github.com/s21platform/community-service/internal/repository/postgres"
 	"github.com/s21platform/community-service/internal/repository/redis"
 	"github.com/s21platform/community-service/internal/service/campus"
-	logger_lib "github.com/s21platform/logger-lib"
-	"github.com/s21platform/metrics-lib/pkg"
-	"log"
-	"sync"
 )
 
 func main() {

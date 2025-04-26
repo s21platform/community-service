@@ -2,6 +2,8 @@ syntax = "proto3";
 
 option go_package = "pkg/community";
 
+import  "google/protobuf/empty.proto";
+
 // Service with peers' info from edu platform
 service CommunityService {
   // Method for checking that the user is a school 21's student
@@ -9,6 +11,7 @@ service CommunityService {
   rpc SearchPeers (SearchPeersIn) returns (SearchPeersOut){};
   rpc GetPeerSchoolData(GetSchoolDataIn) returns (GetSchoolDataOut){};
   rpc isUserStaff(LoginIn) returns (IsUserStaffOut){};
+  rpc RunLoginsWorkerManually(google.protobuf.Empty) returns (google.protobuf.Empty){};
 }
 
 message IsUserStaffOut {

@@ -39,7 +39,7 @@ func TestService_IsUserStaff(t *testing.T) {
 		mockLogger.EXPECT().AddFuncName("IsUserStaff")
 		mockRepo.EXPECT().GetStaffId(gomock.Any(), login).Return(id, nil)
 
-		s := New(mockRepo, env)
+		s := New(mockRepo, env, nil)
 
 		data, err := s.IsUserStaff(ctx, &community.LoginIn{Login: login})
 		assert.NoError(t, err)
@@ -53,7 +53,7 @@ func TestService_IsUserStaff(t *testing.T) {
 		mockLogger.EXPECT().AddFuncName("IsUserStaff")
 		mockRepo.EXPECT().GetStaffId(gomock.Any(), login).Return(id, sql.ErrNoRows)
 
-		s := New(mockRepo, env)
+		s := New(mockRepo, env, nil)
 
 		data, err := s.IsUserStaff(ctx, &community.LoginIn{Login: login})
 		assert.NoError(t, err)
@@ -69,7 +69,7 @@ func TestService_IsUserStaff(t *testing.T) {
 		mockLogger.EXPECT().Error(fmt.Sprintf("cannot check is user staff, err: %v", expectedErr))
 		mockRepo.EXPECT().GetStaffId(gomock.Any(), login).Return(id, expectedErr)
 
-		s := New(mockRepo, env)
+		s := New(mockRepo, env, nil)
 
 		data, err := s.IsUserStaff(ctx, &community.LoginIn{Login: login})
 		assert.Nil(t, data)
@@ -93,7 +93,7 @@ func TestServer_GetPeerSchoolData(t *testing.T) {
 		nickName := "aboba"
 		mockRepo.EXPECT().GetPeerSchoolData(gomock.Any(), nickName).Return(expectedData, nil)
 
-		s := New(mockRepo, env)
+		s := New(mockRepo, env, nil)
 		data, err := s.GetPeerSchoolData(ctx, &community.GetSchoolDataIn{NickName: nickName})
 		assert.NoError(t, err)
 		assert.Equal(t, data, &community.GetSchoolDataOut{ClassName: expectedData.ClassName, ParallelName: expectedData.ParallelName})
@@ -104,7 +104,7 @@ func TestServer_GetPeerSchoolData(t *testing.T) {
 		expectedErr := errors.New("select err")
 		mockRepo.EXPECT().GetPeerSchoolData(gomock.Any(), nickName).Return(model.PeerSchoolData{}, expectedErr)
 
-		s := New(mockRepo, env)
+		s := New(mockRepo, env, nil)
 
 		data, err := s.GetPeerSchoolData(ctx, &community.GetSchoolDataIn{NickName: nickName})
 		assert.Nil(t, data)
@@ -133,7 +133,7 @@ func TestServer_IsPeerExist(t *testing.T) {
 		mockRepo.EXPECT().GetPeerStatus(gomock.Any(), email).Return(expectedStatus, nil)
 		mockLogger.EXPECT().AddFuncName("IsPeerExist")
 
-		s := New(mockRepo, env)
+		s := New(mockRepo, env, nil)
 		isExist, err := s.IsPeerExist(ctx, &community.EmailIn{Email: email})
 		assert.NoError(t, err)
 		assert.True(t, isExist.IsExist)
@@ -148,13 +148,13 @@ func TestServer_IsPeerExist(t *testing.T) {
 		mockRepo.EXPECT().GetStaffId(gomock.Any(), email).Return(id, nil)
 		mockLogger.EXPECT().AddFuncName("IsPeerExist")
 
-		s := New(mockRepo, "stage")
+		s := New(mockRepo, "stage", nil)
 		isExist, err := s.IsPeerExist(ctx, &community.EmailIn{Email: email})
 		assert.NoError(t, err)
 		assert.True(t, isExist.IsExist)
 	})
 
-	// user has no permission to stage env
+	// user has no permission to stage cfg
 	t.Run("get_peer_status_no_permission_to_stage", func(t *testing.T) {
 		expectedStatus := "ACTIVE"
 		email := "aboba@student.21-school.ru"
@@ -165,7 +165,7 @@ func TestServer_IsPeerExist(t *testing.T) {
 		mockLogger.EXPECT().AddFuncName("IsPeerExist")
 		mockLogger.EXPECT().Info(fmt.Sprintf("user %s is not allowed to the stage enviroment", email))
 
-		s := New(mockRepo, "stage")
+		s := New(mockRepo, "stage", nil)
 		isExist, err := s.IsPeerExist(ctx, &community.EmailIn{Email: email})
 		assert.Nil(t, isExist)
 		st, ok := status.FromError(err)
@@ -185,7 +185,7 @@ func TestServer_IsPeerExist(t *testing.T) {
 		mockLogger.EXPECT().AddFuncName("IsPeerExist")
 		mockLogger.EXPECT().Error(fmt.Sprintf("cannot check is user staff, err: %v", expectedErr))
 
-		s := New(mockRepo, "stage")
+		s := New(mockRepo, "stage", nil)
 		isExist, err := s.IsPeerExist(ctx, &community.EmailIn{Email: email})
 		assert.Nil(t, isExist)
 		st, ok := status.FromError(err)
@@ -202,7 +202,7 @@ func TestServer_IsPeerExist(t *testing.T) {
 		mockLogger.EXPECT().AddFuncName("IsPeerExist")
 		mockLogger.EXPECT().Info(fmt.Sprintf("peer=%s has status: %s", email, expectedStatus))
 
-		s := New(mockRepo, env)
+		s := New(mockRepo, env, nil)
 		isExist, err := s.IsPeerExist(ctx, &community.EmailIn{Email: email})
 		assert.NoError(t, err)
 		assert.False(t, isExist.IsExist)
@@ -216,7 +216,7 @@ func TestServer_IsPeerExist(t *testing.T) {
 		mockLogger.EXPECT().AddFuncName("IsPeerExist")
 		mockLogger.EXPECT().Error(fmt.Sprintf("cannot get peer status, err: %v", expectedErr))
 
-		s := New(mockRepo, env)
+		s := New(mockRepo, env, nil)
 		isExist, err := s.IsPeerExist(ctx, &community.EmailIn{Email: email})
 
 		assert.Nil(t, isExist)
@@ -245,7 +245,7 @@ func TestServer_SearchPeers(t *testing.T) {
 		substring := "ab"
 		mockRepo.EXPECT().SearchPeersBySubstring(gomock.Any(), substring).Return(expectedData, nil)
 
-		s := New(mockRepo, env)
+		s := New(mockRepo, env, nil)
 		data, err := s.SearchPeers(ctx, &community.SearchPeersIn{Substring: substring})
 		assert.NoError(t, err)
 		assert.Equal(t, data, &community.SearchPeersOut{SearchPeers: expectedData})
@@ -255,7 +255,7 @@ func TestServer_SearchPeers(t *testing.T) {
 		expectedErr := errors.New("select err")
 		substring := "ab"
 		mockRepo.EXPECT().SearchPeersBySubstring(gomock.Any(), substring).Return(nil, expectedErr)
-		s := New(mockRepo, env)
+		s := New(mockRepo, env, nil)
 
 		data, err := s.SearchPeers(ctx, &community.SearchPeersIn{Substring: substring})
 		assert.Nil(t, data)

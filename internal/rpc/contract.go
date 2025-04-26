@@ -15,3 +15,7 @@ type DbRepo interface {
 	GetPeerSchoolData(ctx context.Context, nickName string) (model.PeerSchoolData, error)
 	GetStaffId(ctx context.Context, login string) (int64, error)
 }
+
+type RedisRepo interface {
+	Delete(ctx context.Context, key string)
+}

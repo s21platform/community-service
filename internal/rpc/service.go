@@ -10,6 +10,7 @@ import (
 	logger_lib "github.com/s21platform/logger-lib"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
 
 	"github.com/s21platform/community-service/internal/config"
 	"github.com/s21platform/community-service/pkg/community"
@@ -19,6 +20,15 @@ type Service struct {
 	community.UnimplementedCommunityServiceServer
 	dbR DbRepo
 	env string
+	rR  RedisRepo
+}
+
+func New(dbR DbRepo, env string, rR RedisRepo) *Service {
+	return &Service{
+		dbR: dbR,
+		env: env,
+		rR:  rR,
+	}
 }
 
 func (s *Service) IsUserStaff(ctx context.Context, in *community.LoginIn) (*community.IsUserStaffOut, error) {
@@ -91,9 +101,7 @@ func (s *Service) SearchPeers(ctx context.Context, in *community.SearchPeersIn) 
 	return &community.SearchPeersOut{SearchPeers: res}, nil
 }
 
-func New(dbR DbRepo, env string) *Service {
-	return &Service{
-		dbR: dbR,
-		env: env,
-	}
+func (s *Service) RunLoginsWorkerManually(ctx context.Context, _ *emptypb.Empty) (*emptypb.Empty, error) {
+	s.rR.Delete(ctx, config.KeyLoginsLastUpdated)
+	return &emptypb.Empty{}, nil
 }

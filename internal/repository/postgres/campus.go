@@ -5,9 +5,10 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/s21platform/community-service/internal/model"
 
 	sq "github.com/Masterminds/squirrel"
+
+	"github.com/s21platform/community-service/internal/model"
 )
 
 func (r *Repository) GetCampusUuids(ctx context.Context) ([]string, error) {
