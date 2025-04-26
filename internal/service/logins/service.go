@@ -51,7 +51,7 @@ func (w *Worker) RunPeerWorker(ctx context.Context, wg *sync.WaitGroup) {
 
 			if lastUpdate == "" {
 				logger.Info(fmt.Sprintf("Update Logins is start at %s", time.Now().Format(time.RFC3339)))
-				err := w.UploadParticipants(ctx)
+				err := w.uploadLogins(ctx)
 				if err != nil {
 					logger.Error(fmt.Sprintf("cannot upload participants, err: %v", err))
 				}
@@ -66,7 +66,9 @@ func (w *Worker) RunPeerWorker(ctx context.Context, wg *sync.WaitGroup) {
 	}
 }
 
-func (w *Worker) UploadParticipants(ctx context.Context) error {
+func (w *Worker) uploadLogins(ctx context.Context) error {
+	logger := logger_lib.FromContext(ctx, config.KeyLogger)
+	logger.AddFuncName("uploadLogins")
 	campuses, err := w.dbR.GetCampusUuids(ctx)
 	if err != nil {
 		return fmt.Errorf("cannot get campuses, err: %v", err)
@@ -75,11 +77,12 @@ func (w *Worker) UploadParticipants(ctx context.Context) error {
 	var offset int64
 	for _, campus := range campuses {
 		offset = 0
+		counter := 0
 
 		for {
 			peerLogins, err := w.sC.GetPeersByCampusUuid(ctx, campus, peerLimit, offset)
 			if err != nil {
-				return fmt.Errorf("cannot get peer logins from logins client, err: %v", err)
+				return fmt.Errorf("cannot get peer logins from school client, err: %v", err)
 			}
 
 			err = w.dbR.AddPeerLogins(ctx, peerLogins)
@@ -88,10 +91,15 @@ func (w *Worker) UploadParticipants(ctx context.Context) error {
 			}
 
 			if len(peerLogins) < peerLimit {
+				counter += len(peerLogins)
 				break
 			}
 			offset += peerLimit
+			counter += peerLimit
+			logger.Info(fmt.Sprintf("iteration complete: campus: %s", campus))
+			time.Sleep(10 * time.Second)
 		}
+		logger.Info(fmt.Sprintf("read: %d peers (for campus: %s)", counter, campus))
 	}
 	return nil
 }

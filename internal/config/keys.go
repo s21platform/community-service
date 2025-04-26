@@ -6,6 +6,6 @@ const (
 	KeyMetrics             = key("metrics")
 	KeyUUID                = key("uuid")
 	KeyLogger              = key("logger")
-	KeyLoginsLastUpdated   = "participant_last_updated"
+	KeyLoginsLastUpdated   = "logins_last_updated"
 	KeyCampusesLastUpdated = "campuses_last_update"
 )

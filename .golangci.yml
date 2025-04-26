@@ -1,28 +1,37 @@
+version: "2"
+run:
+  tests: true
 linters:
   enable:
-    - govet
-    - gofmt
-    - goimports
-    - staticcheck
-    - ineffassign
-    - errcheck
-
-    - gosimple
-    - typecheck
-    - unused
     - makezero
     - whitespace
-
-run:
-  timeout: 5m
-  tests: true
-
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    rules:
+      - linters:
+          - errcheck
+        text: error is not checked
+    paths:
+      - /migrations
+      - third_party$
+      - builtin$
+      - examples$
 issues:
-  exclude-dirs:
-    - "/migrations"
-  exclude-rules:
-    - linters:
-        - errcheck
-      text: "error is not checked"
   max-issues-per-linter: 0
   max-same-issues: 0
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  exclusions:
+    generated: lax
+    paths:
+      - /migrations
+      - third_party$
+      - builtin$
+      - examples$

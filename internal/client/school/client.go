@@ -49,7 +49,7 @@ func (c *Client) GetCampuses(ctx context.Context) ([]model.Campus, error) {
 func MustConnect(cfg *config.Config) *Client {
 	conn, err := grpc.NewClient(fmt.Sprintf("%s:%s", cfg.School.Host, cfg.School.Port), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Fatalf("Could not connect to logins service: %v", err)
+		log.Fatalf("Could not connect to school service: %v", err)
 	}
 	client := school.NewSchoolServiceClient(conn)
 	return &Client{client: client}
