@@ -23,7 +23,7 @@ func (r *Repository) GetPeerByLogin(ctx context.Context, nickname string) (model
 		return model.Login{}, fmt.Errorf("failed to build query: %v", err)
 	}
 	var result model.Login
-	err = r.conn.GetContext(ctx, &result, query, args)
+	err = r.conn.GetContext(ctx, &result, query, args...)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return model.Login{}, nil
@@ -42,7 +42,7 @@ func (r *Repository) SetNickname(ctx context.Context, nickname string) error {
 	if err != nil {
 		return fmt.Errorf("failed to build query: %v", err)
 	}
-	_, err = r.conn.ExecContext(ctx, query, args)
+	_, err = r.conn.ExecContext(ctx, query, args...)
 	if err != nil {
 		return fmt.Errorf("failed to run query: %v", err)
 	}
