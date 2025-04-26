@@ -12,8 +12,8 @@ import (
 )
 
 func (r *Repository) GetPeerByLogin(ctx context.Context, nickname string) (model.Login, error) {
-	query, args, err := sq.Select("login").
-		Column("nickname").
+	query, args, err := sq.Select("nickname").
+		From("login").
 		Where(sq.Eq{"nickname": nickname}).
 		Limit(1).
 		PlaceholderFormat(sq.Dollar).
