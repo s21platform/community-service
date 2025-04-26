@@ -64,5 +64,7 @@ jobs:
           key: ${{ secrets.PRIVATE_SSH_KEY_DEVELOP }}
           passphrase: ${{ secrets.PASSPHRASE_DEVELOP }}
           script: |
+            set -e
             docker pull ${{ secrets.CR_REGISTRY }}/${{ secrets.CR_NAME }}:develop
             docker-compose -f ~/space21/staging/staging-deployment/docker-compose.yml --env-file ~/space21/staging/.env up -d ${{ secrets.CR_NAME }}
+            echo "${{ secrets.SERVICE_NAME }}.stage.deploy:1|c" | nc -u ${{ secrets.HOST_DEVELOP }} ${{ secrets.STATSD_PORT }}

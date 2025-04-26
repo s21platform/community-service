@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"github.com/s21platform/metrics-lib/pkg"
+	"log"
 	"sync"
 
 	logger_lib "github.com/s21platform/logger-lib"
@@ -21,6 +23,12 @@ func main() {
 
 	logger := logger_lib.New(cfg.Logger.Host, cfg.Logger.Port, cfg.Service.Name, cfg.Platform.Env)
 	ctx = context.WithValue(ctx, config.KeyLogger, logger)
+
+	metrics, err := pkg.NewMetrics(cfg.Metrics.Host, cfg.Metrics.Port, cfg.Service.Name, cfg.Platform.Env)
+	if err != nil {
+		log.Fatalf("failed to connet to metric lib: %v", err)
+	}
+	ctx = context.WithValue(ctx, config.KeyMetrics, metrics)
 
 	schoolClient := school.MustConnect(cfg)
 	dbRepo := postgres.New(cfg)
