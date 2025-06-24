@@ -2,15 +2,15 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
-	"encoding/json"
 	"fmt"
+
 	sq "github.com/Masterminds/squirrel"
-	school "github.com/s21platform/school-proto/school-proto"
+	"github.com/s21platform/community-service/internal/model"
 )
 
 func (r *Repository) GetParticipantsLogin(ctx context.Context, limit, offset int64) ([]string, error) {
 	var loginsParticipants []string
+
 	query, args, err := sq.
 		Select("login").
 		From("participant").
@@ -31,74 +31,31 @@ func (r *Repository) GetParticipantsLogin(ctx context.Context, limit, offset int
 	return loginsParticipants, nil
 }
 
-
-
-func (r *Repository) SetParticipantData(ctx context.Context, participantData *school.GetParticipantDataOut, login string) error {
-	tx, err := r.conn.BeginTx(ctx, &sql.TxOptions{})
-	if err != nil {
-		return fmt.Errorf("failed to start transaction: %v", err)
-	}
-	defer func() {
-		if err != nil {
-			tx.Rollback()
-		}
-	}()
-
-	skillsJSON, err := json.Marshal(participantData.Skills)
-	if err != nil {
-		return fmt.Errorf("failed to marshal skills: %v", err)
-	}
-
-	badgesJSON, err := json.Marshal(participantData.Badges)
-	if err != nil {
-		return fmt.Errorf("failed to marshal badges: %v", err)
-	}
-
-	queryBase := sq.Insert("participant").
-		Columns(
-			"login", "campus_id", "class_name", "parallel_name",
-			"status", "exp_value", "level", "exp_to_next_level", "skills",
-			"crp", "prp", "coins", "badges").
-		Values(
-			login, 
-			participantData.CampusUuid,
-			participantData.ClassName, 
-			participantData.ParallelName,
-			participantData.Status, 
-			participantData.ExpValue, 
-			participantData.Level,
-			participantData.ExpToNextLevel, 
-			skillsJSON,
-			participantData.PeerCodeReviewPoints,
-			participantData.PeerReviewPoints, 
-			participantData.Coins, 
-			badgesJSON).
-		Suffix(`
-			ON CONFLICT (login)
-			DO UPDATE SET
-				exp_value = EXCLUDED.exp_value,
-				level = EXCLUDED.level,
-				exp_to_next_level = EXCLUDED.exp_to_next_level,
-				skills = EXCLUDED.skills,
-				crp = EXCLUDED.crp,
-				prp = EXCLUDED.prp,
-				coins = EXCLUDED.coins,
-				badges = EXCLUDED.badges`).
+func (r *Repository) SetParticipantData(ctx context.Context, participantDataValue model.ParticipantDataValue, login string) error {
+	queryBase := sq.Update("participant").
+		Set("campus_id", participantDataValue.CampusUUID).
+		Set("class_name", participantDataValue.ClassName).
+		Set("parallel_name", participantDataValue.ParallelName).
+		Set("status", participantDataValue.Status).
+		Set("exp_value", participantDataValue.ExpValue).
+		Set("level", participantDataValue.Level).
+		Set("exp_to_next_level", participantDataValue.ExpToNextLevel).
+		Set("skills", participantDataValue.Skills).
+		Set("crp", participantDataValue.PeerCodeReviewPoints).
+		Set("prp", participantDataValue.PeerReviewPoints).
+		Set("coins", participantDataValue.Coins).
+		Set("badges", participantDataValue.Badges).
+		Set("tribe_id", participantDataValue.TribeID).
+		Where(sq.Eq{"login": login}).Where(sq.Eq{"login": login}).
 		PlaceholderFormat(sq.Dollar)
-
 	query, args, err := queryBase.ToSql()
 	if err != nil {
-		return fmt.Errorf("failed to configure query: %v", err)
+		return fmt.Errorf("failed to build update query: %v", err)
 	}
 
-	_, err = tx.ExecContext(ctx, query, args...)
+	_, err = r.conn.ExecContext(ctx, query, args...)
 	if err != nil {
-		return fmt.Errorf("failed to execute query: %v", err)
-	}
-
-	err = tx.Commit()
-	if err != nil {
-		return fmt.Errorf("failed to commit transaction: %v", err)
+		return fmt.Errorf("failed to execute update query: %v", err)
 	}
 
 	return nil

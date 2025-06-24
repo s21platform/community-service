@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"sync"
 	"time"
-	logger_lib "github.com/s21platform/logger-lib"
+
 	"github.com/s21platform/community-service/internal/config"
+	logger_lib "github.com/s21platform/logger-lib"
 )
+
 const (
 	limit = 1000
 )
@@ -30,7 +32,7 @@ func (s *School) RunPeerWorker(ctx context.Context, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	logger := logger_lib.FromContext(ctx, config.KeyLogger)
-	logger.AddFuncName("RunPeerWorker")
+	logger.AddFuncName("ParticipantDataWorker")
 
 	ticker := time.NewTicker(time.Hour)
 	defer ticker.Stop()
@@ -42,18 +44,18 @@ func (s *School) RunPeerWorker(ctx context.Context, wg *sync.WaitGroup) {
 			return
 
 		case <-ticker.C:
-			lastUpdate, err := s.rR.GetByKey(ctx, config.KeyParticipantLastUpdated)
+			lastUpdate, err := s.rR.GetByKey(ctx, config.KeyParticipantDataLastUpdated)
 			if err != nil {
 				logger.Error(fmt.Sprintf("failed to get last update time, err: %v", err))
 			}
 
 			if lastUpdate == "" {
-				err := s.uploadDataParticipant(ctx) 
+				err := s.uploadDataParticipant(ctx)
 				if err != nil {
 					logger.Error(fmt.Sprintf("failed to upload participants, err: %v", err))
 				}
 
-				err = s.rR.Set(ctx, config.KeyParticipantLastUpdated, "upd", time.Hour*24*30)
+				err = s.rR.Set(ctx, config.KeyParticipantDataLastUpdated, "upd", time.Hour*24)
 				if err != nil {
 					logger.Error(fmt.Sprintf("failed to save participant last updated, err: %v", err))
 				}
@@ -71,23 +73,24 @@ func (s *School) uploadDataParticipant(ctx context.Context) error {
 			return fmt.Errorf("failed to get participant logins, err: %v", err)
 		}
 		if len(logins) == 0 {
-			break 
+			break
 		}
+		logger := logger_lib.FromContext(ctx, config.KeyLogger)
+
 		for _, login := range logins {
 			participantData, err := s.sC.GetParticipantData(ctx, login)
 			if err != nil {
-				logger_lib.FromContext(ctx, config.KeyLogger).
-					Error(fmt.Sprintf("failed to get participant data for login %s, err: %v", login, err))
+				logger.Error(fmt.Sprintf("failed to get participant data for login %s, err: %v", login, err))
 				continue
 			}
 
 			err = s.dbR.SaveParticipantData(ctx, participantData, login)
 			if err != nil {
-				logger_lib.FromContext(ctx, config.KeyLogger).
-					Error(fmt.Sprintf("failed to save participant data for login %s, err: %v", login, err))
+				logger.Error(fmt.Sprintf("failed to save participant data for login %s, err: %v", login, err))
 			}
 		}
-		offset += limit 
+
+		offset += limit
 	}
 
 	return nil

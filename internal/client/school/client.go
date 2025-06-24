@@ -29,15 +29,15 @@ func (c *Client) GetPeersByCampusUuid(ctx context.Context, campusUuid string, li
 	return peers.Peer, nil
 }
 
-func (c *Client) GetParticipantData(ctx context.Context, peersLogin string) ( *school.GetParticipantDataOut , error) {
+func (c *Client) GetParticipantData(ctx context.Context, peersLogin string) ( model.ParticipantDataValue, error) {
 	participantData, err := c.client.GetParticipantData(ctx, &school.GetParticipantDataIn{
 		Login: peersLogin,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("failed to get peers: %v", err)
+		return model.ParticipantDataValue{}, fmt.Errorf("failed to get peers: %v", err)
 	}
-
-	return participantData, nil
+	
+	return model.ToParticipantDataDTO(participantData), nil
 }
 
 func (c *Client) GetCampuses(ctx context.Context) ([]model.Campus, error) {

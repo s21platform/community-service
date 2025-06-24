@@ -1,6 +1,12 @@
 package model
 
-import 	school "github.com/s21platform/school-proto/school-proto"
+import (
+	"database/sql/driver"
+	"encoding/json"
+	"errors"
+
+	school "github.com/s21platform/school-proto/school-proto"
+)
 
 type Skill struct {
 	Name   string `json:"name"`
@@ -13,7 +19,7 @@ type Badge struct {
 	IconURL         string `json:"iconURL"`
 }
 
-type ParticipantData struct {
+type ParticipantDataValue struct {
 	ClassName            string  `json:"className"`
 	ParallelName         string  `json:"parallelName"`
 	ExpValue             int64   `json:"expValue"`
@@ -26,20 +32,12 @@ type ParticipantData struct {
 	PeerCodeReviewPoints int64   `json:"peerCodeReviewPoints"`
 	Coins                int64   `json:"coins"`
 	Badges               []Badge `json:"badges"`
+	TribeID              string  `json:"tribeId,omitempty"`
 }
 
+func ToParticipantDataDTO(in *school.GetParticipantDataOut) ParticipantDataValue {
 
-
-func (p *ParticipantData) ToDTO(in *school.GetParticipantDataOut) (ParticipantData, error) {
-	result := ParticipantData{
-		AttributeId: in.AttributeId,
-		Value:       in.Value,
-		ParentId:    in.ParentId,
-	}
-	return result, nil
-}
-func (p *ParticipantData) ToDTO(in *school.GetParticipantDataOut) (ParticipantData, error){
-	result := ParticipantData{
+	return ParticipantDataValue{
 		ClassName:            in.ClassName,
 		ParallelName:         in.ParallelName,
 		ExpValue:             in.ExpValue,
@@ -47,10 +45,71 @@ func (p *ParticipantData) ToDTO(in *school.GetParticipantDataOut) (ParticipantDa
 		ExpToNextLevel:       in.ExpToNextLevel,
 		CampusUUID:           in.CampusUuid,
 		Status:               in.Status,
-		Skills:               convertSkillsToProto(p.Skills),
-		PeerReviewPoints:     p.PeerReviewPoints,
-		PeerCodeReviewPoints: p.PeerCodeReviewPoints,
-		Coins:                p.Coins,
-		Badges:               convertBadgesToProto(p.Badges),
+		Skills:               Skills(convertSkillsFromProto(in.Skills)),
+		PeerReviewPoints:     in.PeerReviewPoints,
+		PeerCodeReviewPoints: in.PeerCodeReviewPoints,
+		Coins:                in.Coins,
+		Badges:               Badges(convertBadgesFromProto(in.Badges)),
 	}
+}
+
+func convertSkillsFromProto(skills []*school.Skills) []Skill {
+	result := make([]Skill, len(skills))
+	for i, s := range skills {
+		result[i] = Skill{
+			Name:   s.Name,
+			Points: s.Points,
+		}
+	}
+	return result
+}
+
+func convertBadgesFromProto(badges []*school.Badges) []Badge {
+	result := make([]Badge, len(badges))
+	for i, b := range badges {
+		result[i] = Badge{
+			Name:            b.Name,
+			ReceiptDateTime: b.ReceiptDateTime,
+			IconURL:         b.IconURL,
+		}
+	}
+	return result
+}
+
+func Value(s interface{}) (driver.Value, error) {
+	j, err:= json.Marshal(s)
+	if err != nil {
+		return "", err
+	}
+	return string(j), nil
+}
+
+func Scan(value interface{}, s interface{}) error {
+	bytes, ok := value.([]byte)
+	if !ok {
+		str, ok := value.(string)
+		if !ok {
+			return errors.New("failed to scan Skills, not string or []byte")
+		}
+		bytes = []byte(str)
+	}
+	return json.Unmarshal(bytes, s)
+}
+type Skills []Skill
+
+func (s Skills) Value() (driver.Value, error) {
+	return Value(s)
+}
+
+func (s *Skills) Scan(value interface{}) error {
+	return Scan(value, s)
+}
+type Badges []Badge
+
+func (b Badges) Value() (driver.Value, error) {
+	return Value(b)
+}
+
+func (b *Badges) Scan(value interface{}) error {
+	return Scan(value, b)
 }
