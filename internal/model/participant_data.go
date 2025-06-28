@@ -27,11 +27,11 @@ type ParticipantDataValue struct {
 	ExpToNextLevel       int64   `json:"expToNextLevel"`
 	CampusUUID           string  `json:"campusUuid"`
 	Status               string  `json:"status"`
-	Skills               []Skill `json:"skills"`
+	Skills               Skills `json:"skills"`
 	PeerReviewPoints     int64   `json:"peerReviewPoints"`
 	PeerCodeReviewPoints int64   `json:"peerCodeReviewPoints"`
 	Coins                int64   `json:"coins"`
-	Badges               []Badge `json:"badges"`
+	Badges               Badges `json:"badges"`
 	TribeID              string  `json:"tribeId,omitempty"`
 }
 

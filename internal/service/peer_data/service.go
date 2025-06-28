@@ -8,6 +8,7 @@ import (
 
 	"github.com/s21platform/community-service/internal/config"
 	logger_lib "github.com/s21platform/logger-lib"
+	"github.com/s21platform/metrics-lib/pkg"
 )
 
 const (
@@ -67,6 +68,7 @@ func (s *School) RunPeerWorker(ctx context.Context, wg *sync.WaitGroup) {
 
 func (s *School) uploadDataParticipant(ctx context.Context) error {
 	var offset int64
+	mtx := pkg.FromContext(ctx, config.KeyMetrics)
 	for {
 		logins, err := s.dbR.GetParticipantsLogin(ctx, limit, offset)
 		if err != nil {
@@ -81,6 +83,11 @@ func (s *School) uploadDataParticipant(ctx context.Context) error {
 			participantData, err := s.sC.GetParticipantData(ctx, login)
 			if err != nil {
 				logger.Error(fmt.Sprintf("failed to get participant data for login %s, err: %v", login, err))
+				continue
+			}
+
+			if participantData != nil {
+				mtx.Increment("update_paticipant_data.data_exists")
 				continue
 			}
 
