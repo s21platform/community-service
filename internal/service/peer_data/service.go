@@ -45,7 +45,7 @@ func (s *School) RunPeerWorker(ctx context.Context, wg *sync.WaitGroup) {
 			return
 
 		case <-ticker.C:
-			lastUpdate, err := s.rR.GetByKey(ctx, config.KeyParticipantDataLastUpdated)
+			lastUpdate, err := s.rR.GetByKey(ctx, string(config.KeyParticipantDataLastUpdated))
 			if err != nil {
 				logger.Error(fmt.Sprintf("failed to get last update time, err: %v", err))
 			}
@@ -56,7 +56,7 @@ func (s *School) RunPeerWorker(ctx context.Context, wg *sync.WaitGroup) {
 					logger.Error(fmt.Sprintf("failed to upload participants, err: %v", err))
 				}
 
-				err = s.rR.Set(ctx, config.KeyParticipantDataLastUpdated, "upd", time.Hour*24)
+				err = s.rR.Set(ctx, string(config.KeyParticipantDataLastUpdated), "upd", time.Hour*24)
 				if err != nil {
 					logger.Error(fmt.Sprintf("failed to save participant last updated, err: %v", err))
 				}
@@ -69,6 +69,7 @@ func (s *School) RunPeerWorker(ctx context.Context, wg *sync.WaitGroup) {
 func (s *School) uploadDataParticipant(ctx context.Context) error {
 	var offset int64
 	mtx := pkg.FromContext(ctx, config.KeyMetrics)
+	logger := logger_lib.FromContext(ctx, config.KeyLogger)
 	for {
 		logins, err := s.dbR.GetParticipantsLogin(ctx, limit, offset)
 		if err != nil {
@@ -77,7 +78,6 @@ func (s *School) uploadDataParticipant(ctx context.Context) error {
 		if len(logins) == 0 {
 			break
 		}
-		logger := logger_lib.FromContext(ctx, config.KeyLogger)
 
 		for _, login := range logins {
 			participantData, err := s.sC.GetParticipantData(ctx, login)
@@ -86,7 +86,7 @@ func (s *School) uploadDataParticipant(ctx context.Context) error {
 				continue
 			}
 
-			if participantData != nil {
+			if participantData == nil {
 				mtx.Increment("update_paticipant_data.data_exists")
 				continue
 			}

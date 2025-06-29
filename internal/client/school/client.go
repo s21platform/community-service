@@ -4,12 +4,13 @@ import (
 	"context"
 	"fmt"
 	"log"
+
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	school "github.com/s21platform/school-proto/school-proto"
 	"github.com/s21platform/community-service/internal/config"
 	"github.com/s21platform/community-service/internal/model"
+	school "github.com/s21platform/school-proto/school-proto"
 )
 
 type Client struct {
@@ -29,15 +30,16 @@ func (c *Client) GetPeersByCampusUuid(ctx context.Context, campusUuid string, li
 	return peers.Peer, nil
 }
 
-func (c *Client) GetParticipantData(ctx context.Context, peersLogin string) ( model.ParticipantDataValue, error) {
-	participantData, err := c.client.GetParticipantData(ctx, &school.GetParticipantDataIn{
+func (c *Client) GetParticipantData(ctx context.Context, peersLogin string) (*model.ParticipantDataValue, error) {
+	var pd model.ParticipantDataValue
+	protoData, err := c.client.GetParticipantData(ctx, &school.GetParticipantDataIn{
 		Login: peersLogin,
 	})
 	if err != nil {
-		return model.ParticipantDataValue{}, fmt.Errorf("failed to get peers: %v", err)
+		return &pd, fmt.Errorf("failed to get peers: %v", err)
 	}
-	
-	return model.ToParticipantDataDTO(participantData), nil
+	pd.ToParticipantData(protoData)
+	return &pd, nil
 }
 
 func (c *Client) GetCampuses(ctx context.Context) ([]model.Campus, error) {
@@ -64,4 +66,3 @@ func MustConnect(cfg *config.Config) *Client {
 	client := school.NewSchoolServiceClient(conn)
 	return &Client{client: client}
 }
-
