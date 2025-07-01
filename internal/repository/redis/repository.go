@@ -35,8 +35,8 @@ func New(cfg *config.Config) *Repository {
 	return &Repository{conn: rdb}
 }
 
-func (r *Repository) GetByKey(ctx context.Context, key string) (string, error) {
-	val, err := r.conn.Get(ctx, key).Result()
+func (r *Repository) GetByKey(ctx context.Context, key config.Key) (string, error) {
+	val, err := r.conn.Get(ctx, string(key)).Result()
 	if err != nil {
 		if errors.Is(err, redis.Nil) {
 			return "", nil

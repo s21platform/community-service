@@ -39,8 +39,10 @@ func (c *Client) GetParticipantData(ctx context.Context, peersLogin string) (*mo
 		return nil, fmt.Errorf("failed to get peers: %v", err)
 	}
 	var skills model.Skills
+	skills.ConvertSkillsFromProto(protoData.Skills)
 	var badges model.Badges
-	pd := model.ParticipantDataValue{
+	badges.ConvertBadgesFromProto(protoData.Badges)
+	return &model.ParticipantDataValue{
 		ClassName:            protoData.ClassName,
 		ParallelName:         protoData.ParallelName,
 		ExpValue:             protoData.ExpValue,
@@ -48,13 +50,12 @@ func (c *Client) GetParticipantData(ctx context.Context, peersLogin string) (*mo
 		ExpToNextLevel:       protoData.ExpToNextLevel,
 		CampusUUID:           protoData.CampusUuid,
 		Status:               protoData.Status,
-		Skills:               skills.ConvertSkillsFromProto(protoData.Skills),
+		Skills:               skills,
 		PeerReviewPoints:     protoData.PeerReviewPoints,
 		PeerCodeReviewPoints: protoData.PeerCodeReviewPoints,
 		Coins:                protoData.Coins,
-		Badges:               badges.ConvertBadgesFromProto(protoData.Badges),
-	}
-	return &pd, nil
+		Badges:               badges,
+	}, nil
 }
 
 func (c *Client) GetCampuses(ctx context.Context) ([]model.Campus, error) {

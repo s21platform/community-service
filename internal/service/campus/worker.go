@@ -39,7 +39,7 @@ func (w *Worker) Run(ctx context.Context, wg *sync.WaitGroup) {
 			logger.Info("campus uploading worker shutting down")
 
 		case <-ticker.C:
-			lastUpdate, err := w.rR.GetByKey(ctx, string(config.KeyCampusesLastUpdated))
+			lastUpdate, err := w.rR.GetByKey(ctx, config.KeyCampusesLastUpdated)
 			if err != nil {
 				logger.Error(fmt.Sprintf("failed to get last update time, err: %v", err))
 				continue
