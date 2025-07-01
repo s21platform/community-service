@@ -86,8 +86,8 @@ func (s *School) uploadDataParticipant(ctx context.Context) error {
 				continue
 			}
 
-			if participantData == nil {
-				mtx.Increment("update_paticipant_data.data_exists")
+			if participantData != nil {
+				mtx.Increment("update_paticipant_data.data_not_exists")
 				continue
 			}
 

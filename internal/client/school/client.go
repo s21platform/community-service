@@ -31,14 +31,29 @@ func (c *Client) GetPeersByCampusUuid(ctx context.Context, campusUuid string, li
 }
 
 func (c *Client) GetParticipantData(ctx context.Context, peersLogin string) (*model.ParticipantDataValue, error) {
-	var pd model.ParticipantDataValue
+
 	protoData, err := c.client.GetParticipantData(ctx, &school.GetParticipantDataIn{
 		Login: peersLogin,
 	})
 	if err != nil {
-		return &pd, fmt.Errorf("failed to get peers: %v", err)
+		return nil, fmt.Errorf("failed to get peers: %v", err)
 	}
-	pd.ToParticipantData(protoData)
+	var skills model.Skills
+	var badges model.Badges
+	pd := model.ParticipantDataValue{
+		ClassName:            protoData.ClassName,
+		ParallelName:         protoData.ParallelName,
+		ExpValue:             protoData.ExpValue,
+		Level:                protoData.Level,
+		ExpToNextLevel:       protoData.ExpToNextLevel,
+		CampusUUID:           protoData.CampusUuid,
+		Status:               protoData.Status,
+		Skills:               skills.ConvertSkillsFromProto(protoData.Skills),
+		PeerReviewPoints:     protoData.PeerReviewPoints,
+		PeerCodeReviewPoints: protoData.PeerCodeReviewPoints,
+		Coins:                protoData.Coins,
+		Badges:               badges.ConvertBadgesFromProto(protoData.Badges),
+	}
 	return &pd, nil
 }
 

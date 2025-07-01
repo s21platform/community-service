@@ -12,6 +12,7 @@ type Skill struct {
 	Name   string `json:"name"`
 	Points int32  `json:"points"`
 }
+type Skills []Skill
 
 type Badge struct {
 	Name            string `json:"name"`
@@ -20,43 +21,22 @@ type Badge struct {
 }
 
 type ParticipantDataValue struct {
-	ClassName            string    `json:"className"`
-	ParallelName         string    `json:"parallelName"`
-	ExpValue             int64     `json:"expValue"`
-	Level                int32     `json:"level"`
-	ExpToNextLevel       int64     `json:"expToNextLevel"`
-	CampusUUID           string    `json:"campusUuid"`
-	Status               string    `json:"status"`
-	Skills               SkillList `json:"skills"`
-	PeerReviewPoints     int64     `json:"peerReviewPoints"`
-	PeerCodeReviewPoints int64     `json:"peerCodeReviewPoints"`
-	Coins                int64     `json:"coins"`
-	Badges               BadgesList    `json:"badges"`
-	TribeID              string    `json:"tribeId,omitempty"`
+	ClassName            string `json:"className"`
+	ParallelName         string `json:"parallelName"`
+	ExpValue             int64  `json:"expValue"`
+	Level                int32  `json:"level"`
+	ExpToNextLevel       int64  `json:"expToNextLevel"`
+	CampusUUID           string `json:"campusUuid"`
+	Status               string `json:"status"`
+	Skills               Skills `json:"skills"`
+	PeerReviewPoints     int64  `json:"peerReviewPoints"`
+	PeerCodeReviewPoints int64  `json:"peerCodeReviewPoints"`
+	Coins                int64  `json:"coins"`
+	Badges               Badges `json:"badges"`
+	TribeID              string `json:"tribeId,omitempty"`
 }
 
-func (pd *ParticipantDataValue) ToParticipantData(in *school.GetParticipantDataOut) *ParticipantDataValue {
-	var skillList SkillList
-	var badgesList BadgesList
-	return &ParticipantDataValue{
-		ClassName:            in.ClassName,
-		ParallelName:         in.ParallelName,
-		ExpValue:             in.ExpValue,
-		Level:                in.Level,
-		ExpToNextLevel:       in.ExpToNextLevel,
-		CampusUUID:           in.CampusUuid,
-		Status:               in.Status,
-		Skills:               skillList.ConvertSkillsFromProto(in.Skills),
-		PeerReviewPoints:     in.PeerReviewPoints,
-		PeerCodeReviewPoints: in.PeerCodeReviewPoints,
-		Coins:                in.Coins,
-		Badges:               badgesList.ConvertBadgesFromProto(in.Badges),
-	}
-}
-
-type SkillList []Skill
-
-func (s *SkillList) ConvertSkillsFromProto(skills []*school.Skills) []Skill {
+func (s *Skills) ConvertSkillsFromProto(skills []*school.Skills) []Skill {
 	result := make([]Skill, len(skills))
 	for i, skill := range skills {
 		result[i] = Skill{
@@ -67,17 +47,17 @@ func (s *SkillList) ConvertSkillsFromProto(skills []*school.Skills) []Skill {
 	return result
 }
 
-func (s *SkillList) Value() (driver.Value, error) {
+func (s *Skills) Value() (driver.Value, error) {
 	return Value(s)
 }
 
-func (s *SkillList) Scan(value interface{}) error {
+func (s *Skills) Scan(value interface{}) error {
 	return Scan(value, s)
 }
 
-type BadgesList []Badge
+type Badges []Badge
 
-func (b *BadgesList)ConvertBadgesFromProto(badges []*school.Badges) []Badge {
+func (b *Badges) ConvertBadgesFromProto(badges []*school.Badges) []Badge {
 	result := make([]Badge, len(badges))
 	for i, badge := range badges {
 		result[i] = Badge{
@@ -89,12 +69,11 @@ func (b *BadgesList)ConvertBadgesFromProto(badges []*school.Badges) []Badge {
 	return result
 }
 
-
-func (b BadgesList) Value() (driver.Value, error) {
+func (b Badges) Value() (driver.Value, error) {
 	return Value(b)
 }
 
-func (b *BadgesList) Scan(value interface{}) error {
+func (b *Badges) Scan(value interface{}) error {
 	return Scan(value, b)
 }
 

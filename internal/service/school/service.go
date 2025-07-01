@@ -48,7 +48,6 @@ func (s *School) RunPeerWorker(ctx context.Context, wg *sync.WaitGroup) {
 			if err != nil {
 				logger.Error(fmt.Sprintf("cannot get last update time, err: %v", err))
 			}
-
 			if lastUpdate == "" {
 				err := s.uploadParticipants(ctx)
 				if err != nil {
