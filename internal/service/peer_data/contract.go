@@ -1,23 +1,23 @@
-package service
+package peerdata
 
 import (
 	"context"
 	"time"
 
-	school "github.com/s21platform/school-proto/school-proto"
+	"github.com/s21platform/community-service/internal/config"
+	"github.com/s21platform/community-service/internal/model"
 )
 
 type SchoolC interface {
-	GetParticipantData(ctx context.Context, login string) (*school.GetParticipantDataOut, error)
+	GetParticipantData(ctx context.Context, login string) (*model.ParticipantDataValue, error)
 }
 
 type DbRepo interface {
-	GetParticipantData(ctx context.Context, participantData *school.GetParticipantDataOut )(*school.GetParticipantDataOut, error)
 	GetParticipantsLogin(ctx context.Context, limit, offset int64) ([]string, error)
-	SaveParticipantData(ctx context.Context, participantData *school.GetParticipantDataOut, login string) error
+	SetParticipantData(ctx context.Context, participantDataValue *model.ParticipantDataValue, login string) error
 }
 
 type RedisRepo interface {
-	GetByKey(ctx context.Context, key string) (string, error)
-	Set(ctx context.Context, key string, value string, expiration time.Duration) error
+	GetByKey(ctx context.Context, key config.Key) (string, error)
+	Set(ctx context.Context, key config.Key, value string, expiration time.Duration) error
 }

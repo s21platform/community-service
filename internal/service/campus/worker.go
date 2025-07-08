@@ -54,7 +54,7 @@ func (w *Worker) Run(ctx context.Context, wg *sync.WaitGroup) {
 				continue
 			}
 
-			err = w.rR.Set(ctx, string(config.KeyCampusesLastUpdated), "upd", time.Hour*5)
+			err = w.rR.Set(ctx, config.KeyCampusesLastUpdated, "upd", time.Hour*5)
 			if err != nil {
 				logger.Error(fmt.Sprintf("failed to save campuses last updated, err: %v", err))
 				continue

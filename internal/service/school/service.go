@@ -54,7 +54,7 @@ func (s *School) RunPeerWorker(ctx context.Context, wg *sync.WaitGroup) {
 					logger.Error(fmt.Sprintf("cannot upload participants, err: %v", err))
 				}
 
-				err = s.rR.Set(ctx, string(config.KeyParticipantLastUpdated), "upd", 24*30*time.Hour)
+				err = s.rR.Set(ctx, config.KeyParticipantLastUpdated, "upd", 24*30*time.Hour)
 				if err != nil {
 					logger.Error(fmt.Sprintf("cannot save participant last updated, err: %v", err))
 				}

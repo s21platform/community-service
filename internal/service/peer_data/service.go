@@ -1,4 +1,4 @@
-package service
+package peerdata
 
 import (
 	"context"
@@ -29,7 +29,7 @@ func New(school SchoolC, dbR DbRepo, rR RedisRepo) *School {
 	}
 }
 
-func (s *School) RunPeerWorker(ctx context.Context, wg *sync.WaitGroup) {
+func (s *School) RunParticipantWorker(ctx context.Context, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	logger := logger_lib.FromContext(ctx, config.KeyLogger)
@@ -45,7 +45,7 @@ func (s *School) RunPeerWorker(ctx context.Context, wg *sync.WaitGroup) {
 			return
 
 		case <-ticker.C:
-			lastUpdate, err := s.rR.GetByKey(ctx, string(config.KeyParticipantDataLastUpdated))
+			lastUpdate, err := s.rR.GetByKey(ctx, config.KeyParticipantDataLastUpdated)
 			if err != nil {
 				logger.Error(fmt.Sprintf("failed to get last update time, err: %v", err))
 			}
@@ -56,7 +56,7 @@ func (s *School) RunPeerWorker(ctx context.Context, wg *sync.WaitGroup) {
 					logger.Error(fmt.Sprintf("failed to upload participants, err: %v", err))
 				}
 
-				err = s.rR.Set(ctx, string(config.KeyParticipantDataLastUpdated), "upd", 24*time.Hour)
+				err = s.rR.Set(ctx, config.KeyParticipantDataLastUpdated, "upd", 24*time.Hour)
 				if err != nil {
 					logger.Error(fmt.Sprintf("failed to save participant last updated, err: %v", err))
 				}
@@ -91,7 +91,7 @@ func (s *School) uploadDataParticipant(ctx context.Context) error {
 				continue
 			}
 
-			err = s.dbR.SaveParticipantData(ctx, participantData, login)
+			err = s.dbR.SetParticipantData(ctx, participantData, login)
 			if err != nil {
 				logger.Error(fmt.Sprintf("failed to save participant data for login %s, err: %v", login, err))
 			}

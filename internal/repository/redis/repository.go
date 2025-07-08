@@ -46,8 +46,8 @@ func (r *Repository) GetByKey(ctx context.Context, key config.Key) (string, erro
 	return val, nil
 }
 
-func (r *Repository) Set(ctx context.Context, key string, value string, expiration time.Duration) error {
-	err := r.conn.Set(ctx, key, value, expiration).Err()
+func (r *Repository) Set(ctx context.Context, key config.Key, value string, expiration time.Duration) error {
+	err := r.conn.Set(ctx, string(key), value, expiration).Err()
 	if err != nil {
 		log.Printf("cannot set key: %s, value: %s, err: %v", key, value, err)
 		return fmt.Errorf("cannot set key: %s, value: %s, err: %v", key, value, err)

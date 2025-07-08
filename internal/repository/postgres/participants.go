@@ -31,7 +31,7 @@ func (r *Repository) GetParticipantsLogin(ctx context.Context, limit, offset int
 	return loginsParticipants, nil
 }
 
-func (r *Repository) SetParticipantData(ctx context.Context, participantDataValue model.ParticipantDataValue, login string) error {
+func (r *Repository) SetParticipantData(ctx context.Context, participantDataValue *model.ParticipantDataValue, login string) error {
 	queryBase := sq.Update("participant").
 		Set("campus_id", participantDataValue.CampusUUID).
 		Set("class_name", participantDataValue.ClassName).

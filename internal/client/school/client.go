@@ -38,9 +38,10 @@ func (c *Client) GetParticipantData(ctx context.Context, peersLogin string) (*mo
 	if err != nil {
 		return nil, fmt.Errorf("failed to get peers: %v", err)
 	}
-	var skills model.Skills
+	skills := make(model.Skills, len(protoData.Skills))
 	skills.ConvertSkillsFromProto(protoData.Skills)
-	var badges model.Badges
+
+	badges := make(model.Badges, len(protoData.Badges))
 	badges.ConvertBadgesFromProto(protoData.Badges)
 	return &model.ParticipantDataValue{
 		ClassName:            protoData.ClassName,
