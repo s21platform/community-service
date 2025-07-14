@@ -34,8 +34,8 @@ func (s *School) RunParticipantWorker(ctx context.Context, wg *sync.WaitGroup) {
 
 	logger := logger_lib.FromContext(ctx, config.KeyLogger)
 	logger.AddFuncName("ParticipantDataWorker")
-
-	ticker := time.NewTicker(time.Hour)
+	// TODO change hour
+	ticker := time.NewTicker(time.Second * 5)
 	defer ticker.Stop()
 
 	for {
@@ -86,7 +86,7 @@ func (s *School) uploadDataParticipant(ctx context.Context) error {
 				continue
 			}
 
-			if participantData != nil {
+			if participantData == nil {
 				mtx.Increment("update_paticipant_data.data_not_exists")
 				continue
 			}

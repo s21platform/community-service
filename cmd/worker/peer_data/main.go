@@ -1,4 +1,4 @@
-package peerdata
+package main
 
 import (
 	"context"

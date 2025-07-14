@@ -32,7 +32,7 @@ func (r *Repository) GetParticipantsLogin(ctx context.Context, limit, offset int
 }
 
 func (r *Repository) SetParticipantData(ctx context.Context, participantDataValue *model.ParticipantDataValue, login string) error {
-	queryBase := sq.Update("participant").
+	query, args, err := sq.Update("participant").
 		Set("campus_id", participantDataValue.CampusUUID).
 		Set("class_name", participantDataValue.ClassName).
 		Set("parallel_name", participantDataValue.ParallelName).
@@ -47,8 +47,8 @@ func (r *Repository) SetParticipantData(ctx context.Context, participantDataValu
 		Set("badges", participantDataValue.Badges).
 		Set("tribe_id", participantDataValue.TribeID).
 		Where(sq.Eq{"login": login}).Where(sq.Eq{"login": login}).
-		PlaceholderFormat(sq.Dollar)
-	query, args, err := queryBase.ToSql()
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
 	if err != nil {
 		return fmt.Errorf("failed to build update query: %v", err)
 	}

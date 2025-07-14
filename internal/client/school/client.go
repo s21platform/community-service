@@ -31,7 +31,6 @@ func (c *Client) GetPeersByCampusUuid(ctx context.Context, campusUuid string, li
 }
 
 func (c *Client) GetParticipantData(ctx context.Context, peersLogin string) (*model.ParticipantDataValue, error) {
-
 	protoData, err := c.client.GetParticipantData(ctx, &school.GetParticipantDataIn{
 		Login: peersLogin,
 	})
