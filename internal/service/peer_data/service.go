@@ -81,6 +81,7 @@ func (s *School) uploadDataParticipant(ctx context.Context) error {
 		}
 
 		for _, login := range logins {
+			time.Sleep(10 * time.Millisecond)
 			participantData, err := s.sC.GetParticipantData(ctx, login)
 			if err != nil {
 				logger.Error(fmt.Sprintf("failed to get participant data for login %s, err: %v", login, err))
@@ -105,7 +106,7 @@ func (s *School) uploadDataParticipant(ctx context.Context) error {
 				logger.Error(fmt.Sprintf("failed to get participant campus: %v", err))
 				continue
 			}
-			participantData.TribeID = 0
+			participantData.TribeID = 1
 			if !exists {
 				err = s.dbR.InsertParticipantData(ctx, participantData, login, campus.Id)
 			} else {
@@ -117,7 +118,6 @@ func (s *School) uploadDataParticipant(ctx context.Context) error {
 				continue
 			}
 			mtx.Increment("update_participant_data.ok")
-			time.Sleep(10 * time.Millisecond)
 		}
 
 		offset += limit
