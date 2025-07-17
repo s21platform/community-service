@@ -84,6 +84,7 @@ func (s *School) uploadDataParticipant(ctx context.Context) error {
 			participantData, err := s.sC.GetParticipantData(ctx, login)
 			if err != nil {
 				logger.Error(fmt.Sprintf("failed to get participant data for login %s, err: %v", login, err))
+				continue
 			}
 
 			if participantData == nil {
@@ -91,10 +92,22 @@ func (s *School) uploadDataParticipant(ctx context.Context) error {
 				continue
 			}
 
-			err = s.dbR.SetParticipantData(ctx, participantData, login)
+			exists, err := s.dbR.ParticipantDataExists(ctx, login)
+			if err != nil {
+				mtx.Increment("update_paticipant_data.not_save")
+				logger.Error(fmt.Sprintf("failed to check participant existance: %v", err))
+				continue
+			}
+
+			if exists {
+				err = s.dbR.InsertParticipantData(ctx, participantData, login)
+			} else {
+				err = s.dbR.UpdateParticipantData(ctx, participantData, login)
+			}
 			if err != nil {
 				mtx.Increment("update_paticipant_data.not_save")
 				logger.Error(fmt.Sprintf("failed to save participant data for login %s, err: %v", login, err))
+				continue
 			}
 			mtx.Increment("update_paticipant_data.ok")
 		}

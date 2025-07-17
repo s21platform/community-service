@@ -31,8 +31,30 @@ func (r *Repository) GetParticipantsLogin(ctx context.Context, limit, offset int
 	return loginsParticipants, nil
 }
 
-func (r *Repository) SetParticipantData(ctx context.Context, participantDataValue *model.ParticipantDataValue, login string) error {
+func (r *Repository) ParticipantDataExists(ctx context.Context, login string) (bool, error) {
+	var exists int
+
+	query, args, err := sq.Select("1").
+		From("participant").
+		Where(sq.Eq{"login": login}).
+		Limit(1).
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
+	if err != nil {
+		return false, fmt.Errorf("failed to build exists query: %v", err)
+	}
+
+	err = r.conn.GetContext(ctx, &exists, query, args...)
+	if err != nil {
+		return false, nil
+	}
+
+	return true, nil
+}
+
+func (r *Repository) InsertParticipantData(ctx context.Context, participantDataValue *model.ParticipantDataValue, login string) error {
 	var campusID int
+
 	err := r.conn.GetContext(ctx, &campusID, "SELECT id FROM campus WHERE campus_uuid = $1", participantDataValue.CampusUUID)
 	if err != nil {
 		return fmt.Errorf("failed to get campus_id by campus_uuid: %v", err)
@@ -43,21 +65,42 @@ func (r *Repository) SetParticipantData(ctx context.Context, participantDataValu
 		Values(login, campusID, participantDataValue.ClassName, participantDataValue.ParallelName, participantDataValue.Status,
 			participantDataValue.ExpValue, participantDataValue.Level, participantDataValue.ExpToNextLevel, participantDataValue.Skills,
 			participantDataValue.PeerCodeReviewPoints, participantDataValue.PeerReviewPoints, participantDataValue.Coins, participantDataValue.Badges).
-		Suffix(`
-        ON CONFLICT (login) DO UPDATE SET
-            campus_id = EXCLUDED.campus_id,
-            class_name = EXCLUDED.class_name,
-            parallel_name = EXCLUDED.parallel_name,
-            status = EXCLUDED.status,
-            exp_value = EXCLUDED.exp_value,
-            level = EXCLUDED.level,
-            exp_to_next_level = EXCLUDED.exp_to_next_level,
-            skills = EXCLUDED.skills,
-            crp = EXCLUDED.crp,
-            prp = EXCLUDED.prp,
-            coins = EXCLUDED.coins,
-            badges = EXCLUDED.badges
-    `).
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
+	if err != nil {
+		return fmt.Errorf("failed to build insert query: %v", err)
+	}
+
+	_, err = r.conn.ExecContext(ctx, query, args...)
+	if err != nil {
+		return fmt.Errorf("failed to insert participant: %v", err)
+	}
+
+	return nil
+}
+
+func (r *Repository) UpdateParticipantData(ctx context.Context, participantDataValue *model.ParticipantDataValue, login string) error {
+	var campusID int
+	err := r.conn.GetContext(ctx, &campusID, "SELECT id FROM campus WHERE campus_uuid = $1", participantDataValue.CampusUUID)
+	if err != nil {
+		return fmt.Errorf("failed to get campus_id by campus_uuid: %v", err)
+	}
+
+	query, args, err := sq.Update("participant").
+		Set("campus_id", campusID).
+		Set("class_name", participantDataValue.ClassName).
+		Set("parallel_name", participantDataValue.ParallelName).
+		Set("status", participantDataValue.Status).
+		Set("exp_value", participantDataValue.ExpValue).
+		Set("level", participantDataValue.Level).
+		Set("exp_to_next_level", participantDataValue.ExpToNextLevel).
+		Set("skills", participantDataValue.Skills).
+		Set("crp", participantDataValue.PeerCodeReviewPoints).
+		Set("prp", participantDataValue.PeerReviewPoints).
+		Set("coins", participantDataValue.Coins).
+		Set("badges", participantDataValue.Badges).
+		//Set("tribe_id", tribeID).
+		Where(sq.Eq{"login": login}).
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 	if err != nil {

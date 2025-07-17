@@ -14,7 +14,9 @@ type SchoolC interface {
 
 type DbRepo interface {
 	GetParticipantsLogin(ctx context.Context, limit, offset int64) ([]string, error)
-	SetParticipantData(ctx context.Context, participantDataValue *model.ParticipantDataValue, login string) error
+	ParticipantDataExists(ctx context.Context, login string) (bool, error)
+	InsertParticipantData(ctx context.Context, participantDataValue *model.ParticipantDataValue, login string) error
+	UpdateParticipantData(ctx context.Context, participantDataValue *model.ParticipantDataValue, login string) error
 }
 
 type RedisRepo interface {
