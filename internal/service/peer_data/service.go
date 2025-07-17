@@ -34,8 +34,7 @@ func (s *School) RunParticipantWorker(ctx context.Context, wg *sync.WaitGroup) {
 
 	logger := logger_lib.FromContext(ctx, config.KeyLogger)
 	logger.AddFuncName("ParticipantDataWorker")
-	// TODO change hour
-	ticker := time.NewTicker(time.Second * 5)
+	ticker := time.NewTicker(time.Hour)
 	defer ticker.Stop()
 
 	for {
@@ -83,7 +82,6 @@ func (s *School) uploadDataParticipant(ctx context.Context) error {
 			participantData, err := s.sC.GetParticipantData(ctx, login)
 			if err != nil {
 				logger.Error(fmt.Sprintf("failed to get participant data for login %s, err: %v", login, err))
-				continue
 			}
 
 			if participantData == nil {

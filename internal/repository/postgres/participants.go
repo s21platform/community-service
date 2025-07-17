@@ -32,8 +32,14 @@ func (r *Repository) GetParticipantsLogin(ctx context.Context, limit, offset int
 }
 
 func (r *Repository) SetParticipantData(ctx context.Context, participantDataValue *model.ParticipantDataValue, login string) error {
+	var campusID int
+	err := r.conn.GetContext(ctx, &campusID, "SELECT id FROM campus WHERE campus_uuid = $1", participantDataValue.CampusUUID)
+	if err != nil {
+		return fmt.Errorf("failed to get campus_id by campus_uuid: %v", err)
+	}
+
 	query, args, err := sq.Update("participant").
-		Set("campus_id", participantDataValue.CampusUUID).
+		Set("campus_id", campusID).
 		Set("class_name", participantDataValue.ClassName).
 		Set("parallel_name", participantDataValue.ParallelName).
 		Set("status", participantDataValue.Status).
@@ -45,8 +51,8 @@ func (r *Repository) SetParticipantData(ctx context.Context, participantDataValu
 		Set("prp", participantDataValue.PeerReviewPoints).
 		Set("coins", participantDataValue.Coins).
 		Set("badges", participantDataValue.Badges).
-		Set("tribe_id", participantDataValue.TribeID).
-		Where(sq.Eq{"login": login}).Where(sq.Eq{"login": login}).
+		//Set("tribe_id", tribeID).
+		Where(sq.Eq{"login": login}).
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 	if err != nil {

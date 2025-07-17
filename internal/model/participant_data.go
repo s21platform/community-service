@@ -1,6 +1,11 @@
 package model
 
 import (
+	"encoding/json"
+	"fmt"
+	
+	"database/sql/driver"
+
 	school "github.com/s21platform/school-proto/school-proto"
 )
 
@@ -51,4 +56,64 @@ func (b *Badges) ConvertBadgesFromProto(badges []*school.Badges) {
 			IconURL:         badge.IconURL,
 		}
 	}
+}
+
+// Реализация driver.Valuer для Skills
+func (s Skills) Value() (driver.Value, error) {
+	if len(s) == 0 {
+		return "[]", nil
+	}
+	b, err := json.Marshal(s)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal Skills: %w", err)
+	}
+	return string(b), nil
+}
+
+// Реализация sql.Scanner для Skills
+func (s *Skills) Scan(src interface{}) error {
+	if src == nil {
+		*s = Skills{}
+		return nil
+	}
+	var data []byte
+	switch v := src.(type) {
+	case string:
+		data = []byte(v)
+	case []byte:
+		data = v
+	default:
+		return fmt.Errorf("cannot scan type %T into Skills", src)
+	}
+	return json.Unmarshal(data, s)
+}
+
+// Реализация driver.Valuer для Badges
+func (b Badges) Value() (driver.Value, error) {
+	if len(b) == 0 {
+		return "[]", nil
+	}
+	data, err := json.Marshal(b)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal Badges: %w", err)
+	}
+	return string(data), nil
+}
+
+// Реализация sql.Scanner для Badges
+func (b *Badges) Scan(src interface{}) error {
+	if src == nil {
+		*b = Badges{}
+		return nil
+	}
+	var data []byte
+	switch v := src.(type) {
+	case string:
+		data = []byte(v)
+	case []byte:
+		data = v
+	default:
+		return fmt.Errorf("cannot scan type %T into Badges", src)
+	}
+	return json.Unmarshal(data, b)
 }
