@@ -12,8 +12,8 @@ func (r *Repository) GetParticipantsLogin(ctx context.Context, limit, offset int
 	var loginsParticipants []string
 
 	query, args, err := sq.
-		Select("login").
-		From("participant").
+		Select("nickname").
+		From("login").
 		OrderBy("id ASC").
 		Limit(uint64(limit)).
 		Offset(uint64(offset)).
