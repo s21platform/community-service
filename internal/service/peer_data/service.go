@@ -117,6 +117,7 @@ func (s *School) uploadDataParticipant(ctx context.Context) error {
 				continue
 			}
 			mtx.Increment("update_participant_data.ok")
+			time.Sleep(10 * time.Millisecond)
 		}
 
 		offset += limit
