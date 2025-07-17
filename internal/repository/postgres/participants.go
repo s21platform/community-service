@@ -38,21 +38,26 @@ func (r *Repository) SetParticipantData(ctx context.Context, participantDataValu
 		return fmt.Errorf("failed to get campus_id by campus_uuid: %v", err)
 	}
 
-	query, args, err := sq.Update("participant").
-		Set("campus_id", campusID).
-		Set("class_name", participantDataValue.ClassName).
-		Set("parallel_name", participantDataValue.ParallelName).
-		Set("status", participantDataValue.Status).
-		Set("exp_value", participantDataValue.ExpValue).
-		Set("level", participantDataValue.Level).
-		Set("exp_to_next_level", participantDataValue.ExpToNextLevel).
-		Set("skills", participantDataValue.Skills).
-		Set("crp", participantDataValue.PeerCodeReviewPoints).
-		Set("prp", participantDataValue.PeerReviewPoints).
-		Set("coins", participantDataValue.Coins).
-		Set("badges", participantDataValue.Badges).
-		//Set("tribe_id", tribeID).
-		Where(sq.Eq{"login": login}).
+	query, args, err := sq.Insert("participant").
+		Columns("login", "campus_id", "class_name", "parallel_name", "status", "exp_value", "level", "exp_to_next_level", "skills", "crp", "prp", "coins", "badges").
+		Values(login, campusID, participantDataValue.ClassName, participantDataValue.ParallelName, participantDataValue.Status,
+			participantDataValue.ExpValue, participantDataValue.Level, participantDataValue.ExpToNextLevel, participantDataValue.Skills,
+			participantDataValue.PeerCodeReviewPoints, participantDataValue.PeerReviewPoints, participantDataValue.Coins, participantDataValue.Badges).
+		Suffix(`
+        ON CONFLICT (login) DO UPDATE SET
+            campus_id = EXCLUDED.campus_id,
+            class_name = EXCLUDED.class_name,
+            parallel_name = EXCLUDED.parallel_name,
+            status = EXCLUDED.status,
+            exp_value = EXCLUDED.exp_value,
+            level = EXCLUDED.level,
+            exp_to_next_level = EXCLUDED.exp_to_next_level,
+            skills = EXCLUDED.skills,
+            crp = EXCLUDED.crp,
+            prp = EXCLUDED.prp,
+            coins = EXCLUDED.coins,
+            badges = EXCLUDED.badges
+    `).
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 	if err != nil {
