@@ -105,6 +105,7 @@ func (s *School) uploadDataParticipant(ctx context.Context) error {
 				logger.Error(fmt.Sprintf("failed to get participant campus: %v", err))
 				continue
 			}
+			participantData.TribeID = "no tribe yet"
 			if !exists {
 				err = s.dbR.InsertParticipantData(ctx, participantData, login, campus.Id)
 			} else {
