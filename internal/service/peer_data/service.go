@@ -72,9 +72,11 @@ func (s *School) uploadDataParticipant(ctx context.Context) error {
 	for {
 		logins, err := s.dbR.GetParticipantsLogin(ctx, limit, offset)
 		if err != nil {
+			mtx.Increment("update_paticipant_data.error_getting_logins")
 			return fmt.Errorf("failed to get participant logins, err: %v", err)
 		}
 		if len(logins) == 0 {
+			mtx.Increment("update_paticipant_data.empty_login_list")
 			break
 		}
 
@@ -95,9 +97,9 @@ func (s *School) uploadDataParticipant(ctx context.Context) error {
 			}
 		}
 
+		mtx.Increment("update_paticipant_data.successful_update")
 		offset += limit
 	}
 
 	return nil
-
 }
