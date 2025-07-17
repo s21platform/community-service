@@ -34,7 +34,7 @@ func (s *School) RunParticipantWorker(ctx context.Context, wg *sync.WaitGroup) {
 
 	logger := logger_lib.FromContext(ctx, config.KeyLogger)
 	logger.AddFuncName("ParticipantDataWorker")
-	ticker := time.NewTicker(time.Hour)
+	ticker := time.NewTicker(time.Second * 5)
 	defer ticker.Stop()
 
 	for {
@@ -55,7 +55,7 @@ func (s *School) RunParticipantWorker(ctx context.Context, wg *sync.WaitGroup) {
 					logger.Error(fmt.Sprintf("failed to upload participants, err: %v", err))
 				}
 
-				err = s.rR.Set(ctx, config.KeyParticipantDataLastUpdated, "upd", 24*time.Hour)
+				err = s.rR.Set(ctx, config.KeyParticipantDataLastUpdated, "upd", time.Hour)
 				if err != nil {
 					logger.Error(fmt.Sprintf("failed to save participant last updated, err: %v", err))
 				}
