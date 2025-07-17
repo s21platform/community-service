@@ -3,7 +3,7 @@ package model
 import (
 	"encoding/json"
 	"fmt"
-	
+
 	"database/sql/driver"
 
 	school "github.com/s21platform/school-proto/school-proto"
@@ -37,7 +37,11 @@ type ParticipantDataValue struct {
 	TribeID              string `json:"tribeId,omitempty"`
 }
 
-func (s *Skills) ConvertSkillsFromProto(skills []*school.Skills)  {
+type ParticipantLogin struct {
+	Login string `db:"login"`
+}
+
+func (s *Skills) ConvertSkillsFromProto(skills []*school.Skills) {
 	*s = make([]Skill, len(skills))
 	for i, skill := range skills {
 		(*s)[i] = Skill{

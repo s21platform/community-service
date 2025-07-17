@@ -72,11 +72,11 @@ func (s *School) uploadDataParticipant(ctx context.Context) error {
 	for {
 		logins, err := s.dbR.GetParticipantsLogin(ctx, limit, offset)
 		if err != nil {
-			mtx.Increment("update_paticipant_data.edu_error")
+			mtx.Increment("update_participant_data.edu_error")
 			return fmt.Errorf("failed to get participant logins, err: %v", err)
 		}
 		if len(logins) == 0 {
-			mtx.Increment("update_paticipant_data.empty_login_list")
+			mtx.Increment("update_participant_data.empty_login_list")
 			break
 		}
 
@@ -88,28 +88,34 @@ func (s *School) uploadDataParticipant(ctx context.Context) error {
 			}
 
 			if participantData == nil {
-				mtx.Increment("update_paticipant_data.not_exists")
+				mtx.Increment("update_participant_data.not_exists")
 				continue
 			}
 
-			exists, err := s.dbR.ParticipantDataExists(ctx, login)
+			exists, err := s.dbR.IsParticipantDataExists(ctx, login)
 			if err != nil {
-				mtx.Increment("update_paticipant_data.not_save")
+				mtx.Increment("update_participant_data.error_get_participant")
 				logger.Error(fmt.Sprintf("failed to check participant existance: %v", err))
 				continue
 			}
 
-			if exists {
-				err = s.dbR.InsertParticipantData(ctx, participantData, login)
+			campus, err := s.dbR.GetCampusByUUID(ctx, participantData.CampusUUID)
+			if err != nil {
+				mtx.Increment("update_participant_data.error_get_campus")
+				logger.Error(fmt.Sprintf("failed to get participant campus: %v", err))
+				continue
+			}
+			if !exists {
+				err = s.dbR.InsertParticipantData(ctx, participantData, login, campus.Id)
 			} else {
-				err = s.dbR.UpdateParticipantData(ctx, participantData, login)
+				err = s.dbR.UpdateParticipantData(ctx, participantData, login, campus.Id)
 			}
 			if err != nil {
-				mtx.Increment("update_paticipant_data.not_save")
+				mtx.Increment("update_participant_data.not_save")
 				logger.Error(fmt.Sprintf("failed to save participant data for login %s, err: %v", login, err))
 				continue
 			}
-			mtx.Increment("update_paticipant_data.ok")
+			mtx.Increment("update_participant_data.ok")
 		}
 
 		offset += limit

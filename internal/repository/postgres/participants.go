@@ -2,6 +2,8 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 
 	sq "github.com/Masterminds/squirrel"
@@ -31,10 +33,10 @@ func (r *Repository) GetParticipantsLogin(ctx context.Context, limit, offset int
 	return loginsParticipants, nil
 }
 
-func (r *Repository) ParticipantDataExists(ctx context.Context, login string) (bool, error) {
-	var exists int
+func (r *Repository) IsParticipantDataExists(ctx context.Context, login string) (bool, error) {
+	var loginT model.ParticipantLogin
 
-	query, args, err := sq.Select("1").
+	query, args, err := sq.Select("login").
 		From("participant").
 		Where(sq.Eq{"login": login}).
 		Limit(1).
@@ -44,22 +46,17 @@ func (r *Repository) ParticipantDataExists(ctx context.Context, login string) (b
 		return false, fmt.Errorf("failed to build exists query: %v", err)
 	}
 
-	err = r.conn.GetContext(ctx, &exists, query, args...)
+	err = r.conn.GetContext(ctx, &loginT, query, args...)
 	if err != nil {
-		return false, nil
+		if errors.Is(err, sql.ErrNoRows) {
+			return false, nil
+		}
+		return false, err
 	}
-
 	return true, nil
 }
 
-func (r *Repository) InsertParticipantData(ctx context.Context, participantDataValue *model.ParticipantDataValue, login string) error {
-	var campusID int
-
-	err := r.conn.GetContext(ctx, &campusID, "SELECT id FROM campus WHERE campus_uuid = $1", participantDataValue.CampusUUID)
-	if err != nil {
-		return fmt.Errorf("failed to get campus_id by campus_uuid: %v", err)
-	}
-
+func (r *Repository) InsertParticipantData(ctx context.Context, participantDataValue *model.ParticipantDataValue, login string, campusID int64) error {
 	query, args, err := sq.Insert("participant").
 		Columns("login", "campus_id", "class_name", "parallel_name", "status", "exp_value", "level", "exp_to_next_level", "skills", "crp", "prp", "coins", "badges").
 		Values(login, campusID, participantDataValue.ClassName, participantDataValue.ParallelName, participantDataValue.Status,
@@ -79,13 +76,7 @@ func (r *Repository) InsertParticipantData(ctx context.Context, participantDataV
 	return nil
 }
 
-func (r *Repository) UpdateParticipantData(ctx context.Context, participantDataValue *model.ParticipantDataValue, login string) error {
-	var campusID int
-	err := r.conn.GetContext(ctx, &campusID, "SELECT id FROM campus WHERE campus_uuid = $1", participantDataValue.CampusUUID)
-	if err != nil {
-		return fmt.Errorf("failed to get campus_id by campus_uuid: %v", err)
-	}
-
+func (r *Repository) UpdateParticipantData(ctx context.Context, participantDataValue *model.ParticipantDataValue, login string, campusID int64) error {
 	query, args, err := sq.Update("participant").
 		Set("campus_id", campusID).
 		Set("class_name", participantDataValue.ClassName).
