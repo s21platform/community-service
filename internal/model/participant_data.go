@@ -34,7 +34,7 @@ type ParticipantDataValue struct {
 	PeerCodeReviewPoints int64  `json:"peerCodeReviewPoints"`
 	Coins                int64  `json:"coins"`
 	Badges               Badges `json:"badges"`
-	TribeID              string `json:"tribeId,omitempty"`
+	TribeID              int64  `json:"tribeId"`
 }
 
 type ParticipantLogin struct {
