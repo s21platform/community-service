@@ -10,6 +10,7 @@ COPY . .
 RUN go build -o build/main cmd/service/main.go
 RUN go build -o build/workerParticipant cmd/worker/patricipants/main.go
 RUN go build -o build/workerCampus cmd/worker/campuses/main.go
+RUN go build -o build/peerData cmd/worker/peer_data/main.go
 
 FROM alpine:latest
 
@@ -18,4 +19,5 @@ WORKDIR /app
 COPY --from=builder /usr/src/service/build/main .
 COPY --from=builder /usr/src/service/build/workerParticipant .
 COPY --from=builder /usr/src/service/build/workerCampus .
-CMD ./main & ./workerParticipant & ./workerCampus
+COPY --from=builder /usr/src/service/build/peerData .
+CMD ./main & ./workerParticipant & ./workerCampus & ./peerData
