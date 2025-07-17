@@ -58,10 +58,10 @@ func (r *Repository) IsParticipantDataExists(ctx context.Context, login string) 
 
 func (r *Repository) InsertParticipantData(ctx context.Context, participantDataValue *model.ParticipantDataValue, login string, campusID int64) error {
 	query, args, err := sq.Insert("participant").
-		Columns("login", "campus_id", "class_name", "parallel_name", "status", "exp_value", "level", "exp_to_next_level", "skills", "crp", "prp", "coins", "badges").
+		Columns("login", "campus_id", "class_name", "parallel_name", "status", "exp_value", "level", "exp_to_next_level", "skills", "crp", "prp", "coins", "badges", "tribe_id").
 		Values(login, campusID, participantDataValue.ClassName, participantDataValue.ParallelName, participantDataValue.Status,
 			participantDataValue.ExpValue, participantDataValue.Level, participantDataValue.ExpToNextLevel, participantDataValue.Skills,
-			participantDataValue.PeerCodeReviewPoints, participantDataValue.PeerReviewPoints, participantDataValue.Coins, participantDataValue.Badges).
+			participantDataValue.PeerCodeReviewPoints, participantDataValue.PeerReviewPoints, participantDataValue.Coins, participantDataValue.Badges, participantDataValue.TribeID).
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 	if err != nil {
@@ -90,6 +90,7 @@ func (r *Repository) UpdateParticipantData(ctx context.Context, participantDataV
 		Set("prp", participantDataValue.PeerReviewPoints).
 		Set("coins", participantDataValue.Coins).
 		Set("badges", participantDataValue.Badges).
+		Set("tribe_id", participantDataValue.TribeID).
 		//Set("tribe_id", tribeID).
 		Where(sq.Eq{"login": login}).
 		PlaceholderFormat(sq.Dollar).
