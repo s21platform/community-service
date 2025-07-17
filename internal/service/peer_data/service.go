@@ -3,6 +3,7 @@ package peerdata
 import (
 	"context"
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 
@@ -84,6 +85,14 @@ func (s *School) uploadDataParticipant(ctx context.Context) error {
 			time.Sleep(101 * time.Millisecond)
 			participantData, err := s.sC.GetParticipantData(ctx, login)
 			if err != nil {
+				if strings.Contains(err.Error(), "Invalid token") {
+					mtx.Increment("update_participant_data.invalid_token")
+				} else if strings.Contains(err.Error(), "Too many requests") {
+					mtx.Increment("update_participant_data.too_many_requests")
+				} else {
+					mtx.Increment("update_participant_data.unknown_error")
+				}
+
 				logger.Error(fmt.Sprintf("failed to get participant data for login %s, err: %v", login, err))
 				continue
 			}
