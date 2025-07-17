@@ -55,7 +55,7 @@ func (s *School) RunParticipantWorker(ctx context.Context, wg *sync.WaitGroup) {
 					logger.Error(fmt.Sprintf("failed to upload participants, err: %v", err))
 				}
 
-				err = s.rR.Set(ctx, config.KeyParticipantDataLastUpdated, "upd", time.Hour)
+				err = s.rR.Set(ctx, config.KeyParticipantDataLastUpdated, "upd", 3*time.Hour)
 				if err != nil {
 					logger.Error(fmt.Sprintf("failed to save participant last updated, err: %v", err))
 				}
@@ -81,7 +81,7 @@ func (s *School) uploadDataParticipant(ctx context.Context) error {
 		}
 
 		for _, login := range logins {
-			time.Sleep(52 * time.Millisecond)
+			time.Sleep(101 * time.Millisecond)
 			participantData, err := s.sC.GetParticipantData(ctx, login)
 			if err != nil {
 				logger.Error(fmt.Sprintf("failed to get participant data for login %s, err: %v", login, err))
