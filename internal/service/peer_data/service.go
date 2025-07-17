@@ -72,7 +72,7 @@ func (s *School) uploadDataParticipant(ctx context.Context) error {
 	for {
 		logins, err := s.dbR.GetParticipantsLogin(ctx, limit, offset)
 		if err != nil {
-			mtx.Increment("update_paticipant_data.error_getting_logins")
+			mtx.Increment("update_paticipant_data.edu_error")
 			return fmt.Errorf("failed to get participant logins, err: %v", err)
 		}
 		if len(logins) == 0 {
@@ -87,17 +87,18 @@ func (s *School) uploadDataParticipant(ctx context.Context) error {
 			}
 
 			if participantData == nil {
-				mtx.Increment("update_paticipant_data.data_not_exists")
+				mtx.Increment("update_paticipant_data.not_exists")
 				continue
 			}
 
 			err = s.dbR.SetParticipantData(ctx, participantData, login)
 			if err != nil {
+				mtx.Increment("update_paticipant_data.not_save")
 				logger.Error(fmt.Sprintf("failed to save participant data for login %s, err: %v", login, err))
 			}
+			mtx.Increment("update_paticipant_data.ok")
 		}
 
-		mtx.Increment("update_paticipant_data.successful_update")
 		offset += limit
 	}
 
