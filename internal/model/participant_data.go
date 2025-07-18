@@ -43,7 +43,10 @@ type Participant struct {
 }
 
 const (
-	ParticipantStatusActive = "ACTIVE"
+	ParticipantStatusActive   = "ACTIVE"
+	ParticipantStatusBlocked  = "BLOCKED"
+	ParticipantStatusExpelled = "EXPELLED"
+	ParticipantStatusFrozen   = "FROZEN"
 )
 
 func (s *Skills) ConvertSkillsFromProto(skills []*school.Skills) {

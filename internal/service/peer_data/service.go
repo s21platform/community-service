@@ -87,7 +87,6 @@ func (s *School) uploadDataParticipant(ctx context.Context) error {
 
 		for _, login := range logins {
 			exists := true
-			time.Sleep(10 * time.Millisecond)
 			participant, err := s.dbR.ParticipantData(ctx, login)
 			if err != nil {
 				if !errors.Is(err, sql.ErrNoRows) {
@@ -97,10 +96,11 @@ func (s *School) uploadDataParticipant(ctx context.Context) error {
 				}
 				exists = false
 			}
-			if participant != nil && participant.Status != model.ParticipantStatusActive {
+			if participant != nil && (participant.Status == model.ParticipantStatusBlocked || participant.Status == model.ParticipantStatusFrozen || participant.Status == model.ParticipantStatusExpelled) {
 				mtx.Increment("update_participant_data.skip_not_active")
 				continue
 			}
+			time.Sleep(200 * time.Millisecond)
 			participantData, err := s.sC.GetParticipantData(ctx, login)
 			if err != nil {
 				if strings.Contains(err.Error(), "Invalid token") {
