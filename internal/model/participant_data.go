@@ -37,9 +37,14 @@ type ParticipantDataValue struct {
 	TribeID              int64  `json:"tribeId"`
 }
 
-type ParticipantLogin struct {
-	Login string `db:"login"`
+type Participant struct {
+	Login  string `db:"login"`
+	Status string `db:"status"`
 }
+
+const (
+	ParticipantStatusActive = "ACTIVE"
+)
 
 func (s *Skills) ConvertSkillsFromProto(skills []*school.Skills) {
 	*s = make([]Skill, len(skills))

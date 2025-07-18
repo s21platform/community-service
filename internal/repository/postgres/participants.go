@@ -2,8 +2,6 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
-	"errors"
 	"fmt"
 
 	sq "github.com/Masterminds/squirrel"
@@ -33,27 +31,24 @@ func (r *Repository) GetParticipantsLogin(ctx context.Context, limit, offset int
 	return loginsParticipants, nil
 }
 
-func (r *Repository) IsParticipantDataExists(ctx context.Context, login string) (bool, error) {
-	var loginT model.ParticipantLogin
+func (r *Repository) ParticipantData(ctx context.Context, login string) (*model.Participant, error) {
+	var participant model.Participant
 
-	query, args, err := sq.Select("login").
+	query, args, err := sq.Select("login", "status").
 		From("participant").
 		Where(sq.Eq{"login": login}).
 		Limit(1).
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 	if err != nil {
-		return false, fmt.Errorf("failed to build exists query: %v", err)
+		return nil, fmt.Errorf("failed to build exists query: %v", err)
 	}
 
-	err = r.conn.GetContext(ctx, &loginT, query, args...)
+	err = r.conn.GetContext(ctx, &participant, query, args...)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return false, nil
-		}
-		return false, err
+		return nil, fmt.Errorf("failed to get participant, err: %v", err)
 	}
-	return true, nil
+	return &participant, nil
 }
 
 func (r *Repository) InsertParticipantData(ctx context.Context, participantDataValue *model.ParticipantDataValue, login string, campusID int64) error {

@@ -2,14 +2,18 @@ package peerdata
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 	"strings"
 	"sync"
 	"time"
 
-	"github.com/s21platform/community-service/internal/config"
 	logger_lib "github.com/s21platform/logger-lib"
 	"github.com/s21platform/metrics-lib/pkg"
+
+	"github.com/s21platform/community-service/internal/config"
+	"github.com/s21platform/community-service/internal/model"
 )
 
 const (
@@ -82,7 +86,21 @@ func (s *School) uploadDataParticipant(ctx context.Context) error {
 		}
 
 		for _, login := range logins {
+			exists := true
 			time.Sleep(10 * time.Millisecond)
+			participant, err := s.dbR.ParticipantData(ctx, login)
+			if err != nil {
+				if !errors.Is(err, sql.ErrNoRows) {
+					mtx.Increment("update_participant_data.error_get_participant")
+					logger.Error(fmt.Sprintf("failed to check participant existance: %v", err))
+					continue
+				}
+				exists = false
+			}
+			if participant != nil && participant.Status != model.ParticipantStatusActive {
+				mtx.Increment("update_participant_data.skip_not_active")
+				continue
+			}
 			participantData, err := s.sC.GetParticipantData(ctx, login)
 			if err != nil {
 				if strings.Contains(err.Error(), "Invalid token") {
@@ -99,13 +117,6 @@ func (s *School) uploadDataParticipant(ctx context.Context) error {
 
 			if participantData == nil {
 				mtx.Increment("update_participant_data.not_exists")
-				continue
-			}
-
-			exists, err := s.dbR.IsParticipantDataExists(ctx, login)
-			if err != nil {
-				mtx.Increment("update_participant_data.error_get_participant")
-				logger.Error(fmt.Sprintf("failed to check participant existance: %v", err))
 				continue
 			}
 
