@@ -19,7 +19,7 @@ func (r *Repository) GetPeerSchoolData(ctx context.Context, nickName string) (mo
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 	if err != nil {
-		return model.PeerSchoolData{}, fmt.Errorf("cannot configure query, err: %v", err)
+		return model.PeerSchoolData{}, fmt.Errorf("failed to configure query, err: %v", err)
 	}
 
 	err = r.conn.GetContext(ctx, &schoolData, query, args...)

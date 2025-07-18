@@ -42,20 +42,19 @@ func (s *School) RunPeerWorker(ctx context.Context, wg *sync.WaitGroup) {
 		select {
 		case <-ctx.Done():
 			logger.Info("participant uploading worker shutting down")
-
+			return
 		case <-ticker.C:
 			lastUpdate, err := s.rR.GetByKey(ctx, config.KeyParticipantLastUpdated)
 			if err != nil {
 				logger.Error(fmt.Sprintf("cannot get last update time, err: %v", err))
 			}
-
 			if lastUpdate == "" {
 				err := s.uploadParticipants(ctx)
 				if err != nil {
 					logger.Error(fmt.Sprintf("cannot upload participants, err: %v", err))
 				}
 
-				err = s.rR.Set(ctx, config.KeyParticipantLastUpdated, "upd", time.Hour*24*30)
+				err = s.rR.Set(ctx, config.KeyParticipantLastUpdated, "upd", 24*30*time.Hour)
 				if err != nil {
 					logger.Error(fmt.Sprintf("cannot save participant last updated, err: %v", err))
 				}

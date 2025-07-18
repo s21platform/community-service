@@ -35,8 +35,8 @@ func New(cfg *config.Config) *Repository {
 	return &Repository{conn: rdb}
 }
 
-func (r *Repository) GetByKey(ctx context.Context, key string) (string, error) {
-	val, err := r.conn.Get(ctx, key).Result()
+func (r *Repository) GetByKey(ctx context.Context, key config.Key) (string, error) {
+	val, err := r.conn.Get(ctx, string(key)).Result()
 	if err != nil {
 		if errors.Is(err, redis.Nil) {
 			return "", nil
@@ -46,8 +46,8 @@ func (r *Repository) GetByKey(ctx context.Context, key string) (string, error) {
 	return val, nil
 }
 
-func (r *Repository) Set(ctx context.Context, key string, value string, expiration time.Duration) error {
-	err := r.conn.Set(ctx, key, value, expiration).Err()
+func (r *Repository) Set(ctx context.Context, key config.Key, value string, expiration time.Duration) error {
+	err := r.conn.Set(ctx, string(key), value, expiration).Err()
 	if err != nil {
 		log.Printf("cannot set key: %s, value: %s, err: %v", key, value, err)
 		return fmt.Errorf("cannot set key: %s, value: %s, err: %v", key, value, err)

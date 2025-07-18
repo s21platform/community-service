@@ -1,5 +1,5 @@
 # Используем официальный образ Golang как базовый
-FROM golang:1.22-alpine
+FROM golang:1.24-alpine
 
 # Установим необходимые зависимости
 RUN apk add --no-cache bash gcc musl-dev postgresql-dev
