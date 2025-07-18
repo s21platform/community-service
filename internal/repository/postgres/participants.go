@@ -46,7 +46,7 @@ func (r *Repository) ParticipantData(ctx context.Context, login string) (*model.
 
 	err = r.conn.GetContext(ctx, &participant, query, args...)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get participant, err: %v", err)
+		return nil, err
 	}
 	return &participant, nil
 }
