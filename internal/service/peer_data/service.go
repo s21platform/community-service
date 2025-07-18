@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	limit = 1000
+	limit = 10000
 )
 
 type School struct {
@@ -82,7 +82,7 @@ func (s *School) uploadDataParticipant(ctx context.Context) error {
 		}
 
 		for _, login := range logins {
-			time.Sleep(200 * time.Millisecond)
+			time.Sleep(10 * time.Millisecond)
 			participantData, err := s.sC.GetParticipantData(ctx, login)
 			if err != nil {
 				if strings.Contains(err.Error(), "Invalid token") {
@@ -131,6 +131,6 @@ func (s *School) uploadDataParticipant(ctx context.Context) error {
 
 		offset += limit
 	}
-
+	mtx.Increment("update_participant_data.finish_upload")
 	return nil
 }
