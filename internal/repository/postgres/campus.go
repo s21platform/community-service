@@ -31,7 +31,7 @@ func (r *Repository) GetCampusUuids(ctx context.Context) ([]string, error) {
 
 func (r *Repository) GetCampusByUUID(ctx context.Context, campusUUID string) (*model.Campus, error) {
 	var campus model.Campus
-	query, args, err := sq.Select("campus_uuid").
+	query, args, err := sq.Select("id", "campus_uuid").
 		From("campus").
 		Where(sq.Eq{"campus_uuid": campusUUID}).
 		PlaceholderFormat(sq.Dollar).

@@ -17,7 +17,7 @@ func (r *Repository) GetPeerStatus(ctx context.Context, email string) (string, e
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 	if err != nil {
-		return "", fmt.Errorf("cannot configure query, err: %v", err)
+		return "", fmt.Errorf("failed to configure query, err: %v", err)
 	}
 
 	err = r.conn.GetContext(ctx, &status, query, args...)

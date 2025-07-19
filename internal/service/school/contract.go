@@ -1,20 +1,19 @@
-package campus
+package service
 
 import (
 	"context"
 	"time"
 
 	"github.com/s21platform/community-service/internal/config"
-	"github.com/s21platform/community-service/internal/model"
 )
 
 type SchoolClient interface {
-	GetCampuses(ctx context.Context) ([]model.Campus, error)
+	GetPeersByCampusUuid(ctx context.Context, campusUuid string, limit, offset int64) ([]string, error)
 }
 
 type DbRepo interface {
-	SetCampus(ctx context.Context, campus model.Campus) error
-	GetCampusByUUID(ctx context.Context, campusUUID string) (*model.Campus, error)
+	AddPeerLogins(ctx context.Context, peerLogins []string) error
+	GetCampusUuids(ctx context.Context) ([]string, error)
 }
 
 type RedisRepo interface {

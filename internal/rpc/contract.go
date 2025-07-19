@@ -3,6 +3,7 @@ package rpc
 
 import (
 	"context"
+	"github.com/s21platform/community-service/internal/config"
 
 	"github.com/s21platform/community-service/pkg/community"
 
@@ -17,5 +18,5 @@ type DbRepo interface {
 }
 
 type RedisRepo interface {
-	Delete(ctx context.Context, key string)
+	Delete(ctx context.Context, key config.Key)
 }
