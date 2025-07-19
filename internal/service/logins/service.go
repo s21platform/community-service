@@ -61,7 +61,7 @@ func (w *Worker) RunPeerWorker(ctx context.Context, wg *sync.WaitGroup) {
 				}
 				metric.Duration(time.Since(start).Milliseconds(), "upload_peers.duration.worker")
 
-				err = w.rR.Set(ctx, config.KeyLoginsLastUpdated, time.Now().Add(time.Hour*24*30).Format(time.RFC3339), time.Hour*24*30)
+				err = w.rR.Set(ctx, config.KeyLoginsLastUpdated, time.Now().Add(time.Hour*24*30).Format(time.RFC3339), time.Hour*24*15)
 				if err != nil {
 					logger.Error(fmt.Sprintf("cannot save participant last updated, err: %v", err))
 				}
@@ -86,6 +86,7 @@ func (w *Worker) uploadLogins(ctx context.Context) error {
 		counter := 0
 
 		for {
+			time.Sleep(1 * time.Second)
 			peerLogins, err := w.sC.GetPeersByCampusUuid(ctx, campus, peerLimit, offset)
 			if err != nil {
 				logger.Error(fmt.Sprintf("failed to get chank of peer logins from school client - skip: %v", err))

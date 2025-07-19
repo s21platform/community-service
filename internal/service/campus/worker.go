@@ -54,7 +54,7 @@ func (w *Worker) Run(ctx context.Context, wg *sync.WaitGroup) {
 				continue
 			}
 
-			err = w.rR.Set(ctx, config.KeyCampusesLastUpdated, "upd", time.Hour*24*30)
+			err = w.rR.Set(ctx, config.KeyCampusesLastUpdated, "upd", time.Hour*24*15)
 			if err != nil {
 				logger.Error(fmt.Sprintf("failed to save campuses last updated, err: %v", err))
 				continue
@@ -69,17 +69,19 @@ func (w *Worker) process(ctx context.Context) error {
 	mtx := pkg.FromContext(ctx, config.KeyMetrics)
 	campuses, err := w.sC.GetCampuses(ctx)
 	if err != nil {
+		mtx.Increment("upload_campus.failed_to_get")
 		return fmt.Errorf("failed to get campuses, err: %v", err)
 	}
 
 	for _, campus := range campuses {
 		cpm, err := w.dbR.GetCampusByUUID(ctx, campus.Uuid)
 		if err != nil {
+			mtx.Increment("upload_campus.failed_to_get_from_db")
 			return fmt.Errorf("failed to check campus exist, err: %v", err)
 		}
 
 		if cpm != nil {
-			mtx.Increment("campus_exists")
+			mtx.Increment("upload_campus.already_exist")
 			continue
 		}
 
@@ -87,7 +89,7 @@ func (w *Worker) process(ctx context.Context) error {
 		if err != nil {
 			return fmt.Errorf("failed to create campus, err: %v", err)
 		}
-		mtx.Increment("campus_created")
+		mtx.Increment("upload_campus.new")
 	}
 
 	return nil
