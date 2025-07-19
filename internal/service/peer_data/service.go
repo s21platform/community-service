@@ -100,7 +100,7 @@ func (s *School) uploadDataParticipant(ctx context.Context) error {
 				mtx.Increment("update_participant_data.skip_not_active")
 				continue
 			}
-			time.Sleep(200 * time.Millisecond)
+			time.Sleep(300 * time.Millisecond)
 			participantData, err := s.sC.GetParticipantData(ctx, login)
 			if err != nil {
 				if strings.Contains(err.Error(), "Invalid token") {

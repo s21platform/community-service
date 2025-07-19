@@ -9,13 +9,13 @@ require (
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/lib/pq v1.10.9
 	github.com/redis/go-redis/v9 v9.7.0
-	github.com/s21platform/community-proto v0.0.3
 	github.com/s21platform/logger-lib v0.0.6
 	github.com/s21platform/metrics-lib v0.0.8
 	github.com/s21platform/school-proto v0.0.5
 	github.com/stretchr/testify v1.2.2
 	golang.org/x/net v0.29.0
 	google.golang.org/grpc v1.68.0
+	google.golang.org/protobuf v1.35.1
 )
 
 require (
@@ -31,7 +31,6 @@ require (
 	golang.org/x/sys v0.25.0 // indirect
 	golang.org/x/text v0.18.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240903143218-8af14fe29dc1 // indirect
-	google.golang.org/protobuf v1.35.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	olympos.io/encoding/edn v0.0.0-20201019073823-d3554ca0b0a3 // indirect
 )

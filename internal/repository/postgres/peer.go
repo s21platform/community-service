@@ -2,28 +2,49 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 
 	sq "github.com/Masterminds/squirrel"
+
+	"github.com/s21platform/community-service/internal/model"
 )
 
-func (r *Repository) AddPeerLogins(ctx context.Context, peerLogins []string) error {
-	queryBase := sq.Insert("login").
-		Columns("nickname").
-		Suffix("ON CONFLICT (nickname) DO NOTHING").
-		PlaceholderFormat(sq.Dollar)
+func (r *Repository) GetPeerByLogin(ctx context.Context, nickname string) (model.Login, error) {
+	query, args, err := sq.Select("nickname").
+		From("login").
+		Where(sq.Eq{"nickname": nickname}).
+		Limit(1).
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
 
-	for _, login := range peerLogins {
-		queryBase = queryBase.Values(login)
-	}
-
-	query, args, err := queryBase.ToSql()
 	if err != nil {
-		return fmt.Errorf("failed to configure query, err: %v", err)
+		return model.Login{}, fmt.Errorf("failed to build query: %v", err)
+	}
+	var result model.Login
+	err = r.conn.GetContext(ctx, &result, query, args...)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return model.Login{}, nil
+		}
+		return model.Login{}, fmt.Errorf("failed to run query: %v", err)
+	}
+	return result, nil
+}
+
+func (r *Repository) SetNickname(ctx context.Context, nickname string) error {
+	query, args, err := sq.Insert("login").
+		Columns("nickname").
+		Values(nickname).
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
+	if err != nil {
+		return fmt.Errorf("failed to build query: %v", err)
 	}
 	_, err = r.conn.ExecContext(ctx, query, args...)
 	if err != nil {
-		return fmt.Errorf("failed to execute query, err: %v", err)
+		return fmt.Errorf("failed to run query: %v", err)
 	}
 
 	return nil

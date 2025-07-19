@@ -54,3 +54,7 @@ func (r *Repository) Set(ctx context.Context, key config.Key, value string, expi
 	}
 	return nil
 }
+
+func (r *Repository) Delete(ctx context.Context, key config.Key) {
+	r.conn.Del(ctx, string(key))
+}

@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+option go_package = "pkg/community";
+
+import  "google/protobuf/empty.proto";
+
+// Service with peers' info from edu platform
+service CommunityService {
+  // Method for checking that the user is a school 21's student
+  rpc IsPeerExist (EmailIn) returns (EmailOut);
+  rpc SearchPeers (SearchPeersIn) returns (SearchPeersOut){};
+  rpc GetPeerSchoolData(GetSchoolDataIn) returns (GetSchoolDataOut){};
+  rpc isUserStaff(LoginIn) returns (IsUserStaffOut){};
+  rpc RunLoginsWorkerManually(google.protobuf.Empty) returns (google.protobuf.Empty){};
+}
+
+message IsUserStaffOut {
+  bool isStaff = 1;
+}
+
+message LoginIn {
+  string login = 1;
+}
+
+message GetSchoolDataIn {
+  string nickName = 1;
+}
+
+message GetSchoolDataOut {
+  string className = 1;
+  string parallelName = 2;
+}
+
+// Data for searching for matches in peers' info
+message EmailIn {
+  // User's E-mail address
+  string email = 1;
+}
+
+// Response with found match
+message EmailOut {
+  bool isExist = 1;
+}
+
+message SearchPeersIn {
+  string substring = 1;
+  int64 limit = 2;
+  int64 offset = 3;
+}
+
+message SearchPeer {
+  string login = 1;
+}
+
+message SearchPeersOut {
+  repeated SearchPeer searchPeers = 1;
+}
