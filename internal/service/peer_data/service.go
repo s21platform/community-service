@@ -96,7 +96,7 @@ func (s *School) uploadDataParticipant(ctx context.Context) error {
 				}
 				exists = false
 			}
-			if participant != nil && (participant.Status == model.ParticipantStatusBlocked || participant.Status == model.ParticipantStatusFrozen || participant.Status == model.ParticipantStatusExpelled) {
+			if participant != nil && participant.Status != model.ParticipantStatusActive {
 				mtx.Increment("update_participant_data.skip_not_active")
 				continue
 			}
