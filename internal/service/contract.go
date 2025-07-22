@@ -1,13 +1,12 @@
 //go:generate mockgen -destination=mock_contract_test.go -package=${GOPACKAGE} -source=contract.go
-package rpc
+package service
 
 import (
 	"context"
+
 	"github.com/s21platform/community-service/internal/config"
-
-	"github.com/s21platform/community-service/pkg/community"
-
 	"github.com/s21platform/community-service/internal/model"
+	"github.com/s21platform/community-service/pkg/community"
 )
 
 type DbRepo interface {

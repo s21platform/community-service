@@ -12,7 +12,7 @@ import (
 	"github.com/s21platform/community-service/internal/config"
 	"github.com/s21platform/community-service/internal/repository/postgres"
 	"github.com/s21platform/community-service/internal/repository/redis"
-	peerdata "github.com/s21platform/community-service/internal/service/peer_data"
+	peerdata "github.com/s21platform/community-service/internal/workers/peer_data"
 )
 
 func main() {
@@ -28,10 +28,12 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to create metrics: %s", err)
 	}
+	defer metrics.Disconnect()
 	ctx = context.WithValue(ctx, config.KeyMetrics, metrics)
 
 	schoolClient := school.MustConnect(cfg)
 	dbRepo := postgres.New(cfg)
+	defer dbRepo.Close()
 	redisRepo := redis.New(cfg)
 	peerWorker := peerdata.New(schoolClient, dbRepo, redisRepo)
 

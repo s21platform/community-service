@@ -27,7 +27,7 @@ const (
 	CommunityService_RunLoginsWorkerManually_FullMethodName = "/CommunityService/RunLoginsWorkerManually"
 )
 
-// CommunityServiceClient is the client API for CommunityService service.
+// CommunityServiceClient is the client API for CommunityService workers.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
@@ -99,7 +99,7 @@ func (c *communityServiceClient) RunLoginsWorkerManually(ctx context.Context, in
 	return out, nil
 }
 
-// CommunityServiceServer is the server API for CommunityService service.
+// CommunityServiceServer is the server API for CommunityService workers.
 // All implementations must embed UnimplementedCommunityServiceServer
 // for forward compatibility.
 //
@@ -139,7 +139,7 @@ func (UnimplementedCommunityServiceServer) RunLoginsWorkerManually(context.Conte
 func (UnimplementedCommunityServiceServer) mustEmbedUnimplementedCommunityServiceServer() {}
 func (UnimplementedCommunityServiceServer) testEmbeddedByValue()                          {}
 
-// UnsafeCommunityServiceServer may be embedded to opt out of forward compatibility for this service.
+// UnsafeCommunityServiceServer may be embedded to opt out of forward compatibility for this workers.
 // Use of this interface is not recommended, as added methods to CommunityServiceServer will
 // result in compilation errors.
 type UnsafeCommunityServiceServer interface {
@@ -247,7 +247,7 @@ func _CommunityService_RunLoginsWorkerManually_Handler(srv interface{}, ctx cont
 	return interceptor(ctx, in, info, handler)
 }
 
-// CommunityService_ServiceDesc is the grpc.ServiceDesc for CommunityService service.
+// CommunityService_ServiceDesc is the grpc.ServiceDesc for CommunityService workers.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var CommunityService_ServiceDesc = grpc.ServiceDesc{

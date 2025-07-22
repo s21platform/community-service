@@ -12,7 +12,7 @@ import (
 	"github.com/s21platform/community-service/internal/config"
 	"github.com/s21platform/community-service/internal/repository/postgres"
 	"github.com/s21platform/community-service/internal/repository/redis"
-	"github.com/s21platform/community-service/internal/service/logins"
+	"github.com/s21platform/community-service/internal/workers/logins"
 )
 
 func main() {
@@ -28,10 +28,13 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to connet to metric lib: %v", err)
 	}
+	metrics.Disconnect()
+
 	ctx = context.WithValue(ctx, config.KeyMetrics, metrics)
 
 	schoolClient := school.MustConnect(cfg)
 	dbRepo := postgres.New(cfg)
+	defer dbRepo.Close()
 	redisRepo := redis.New(cfg)
 	peerWorker := logins.New(schoolClient, dbRepo, redisRepo)
 
