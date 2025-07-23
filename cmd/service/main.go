@@ -23,6 +23,7 @@ func main() {
 	logger := logger_lib.New(cfg.Logger.Host, cfg.Logger.Port, cfg.Service.Name, cfg.Platform.Env)
 
 	dbRepo := postgres.New(cfg)
+	defer dbRepo.Close()
 
 	redisRepo := redis.New(cfg)
 

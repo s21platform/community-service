@@ -20,21 +20,21 @@ const (
 	limit = 10000
 )
 
-type School struct {
+type Worker struct {
 	sC  SchoolC
 	dbR DbRepo
 	rR  RedisRepo
 }
 
-func New(school SchoolC, dbR DbRepo, rR RedisRepo) *School {
-	return &School{
+func New(school SchoolC, dbR DbRepo, rR RedisRepo) *Worker {
+	return &Worker{
 		sC:  school,
 		dbR: dbR,
 		rR:  rR,
 	}
 }
 
-func (s *School) RunParticipantWorker(ctx context.Context, wg *sync.WaitGroup) {
+func (s *Worker) RunParticipantWorker(ctx context.Context, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	logger := logger_lib.FromContext(ctx, config.KeyLogger)
@@ -71,7 +71,7 @@ func (s *School) RunParticipantWorker(ctx context.Context, wg *sync.WaitGroup) {
 	}
 }
 
-func (s *School) uploadDataParticipant(ctx context.Context) error {
+func (s *Worker) uploadDataParticipant(ctx context.Context) error {
 	var offset int64
 	mtx := pkg.FromContext(ctx, config.KeyMetrics)
 	logger := logger_lib.FromContext(ctx, config.KeyLogger)
