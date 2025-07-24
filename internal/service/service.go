@@ -1,4 +1,4 @@
-package rpc
+package service
 
 import (
 	"context"
@@ -7,21 +7,31 @@ import (
 	"fmt"
 	"log"
 
-	communityproto "github.com/s21platform/community-proto/community-proto"
 	logger_lib "github.com/s21platform/logger-lib"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
 
 	"github.com/s21platform/community-service/internal/config"
+	"github.com/s21platform/community-service/pkg/community"
 )
 
 type Service struct {
-	communityproto.UnimplementedCommunityServiceServer
+	community.UnimplementedCommunityServiceServer
 	dbR DbRepo
 	env string
+	rR  RedisRepo
 }
 
-func (s *Service) IsUserStaff(ctx context.Context, in *communityproto.LoginIn) (*communityproto.IsUserStaffOut, error) {
+func New(dbR DbRepo, env string, rR RedisRepo) *Service {
+	return &Service{
+		dbR: dbR,
+		env: env,
+		rR:  rR,
+	}
+}
+
+func (s *Service) IsUserStaff(ctx context.Context, in *community.LoginIn) (*community.IsUserStaffOut, error) {
 	logger := logger_lib.FromContext(ctx, config.KeyLogger)
 	logger.AddFuncName("IsUserStaff")
 
@@ -33,23 +43,23 @@ func (s *Service) IsUserStaff(ctx context.Context, in *communityproto.LoginIn) (
 		}
 
 		if errors.Is(err, sql.ErrNoRows) {
-			return &communityproto.IsUserStaffOut{IsStaff: false}, nil
+			return &community.IsUserStaffOut{IsStaff: false}, nil
 		}
 	}
 
-	return &communityproto.IsUserStaffOut{IsStaff: true}, nil
+	return &community.IsUserStaffOut{IsStaff: true}, nil
 }
 
-func (s *Service) GetPeerSchoolData(ctx context.Context, in *communityproto.GetSchoolDataIn) (*communityproto.GetSchoolDataOut, error) {
+func (s *Service) GetPeerSchoolData(ctx context.Context, in *community.GetSchoolDataIn) (*community.GetSchoolDataOut, error) {
 	schoolData, err := s.dbR.GetPeerSchoolData(ctx, in.NickName)
 	if err != nil {
 		log.Printf("cannot get peer school data, err: %s\n", err)
 		return nil, status.Errorf(codes.Internal, "cannot get peer school data, err: %s", err)
 	}
-	return &communityproto.GetSchoolDataOut{ClassName: schoolData.ClassName, ParallelName: schoolData.ParallelName}, nil
+	return &community.GetSchoolDataOut{ClassName: schoolData.ClassName, ParallelName: schoolData.ParallelName}, nil
 }
 
-func (s *Service) IsPeerExist(ctx context.Context, in *communityproto.EmailIn) (*communityproto.EmailOut, error) {
+func (s *Service) IsPeerExist(ctx context.Context, in *community.EmailIn) (*community.EmailOut, error) {
 	logger := logger_lib.FromContext(ctx, config.KeyLogger)
 	logger.AddFuncName("IsPeerExist")
 
@@ -61,7 +71,7 @@ func (s *Service) IsPeerExist(ctx context.Context, in *communityproto.EmailIn) (
 
 	if peerStatus != "ACTIVE" {
 		logger.Info(fmt.Sprintf("peer=%s has status: %s", in.Email, peerStatus))
-		return &communityproto.EmailOut{IsExist: false}, nil
+		return &community.EmailOut{IsExist: false}, nil
 	}
 
 	if s.env == "stage" {
@@ -79,21 +89,19 @@ func (s *Service) IsPeerExist(ctx context.Context, in *communityproto.EmailIn) (
 		}
 	}
 
-	return &communityproto.EmailOut{IsExist: true}, nil
+	return &community.EmailOut{IsExist: true}, nil
 }
 
-func (s *Service) SearchPeers(ctx context.Context, in *communityproto.SearchPeersIn) (*communityproto.SearchPeersOut, error) {
+func (s *Service) SearchPeers(ctx context.Context, in *community.SearchPeersIn) (*community.SearchPeersOut, error) {
 	log.Println("Input SearchPeers: ", in)
 	res, err := s.dbR.SearchPeersBySubstring(ctx, in.Substring)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "search peer error: %s", err)
 	}
-	return &communityproto.SearchPeersOut{SearchPeers: res}, nil
+	return &community.SearchPeersOut{SearchPeers: res}, nil
 }
 
-func New(dbR DbRepo, env string) *Service {
-	return &Service{
-		dbR: dbR,
-		env: env,
-	}
+func (s *Service) RunLoginsWorkerManually(ctx context.Context, _ *emptypb.Empty) (*emptypb.Empty, error) {
+	s.rR.Delete(ctx, config.KeyLoginsLastUpdated)
+	return &emptypb.Empty{}, nil
 }

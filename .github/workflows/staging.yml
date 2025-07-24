@@ -20,7 +20,7 @@ jobs:
           go-version: 1.24
 
       - name: Run tests
-        run: go test -coverprofile=coverage.out -tags=test -v ./internal/rpc/...
+        run: go test -coverprofile=coverage.out -tags=test -v ./internal/service/...
 
       - name: Check coverage
         run: |
@@ -52,8 +52,6 @@ jobs:
         run: |
           docker build -t ${{ secrets.CR_REGISTRY }}/${{ secrets.CR_NAME }}:develop .
           docker push ${{ secrets.CR_REGISTRY }}/${{ secrets.CR_NAME }}:develop
-          docker build -t ${{ secrets.CR_REGISTRY }}/${{ secrets.CR_NAME }}-migrate:develop ./migrations
-          docker push ${{ secrets.CR_REGISTRY }}/${{ secrets.CR_NAME }}-migrate:develop
   deploy:
     runs-on: ubuntu-latest
     needs: build_and_push
@@ -66,5 +64,7 @@ jobs:
           key: ${{ secrets.PRIVATE_SSH_KEY_DEVELOP }}
           passphrase: ${{ secrets.PASSPHRASE_DEVELOP }}
           script: |
+            set -e
             docker pull ${{ secrets.CR_REGISTRY }}/${{ secrets.CR_NAME }}:develop
             docker-compose -f ~/space21/staging/staging-deployment/docker-compose.yml --env-file ~/space21/staging/.env up -d ${{ secrets.CR_NAME }}
+            echo "${{ secrets.SERVICE_NAME }}.stage.deploy:1|c" | nc -u ${{ secrets.HOST_DEVELOP }} ${{ secrets.STATSD_PORT }}

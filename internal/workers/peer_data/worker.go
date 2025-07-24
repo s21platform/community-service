@@ -20,21 +20,21 @@ const (
 	limit = 10000
 )
 
-type School struct {
+type Worker struct {
 	sC  SchoolC
 	dbR DbRepo
 	rR  RedisRepo
 }
 
-func New(school SchoolC, dbR DbRepo, rR RedisRepo) *School {
-	return &School{
+func New(school SchoolC, dbR DbRepo, rR RedisRepo) *Worker {
+	return &Worker{
 		sC:  school,
 		dbR: dbR,
 		rR:  rR,
 	}
 }
 
-func (s *School) RunParticipantWorker(ctx context.Context, wg *sync.WaitGroup) {
+func (s *Worker) RunParticipantWorker(ctx context.Context, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	logger := logger_lib.FromContext(ctx, config.KeyLogger)
@@ -60,7 +60,8 @@ func (s *School) RunParticipantWorker(ctx context.Context, wg *sync.WaitGroup) {
 					logger.Error(fmt.Sprintf("failed to upload participants, err: %v", err))
 				}
 
-				err = s.rR.Set(ctx, config.KeyParticipantDataLastUpdated, "upd", 5*time.Hour)
+				// по сути мы тут указываем через сколько запустить следующий цикл опроса. 5 часов много, поставил 10 минут передышки
+				err = s.rR.Set(ctx, config.KeyParticipantDataLastUpdated, "upd", 10*time.Minute)
 				if err != nil {
 					logger.Error(fmt.Sprintf("failed to save participant last updated, err: %v", err))
 				}
@@ -70,7 +71,7 @@ func (s *School) RunParticipantWorker(ctx context.Context, wg *sync.WaitGroup) {
 	}
 }
 
-func (s *School) uploadDataParticipant(ctx context.Context) error {
+func (s *Worker) uploadDataParticipant(ctx context.Context) error {
 	var offset int64
 	mtx := pkg.FromContext(ctx, config.KeyMetrics)
 	logger := logger_lib.FromContext(ctx, config.KeyLogger)
@@ -96,11 +97,11 @@ func (s *School) uploadDataParticipant(ctx context.Context) error {
 				}
 				exists = false
 			}
-			if participant != nil && (participant.Status == model.ParticipantStatusBlocked || participant.Status == model.ParticipantStatusFrozen || participant.Status == model.ParticipantStatusExpelled) {
+			if participant != nil && participant.Status != model.ParticipantStatusActive {
 				mtx.Increment("update_participant_data.skip_not_active")
 				continue
 			}
-			time.Sleep(200 * time.Millisecond)
+			time.Sleep(300 * time.Millisecond)
 			participantData, err := s.sC.GetParticipantData(ctx, login)
 			if err != nil {
 				if strings.Contains(err.Error(), "Invalid token") {
