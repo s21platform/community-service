@@ -14,7 +14,10 @@ type SchoolC interface {
 
 type DbRepo interface {
 	GetParticipantsLogin(ctx context.Context, limit, offset int64) ([]string, error)
-	SetParticipantData(ctx context.Context, participantDataValue *model.ParticipantDataValue, login string) error
+	ParticipantData(ctx context.Context, login string) (*model.Participant, error)
+	InsertParticipantData(ctx context.Context, participantDataValue *model.ParticipantDataValue, login string, campusID int64) error
+	UpdateParticipantData(ctx context.Context, participantDataValue *model.ParticipantDataValue, login string, campusID int64) error
+	GetCampusByUUID(ctx context.Context, campusUUID string) (*model.Campus, error)
 }
 
 type RedisRepo interface {

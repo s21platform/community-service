@@ -6,12 +6,12 @@ import (
 	"log"
 
 	sq "github.com/Masterminds/squirrel"
-	communityproto "github.com/s21platform/community-proto/community-proto"
+	"github.com/s21platform/community-service/pkg/community"
 
 	"github.com/s21platform/community-service/internal/model"
 )
 
-func (r *Repository) SearchPeersBySubstring(ctx context.Context, substring string) ([]*communityproto.SearchPeer, error) {
+func (r *Repository) SearchPeersBySubstring(ctx context.Context, substring string) ([]*community.SearchPeer, error) {
 	var result []model.SearchPeers
 	query, args, err := sq.Select(`login`).
 		From("participant").
@@ -28,9 +28,9 @@ func (r *Repository) SearchPeersBySubstring(ctx context.Context, substring strin
 		return nil, fmt.Errorf("failed to search peer by substring: %w", err)
 	}
 	log.Println(result)
-	var res []*communityproto.SearchPeer
+	var res []*community.SearchPeer
 	for _, re := range result {
-		res = append(res, &communityproto.SearchPeer{
+		res = append(res, &community.SearchPeer{
 			Login: re.Login,
 		})
 	}

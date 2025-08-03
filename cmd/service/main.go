@@ -5,15 +5,17 @@ import (
 	"log"
 	"net"
 
-	communityproto "github.com/s21platform/community-proto/community-proto"
+	"google.golang.org/grpc"
+
 	logger_lib "github.com/s21platform/logger-lib"
 	"github.com/s21platform/metrics-lib/pkg"
-	"google.golang.org/grpc"
 
 	"github.com/s21platform/community-service/internal/config"
 	"github.com/s21platform/community-service/internal/infra"
 	"github.com/s21platform/community-service/internal/repository/postgres"
-	"github.com/s21platform/community-service/internal/rpc"
+	"github.com/s21platform/community-service/internal/repository/redis"
+	"github.com/s21platform/community-service/internal/service"
+	"github.com/s21platform/community-service/pkg/community"
 )
 
 func main() {
@@ -21,8 +23,11 @@ func main() {
 	logger := logger_lib.New(cfg.Logger.Host, cfg.Logger.Port, cfg.Service.Name, cfg.Platform.Env)
 
 	dbRepo := postgres.New(cfg)
+	defer dbRepo.Close()
 
-	thisService := rpc.New(dbRepo, cfg.Platform.Env)
+	redisRepo := redis.New(cfg)
+
+	thisService := service.New(dbRepo, cfg.Platform.Env, redisRepo)
 
 	metrics, err := pkg.NewMetrics(cfg.Metrics.Host, cfg.Metrics.Port, cfg.Service.Name, cfg.Platform.Env)
 	if err != nil {
@@ -37,7 +42,7 @@ func main() {
 			infra.MetricsInterceptor(metrics),
 		),
 	)
-	communityproto.RegisterCommunityServiceServer(s, thisService)
+	community.RegisterCommunityServiceServer(s, thisService)
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", cfg.Service.Port))
 	if err != nil {

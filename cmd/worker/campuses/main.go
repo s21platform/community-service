@@ -2,15 +2,17 @@ package main
 
 import (
 	"context"
+	"log"
+	"sync"
+
+	logger_lib "github.com/s21platform/logger-lib"
+	"github.com/s21platform/metrics-lib/pkg"
+
 	"github.com/s21platform/community-service/internal/client/school"
 	"github.com/s21platform/community-service/internal/config"
 	"github.com/s21platform/community-service/internal/repository/postgres"
 	"github.com/s21platform/community-service/internal/repository/redis"
-	"github.com/s21platform/community-service/internal/service/campus"
-	logger_lib "github.com/s21platform/logger-lib"
-	"github.com/s21platform/metrics-lib/pkg"
-	"log"
-	"sync"
+	"github.com/s21platform/community-service/internal/workers/campus"
 )
 
 func main() {
@@ -26,13 +28,14 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to create metrics: %s", err)
 	}
+	defer metrics.Disconnect()
 	ctx = context.WithValue(ctx, config.KeyMetrics, metrics)
 
 	schoolClient := school.MustConnect(cfg)
 	dbRepo := postgres.New(cfg)
+	defer dbRepo.Close()
 	redisRepo := redis.New(cfg)
 	campusWorker := campus.New(schoolClient, dbRepo, redisRepo)
-
 
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
