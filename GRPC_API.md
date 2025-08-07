@@ -4,6 +4,8 @@
 ## Table of Contents
 
 - [api/community.proto](#api_community-proto)
+    - [CodeConfirmIn](#-CodeConfirmIn)
+    - [CodeConfirmOut](#-CodeConfirmOut)
     - [EmailIn](#-EmailIn)
     - [EmailOut](#-EmailOut)
     - [GetSchoolDataIn](#-GetSchoolDataIn)
@@ -24,6 +26,37 @@
 <p align="right"><a href="#top">Top</a></p>
 
 ## api/community.proto
+
+
+
+<a name="-CodeConfirmIn"></a>
+
+### CodeConfirmIn
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| login | [string](#string) |  |  |
+| code | [int64](#int64) |  |  |
+
+
+
+
+
+
+<a name="-CodeConfirmOut"></a>
+
+### CodeConfirmOut
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| message | [string](#string) |  |  |
+
+
+
 
 
 
@@ -183,6 +216,7 @@ Service with peers&#39; info from edu platform
 | GetPeerSchoolData | [.GetSchoolDataIn](#GetSchoolDataIn) | [.GetSchoolDataOut](#GetSchoolDataOut) |  |
 | isUserStaff | [.LoginIn](#LoginIn) | [.IsUserStaffOut](#IsUserStaffOut) |  |
 | RunLoginsWorkerManually | [.google.protobuf.Empty](#google-protobuf-Empty) | [.google.protobuf.Empty](#google-protobuf-Empty) |  |
+| CheckAuthCode | [.CodeConfirmIn](#CodeConfirmIn) | [.CodeConfirmOut](#CodeConfirmOut) |  |
 
  
 

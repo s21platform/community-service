@@ -12,10 +12,20 @@ service CommunityService {
   rpc GetPeerSchoolData(GetSchoolDataIn) returns (GetSchoolDataOut){};
   rpc isUserStaff(LoginIn) returns (IsUserStaffOut){};
   rpc RunLoginsWorkerManually(google.protobuf.Empty) returns (google.protobuf.Empty){};
+  rpc CheckAuthCode(CodeConfirmIn) returns (CodeConfirmOut){}
 }
 
 message IsUserStaffOut {
   bool isStaff = 1;
+}
+
+message CodeConfirmIn {
+  string login = 1;
+  int64 code = 2;
+}
+
+message CodeConfirmOut {
+  string message = 1;
 }
 
 message LoginIn {
