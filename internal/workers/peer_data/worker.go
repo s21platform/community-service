@@ -10,6 +10,7 @@ import (
 	"time"
 
 	logger_lib "github.com/s21platform/logger-lib"
+	kafkalib "github.com/s21platform/kafka-lib"
 	"github.com/s21platform/metrics-lib/pkg"
 
 	"github.com/s21platform/community-service/internal/config"
@@ -26,7 +27,7 @@ type Worker struct {
 	rR  RedisRepo
 }
 
-func New(school SchoolC, dbR DbRepo, rR RedisRepo) *Worker {
+func New(school SchoolC, dbR DbRepo, rR RedisRepo, prodLevelCh *kafkalib.KafkaProducer, prodExpLevelCh *kafkalib.KafkaProducer, prodStatusCh *kafkalib.KafkaProducer) *Worker {
 	return &Worker{
 		sC:  school,
 		dbR: dbR,

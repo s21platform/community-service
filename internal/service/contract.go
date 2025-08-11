@@ -19,3 +19,15 @@ type DbRepo interface {
 type RedisRepo interface {
 	Delete(ctx context.Context, key config.Key)
 }
+
+type LevelChangeProducer interface {
+	ProduceMessage(ctx context.Context, message any, key any) error
+}
+
+type producerExpLevelChanged interface {
+	ProduceMessage(ctx context.Context, message any, key any) error
+}
+
+type producerStatusChanged interface {
+	ProduceMessage(ctx context.Context, message any, key any) error
+}

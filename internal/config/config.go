@@ -14,6 +14,7 @@ type Config struct {
 	School   School
 	Logger   Logger
 	Cache    Cache
+	Kafka    Kafka
 }
 
 type Cache struct {
@@ -51,6 +52,14 @@ type Platform struct {
 type School struct {
 	Host string `env:"SCHOOL_SERVICE_HOST"`
 	Port string `env:"SCHOOL_SERVICE_PORT"`
+}
+
+type Kafka struct {
+	Host  string `env:"KAFKA_HOST"`
+	Port  string `env:"KAFKA_PORT"`
+	LevelChangeTopic string `env:"PARTICIPANT_LEVEL_CHANGED"`
+	ExpLevelChanged string `env:"PARTICIPANT_EXP_LEVEL_CHANGED"`
+	StatusChanged string `env:"PARTICIPANT_EXP_LEVEL_CHANGED"`
 }
 
 func MustLoad() *Config {
