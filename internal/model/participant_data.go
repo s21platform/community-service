@@ -38,8 +38,10 @@ type ParticipantDataValue struct {
 }
 
 type Participant struct {
-	Login  string `db:"login"`
-	Status string `db:"status"`
+	Login    string `db:"login"`
+	ExpLevel int64  `db:"exp_level"`
+	Level    int32  `db:"level"`
+	Status   string `db:"status"`
 }
 
 const (
