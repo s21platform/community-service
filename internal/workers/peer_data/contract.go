@@ -29,10 +29,10 @@ type LevelChangeProducer interface {
 	ProduceMessage(ctx context.Context, message any, key any) error
 }
 
-type ExpLevelChangedProducer interface {
+type ExpLevelChangeProducer interface {
 	ProduceMessage(ctx context.Context, message any, key any) error
 }
 
-type StatusChangedProducer interface {
+type StatusChangeProducer interface {
 	ProduceMessage(ctx context.Context, message any, key any) error
 }

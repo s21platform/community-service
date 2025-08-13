@@ -10,7 +10,6 @@ import (
 	"time"
 
 	logger_lib "github.com/s21platform/logger-lib"
-	kafkalib "github.com/s21platform/kafka-lib"
 	"github.com/s21platform/metrics-lib/pkg"
 
 	"github.com/s21platform/community-service/internal/config"
@@ -22,16 +21,22 @@ const (
 )
 
 type Worker struct {
-	sC  SchoolC
-	dbR DbRepo
-	rR  RedisRepo
+	sC   SchoolC
+	dbR  DbRepo
+	rR   RedisRepo
+	lCp  LevelChangeProducer
+	eLcP ExpLevelChangeProducer
+	sCp  StatusChangeProducer
 }
 
-func New(school SchoolC, dbR DbRepo, rR RedisRepo, prodLevelCh *kafkalib.KafkaProducer, prodExpLevelCh *kafkalib.KafkaProducer, prodStatusCh *kafkalib.KafkaProducer) *Worker {
+func New(school SchoolC, dbR DbRepo, rR RedisRepo, lCp LevelChangeProducer, eLcP ExpLevelChangeProducer, sCp StatusChangeProducer) *Worker {
 	return &Worker{
 		sC:  school,
 		dbR: dbR,
 		rR:  rR,
+		lCp: lCp,
+		eLcP: eLcP,
+		sCp: sCp,
 	}
 }
 
