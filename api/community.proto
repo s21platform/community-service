@@ -12,6 +12,7 @@ service CommunityService {
   rpc GetPeerSchoolData(GetSchoolDataIn) returns (GetSchoolDataOut){};
   rpc isUserStaff(LoginIn) returns (IsUserStaffOut){};
   rpc RunLoginsWorkerManually(google.protobuf.Empty) returns (google.protobuf.Empty){};
+  rpc SendCodeEmail(EmailIn) returns (google.protobuf.Empty){};
 }
 
 message IsUserStaffOut {
