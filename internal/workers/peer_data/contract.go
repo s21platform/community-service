@@ -24,3 +24,15 @@ type RedisRepo interface {
 	GetByKey(ctx context.Context, key config.Key) (string, error)
 	Set(ctx context.Context, key config.Key, value string, expiration time.Duration) error
 }
+
+type LevelChangeProducer interface {
+	ProduceMessage(ctx context.Context, message any, key any) error
+}
+
+type ExpLevelChangedProducer interface {
+	ProduceMessage(ctx context.Context, message any, key any) error
+}
+
+type StatusChangedProducer interface {
+	ProduceMessage(ctx context.Context, message any, key any) error
+}

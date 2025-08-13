@@ -33,8 +33,8 @@ func main() {
 	ctx = context.WithValue(ctx, config.KeyMetrics, metrics)
 
 	producerLevelChangedCfg := kafkalib.DefaultProducerConfig(cfg.Kafka.Host, cfg.Kafka.Port, cfg.Kafka.LevelChangeTopic)
-	producerExpLevelChangedCfg := kafkalib.DefaultProducerConfig(cfg.Kafka.Host, cfg.Kafka.Port, "PARTICIPANT_LEVEL_CHANGED")
-	producerStatusChangedCfg := kafkalib.DefaultProducerConfig(cfg.Kafka.Host, cfg.Kafka.Port, "PARTICIPANT_STATUS_CHANGED")	
+	producerExpLevelChangedCfg := kafkalib.DefaultProducerConfig(cfg.Kafka.Host, cfg.Kafka.Port, cfg.Kafka.ExpLevelChanged)
+	producerStatusChangedCfg := kafkalib.DefaultProducerConfig(cfg.Kafka.Host, cfg.Kafka.Port, cfg.Kafka.StatusChanged)	
 	producerLevelChanged := kafkalib.NewProducer(producerLevelChangedCfg)
 	producerExpLevelChanged := kafkalib.NewProducer(producerExpLevelChangedCfg)
 	producerStatusChanged := kafkalib.NewProducer(producerStatusChangedCfg)
