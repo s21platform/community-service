@@ -3,6 +3,7 @@ package service
 
 import (
 	"context"
+	"time"
 
 	"github.com/s21platform/community-service/internal/config"
 	"github.com/s21platform/community-service/internal/model"
@@ -17,5 +18,11 @@ type DbRepo interface {
 }
 
 type RedisRepo interface {
+	GetByKey(ctx context.Context, key config.Key) (string, error)
+	Set(ctx context.Context, key config.Key, value string, expiration time.Duration) error
 	Delete(ctx context.Context, key config.Key)
+}
+
+type NotificationS interface {
+	SendVerificationCode(ctx context.Context, email, code string) error
 }

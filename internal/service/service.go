@@ -6,11 +6,15 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math/rand"
+	"strconv"
+	"time"
 
-	logger_lib "github.com/s21platform/logger-lib"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
+
+	logger_lib "github.com/s21platform/logger-lib"
 
 	"github.com/s21platform/community-service/internal/config"
 	"github.com/s21platform/community-service/pkg/community"
@@ -18,16 +22,18 @@ import (
 
 type Service struct {
 	community.UnimplementedCommunityServiceServer
-	dbR DbRepo
-	env string
-	rR  RedisRepo
+	dbR   DbRepo
+	env   string
+	rR    RedisRepo
+	notCl NotificationS
 }
 
-func New(dbR DbRepo, env string, rR RedisRepo) *Service {
+func New(dbR DbRepo, env string, rR RedisRepo, notCl NotificationS, cfg *config.Config) *Service {
 	return &Service{
-		dbR: dbR,
-		env: env,
-		rR:  rR,
+		dbR:   dbR,
+		env:   env,
+		rR:    rR,
+		notCl: notCl,
 	}
 }
 
@@ -103,5 +109,38 @@ func (s *Service) SearchPeers(ctx context.Context, in *community.SearchPeersIn) 
 
 func (s *Service) RunLoginsWorkerManually(ctx context.Context, _ *emptypb.Empty) (*emptypb.Empty, error) {
 	s.rR.Delete(ctx, config.KeyLoginsLastUpdated)
+	return &emptypb.Empty{}, nil
+}
+
+func (s *Service) SendCodeEmail(ctx context.Context, in *community.EmailIn) (*emptypb.Empty, error) {
+	logger := logger_lib.FromContext(ctx, config.KeyLogger)
+	logger.AddFuncName("SendCodeEmail")
+
+	peerStatus, err := s.dbR.GetPeerStatus(ctx, in.Email)
+	if err != nil {
+		logger.Error(fmt.Sprintf("cannot get peer status, err: %v", err))
+		return nil, status.Errorf(codes.Internal, "cannot get peer error: %v", err)
+	}
+
+	if peerStatus != "ACTIVE" {
+		logger.Info(fmt.Sprintf("peer=%s has status: %s", in.Email, peerStatus))
+		return &emptypb.Empty{}, nil
+	}
+
+	code := strconv.Itoa(rand.Intn(89999) + 10000)
+	logger.Info(fmt.Sprintf("code=%s", code))
+
+	err = s.rR.Set(ctx, config.Key("code_"+in.Email), code, time.Minute*10)
+	if err != nil {
+		logger.Error(fmt.Sprintf("cannot set code to redis, err: %v", err))
+		return nil, status.Errorf(codes.Internal, "cannot set code to redis, err: %v", err)
+	}
+
+	err = s.notCl.SendVerificationCode(ctx, in.Email, code)
+	if err != nil {
+		logger.Error(fmt.Sprintf("cannot send verification code, err: %v", err))
+		return nil, status.Errorf(codes.Internal, "cannot send verification code, err: %v", err)
+	}
+
 	return &emptypb.Empty{}, nil
 }
