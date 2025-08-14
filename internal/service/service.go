@@ -118,8 +118,8 @@ func (s *Service) SendCodeEmail(ctx context.Context, in *community.EmailIn) (*em
 
 	peerStatus, err := s.dbR.GetPeerStatus(ctx, in.Email)
 	if err != nil {
-		logger.Error(fmt.Sprintf("cannot get peer status, err: %v", err))
-		return nil, status.Errorf(codes.Internal, "cannot get peer error: %v", err)
+		logger.Error(fmt.Sprintf("failed to get peer status, err: %v", err))
+		return nil, status.Errorf(codes.Internal, "failed to get peer status, err: %v", err)
 	}
 
 	if peerStatus != "ACTIVE" {
@@ -132,14 +132,14 @@ func (s *Service) SendCodeEmail(ctx context.Context, in *community.EmailIn) (*em
 
 	err = s.rR.Set(ctx, config.Key("code_"+in.Email), code, time.Minute*10)
 	if err != nil {
-		logger.Error(fmt.Sprintf("cannot set code to redis, err: %v", err))
-		return nil, status.Errorf(codes.Internal, "cannot set code to redis, err: %v", err)
+		logger.Error(fmt.Sprintf("failed to set code to redis, err: %v", err))
+		return nil, status.Errorf(codes.Internal, "failed to set code to redis, err: %v", err)
 	}
 
 	err = s.notCl.SendVerificationCode(ctx, in.Email, code)
 	if err != nil {
-		logger.Error(fmt.Sprintf("cannot send verification code, err: %v", err))
-		return nil, status.Errorf(codes.Internal, "cannot send verification code, err: %v", err)
+		logger.Error(fmt.Sprintf("failed to send verification code, err: %v", err))
+		return nil, status.Errorf(codes.Internal, "failed to send verification code, err: %v", err)
 	}
 
 	return &emptypb.Empty{}, nil
