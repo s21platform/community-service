@@ -308,7 +308,7 @@ func TestServer_SendCodeEmail(t *testing.T) {
 		mockRedisRepo.EXPECT().Set(gomock.Any(), config.Key("code_"+email), gomock.Any(), gomock.Any()).Return(expectedErr)
 		mockLogger.EXPECT().AddFuncName("SendCodeEmail")
 		mockLogger.EXPECT().Info(gomock.Any()).Times(1)
-		mockLogger.EXPECT().Error(fmt.Sprintf("cannot set code to redis, err: %v", expectedErr))
+		mockLogger.EXPECT().Error(fmt.Sprintf("failed to set code to redis, err: %v", expectedErr))
 
 		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil)
 		_, err := s.SendCodeEmail(ctx, &community.EmailIn{Email: email})
