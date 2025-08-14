@@ -40,7 +40,7 @@ type CommunityServiceClient interface {
 	GetPeerSchoolData(ctx context.Context, in *GetSchoolDataIn, opts ...grpc.CallOption) (*GetSchoolDataOut, error)
 	IsUserStaff(ctx context.Context, in *LoginIn, opts ...grpc.CallOption) (*IsUserStaffOut, error)
 	RunLoginsWorkerManually(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*empty.Empty, error)
-	SendCodeEmail(ctx context.Context, in *EmailIn, opts ...grpc.CallOption) (*empty.Empty, error)
+	SendCodeEmail(ctx context.Context, in *LoginIn, opts ...grpc.CallOption) (*empty.Empty, error)
 }
 
 type communityServiceClient struct {
@@ -101,7 +101,7 @@ func (c *communityServiceClient) RunLoginsWorkerManually(ctx context.Context, in
 	return out, nil
 }
 
-func (c *communityServiceClient) SendCodeEmail(ctx context.Context, in *EmailIn, opts ...grpc.CallOption) (*empty.Empty, error) {
+func (c *communityServiceClient) SendCodeEmail(ctx context.Context, in *LoginIn, opts ...grpc.CallOption) (*empty.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(empty.Empty)
 	err := c.cc.Invoke(ctx, CommunityService_SendCodeEmail_FullMethodName, in, out, cOpts...)
@@ -123,7 +123,7 @@ type CommunityServiceServer interface {
 	GetPeerSchoolData(context.Context, *GetSchoolDataIn) (*GetSchoolDataOut, error)
 	IsUserStaff(context.Context, *LoginIn) (*IsUserStaffOut, error)
 	RunLoginsWorkerManually(context.Context, *empty.Empty) (*empty.Empty, error)
-	SendCodeEmail(context.Context, *EmailIn) (*empty.Empty, error)
+	SendCodeEmail(context.Context, *LoginIn) (*empty.Empty, error)
 	mustEmbedUnimplementedCommunityServiceServer()
 }
 
@@ -149,7 +149,7 @@ func (UnimplementedCommunityServiceServer) IsUserStaff(context.Context, *LoginIn
 func (UnimplementedCommunityServiceServer) RunLoginsWorkerManually(context.Context, *empty.Empty) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RunLoginsWorkerManually not implemented")
 }
-func (UnimplementedCommunityServiceServer) SendCodeEmail(context.Context, *EmailIn) (*empty.Empty, error) {
+func (UnimplementedCommunityServiceServer) SendCodeEmail(context.Context, *LoginIn) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendCodeEmail not implemented")
 }
 func (UnimplementedCommunityServiceServer) mustEmbedUnimplementedCommunityServiceServer() {}
@@ -264,7 +264,7 @@ func _CommunityService_RunLoginsWorkerManually_Handler(srv interface{}, ctx cont
 }
 
 func _CommunityService_SendCodeEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(EmailIn)
+	in := new(LoginIn)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -276,7 +276,7 @@ func _CommunityService_SendCodeEmail_Handler(srv interface{}, ctx context.Contex
 		FullMethod: CommunityService_SendCodeEmail_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CommunityServiceServer).SendCodeEmail(ctx, req.(*EmailIn))
+		return srv.(CommunityServiceServer).SendCodeEmail(ctx, req.(*LoginIn))
 	}
 	return interceptor(ctx, in, info, handler)
 }

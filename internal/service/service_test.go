@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"regexp"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -286,32 +285,29 @@ func TestServer_SendCodeEmail(t *testing.T) {
 	ctx = context.WithValue(ctx, config.KeyLogger, mockLogger)
 
 	t.Run("send_code_email_ok", func(t *testing.T) {
-		email := "aboba@student.21-school.ru"
+		login := "aboba"
+		email := login + "@student.21-school.ru"
 		mockRepo.EXPECT().GetPeerStatus(gomock.Any(), email).Return("ACTIVE", nil)
-		mockRedisRepo.EXPECT().Set(gomock.Any(), config.Key("code_"+email), gomock.Any(), gomock.Any()).Return(nil)
+		mockRedisRepo.EXPECT().Set(gomock.Any(), config.Key("code_"+login), gomock.Any(), gomock.Any()).Return(nil)
 		mockLogger.EXPECT().AddFuncName("SendCodeEmail")
-		mockLogger.EXPECT().Info(gomock.Any()).Do(func(arg interface{}) {
-			regex := regexp.MustCompile(`^code=\d+$`)
-			assert.True(t, regex.MatchString(arg.(string)))
-		})
 		mockNotCl.EXPECT().SendVerificationCode(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil)
 
 		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil)
-		_, err := s.SendCodeEmail(ctx, &community.EmailIn{Email: email})
+		_, err := s.SendCodeEmail(ctx, &community.LoginIn{Login: login})
 		assert.NoError(t, err)
 	})
 
 	t.Run("send_code_email_err", func(t *testing.T) {
-		email := "aboba@student.21-school.ru"
+		login := "aboba"
+		email := login + "@student.21-school.ru"
 		expectedErr := errors.New("set err")
 		mockRepo.EXPECT().GetPeerStatus(gomock.Any(), email).Return("ACTIVE", nil)
-		mockRedisRepo.EXPECT().Set(gomock.Any(), config.Key("code_"+email), gomock.Any(), gomock.Any()).Return(expectedErr)
+		mockRedisRepo.EXPECT().Set(gomock.Any(), config.Key("code_"+login), gomock.Any(), gomock.Any()).Return(expectedErr)
 		mockLogger.EXPECT().AddFuncName("SendCodeEmail")
-		mockLogger.EXPECT().Info(gomock.Any()).Times(1)
 		mockLogger.EXPECT().Error(fmt.Sprintf("failed to set code to redis, err: %v", expectedErr))
 
 		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil)
-		_, err := s.SendCodeEmail(ctx, &community.EmailIn{Email: email})
+		_, err := s.SendCodeEmail(ctx, &community.LoginIn{Login: login})
 		assert.Error(t, err)
 	})
 }

@@ -183,7 +183,7 @@ Service with peers&#39; info from edu platform
 | GetPeerSchoolData | [.GetSchoolDataIn](#GetSchoolDataIn) | [.GetSchoolDataOut](#GetSchoolDataOut) |  |
 | isUserStaff | [.LoginIn](#LoginIn) | [.IsUserStaffOut](#IsUserStaffOut) |  |
 | RunLoginsWorkerManually | [.google.protobuf.Empty](#google-protobuf-Empty) | [.google.protobuf.Empty](#google-protobuf-Empty) |  |
-| SendCodeEmail | [.EmailIn](#EmailIn) | [.google.protobuf.Empty](#google-protobuf-Empty) |  |
+| SendCodeEmail | [.LoginIn](#LoginIn) | [.google.protobuf.Empty](#google-protobuf-Empty) |  |
 
  
 

@@ -112,31 +112,32 @@ func (s *Service) RunLoginsWorkerManually(ctx context.Context, _ *emptypb.Empty)
 	return &emptypb.Empty{}, nil
 }
 
-func (s *Service) SendCodeEmail(ctx context.Context, in *community.EmailIn) (*emptypb.Empty, error) {
+func (s *Service) SendCodeEmail(ctx context.Context, in *community.LoginIn) (*emptypb.Empty, error) {
 	logger := logger_lib.FromContext(ctx, config.KeyLogger)
 	logger.AddFuncName("SendCodeEmail")
 
-	peerStatus, err := s.dbR.GetPeerStatus(ctx, in.Email)
+	email := in.Login + "@student.21-school.ru"
+
+	peerStatus, err := s.dbR.GetPeerStatus(ctx, email)
 	if err != nil {
 		logger.Error(fmt.Sprintf("failed to get peer status, err: %v", err))
 		return nil, status.Errorf(codes.Internal, "failed to get peer status, err: %v", err)
 	}
 
 	if peerStatus != "ACTIVE" {
-		logger.Info(fmt.Sprintf("peer=%s has status: %s", in.Email, peerStatus))
+		logger.Info(fmt.Sprintf("peer=%s has status: %s", in.Login, peerStatus))
 		return &emptypb.Empty{}, nil
 	}
 
 	code := strconv.Itoa(rand.Intn(89999) + 10000)
-	logger.Info(fmt.Sprintf("code=%s", code))
 
-	err = s.rR.Set(ctx, config.Key("code_"+in.Email), code, time.Minute*10)
+	err = s.rR.Set(ctx, config.Key("code_"+in.Login), code, time.Minute*10)
 	if err != nil {
 		logger.Error(fmt.Sprintf("failed to set code to redis, err: %v", err))
 		return nil, status.Errorf(codes.Internal, "failed to set code to redis, err: %v", err)
 	}
 
-	err = s.notCl.SendVerificationCode(ctx, in.Email, code)
+	err = s.notCl.SendVerificationCode(ctx, email, code)
 	if err != nil {
 		logger.Error(fmt.Sprintf("failed to send verification code, err: %v", err))
 		return nil, status.Errorf(codes.Internal, "failed to send verification code, err: %v", err)
