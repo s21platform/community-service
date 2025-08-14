@@ -7,13 +7,14 @@ import (
 )
 
 type Config struct {
-	Service  Service
-	Postgres Postgres
-	Metrics  Metrics
-	Platform Platform
-	School   School
-	Logger   Logger
-	Cache    Cache
+	Service      Service
+	Postgres     Postgres
+	Metrics      Metrics
+	Platform     Platform
+	School       School
+	Logger       Logger
+	Cache        Cache
+	Notification Notification
 }
 
 type Cache struct {
@@ -51,6 +52,11 @@ type Platform struct {
 type School struct {
 	Host string `env:"SCHOOL_SERVICE_HOST"`
 	Port string `env:"SCHOOL_SERVICE_PORT"`
+}
+
+type Notification struct {
+	Host string `env:"NOTIFICATION_SERVICE_HOST"`
+	Port string `env:"NOTIFICATION_SERVICE_PORT"`
 }
 
 func MustLoad() *Config {
