@@ -4,15 +4,19 @@
 ## Table of Contents
 
 - [api/community.proto](#api_community-proto)
+    - [Badge](#-Badge)
     - [EmailIn](#-EmailIn)
     - [EmailOut](#-EmailOut)
     - [GetSchoolDataIn](#-GetSchoolDataIn)
     - [GetSchoolDataOut](#-GetSchoolDataOut)
+    - [GetStudentDataIn](#-GetStudentDataIn)
+    - [GetStudentDataOut](#-GetStudentDataOut)
     - [IsUserStaffOut](#-IsUserStaffOut)
     - [LoginIn](#-LoginIn)
     - [SearchPeer](#-SearchPeer)
     - [SearchPeersIn](#-SearchPeersIn)
     - [SearchPeersOut](#-SearchPeersOut)
+    - [Skill](#-Skill)
   
     - [CommunityService](#-CommunityService)
   
@@ -24,6 +28,23 @@
 <p align="right"><a href="#top">Top</a></p>
 
 ## api/community.proto
+
+
+
+<a name="-Badge"></a>
+
+### Badge
+Достижения студента
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| name | [string](#string) |  | Наименование достижеиня |
+| icon_url | [string](#string) |  | Ссылка на иконку |
+| receipt_date_time | [string](#string) |  | Дата получения |
+
+
+
 
 
 
@@ -82,6 +103,50 @@ Response with found match
 | ----- | ---- | ----- | ----------- |
 | className | [string](#string) |  |  |
 | parallelName | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="-GetStudentDataIn"></a>
+
+### GetStudentDataIn
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| userUUID | [string](#string) |  | uuid пользователя, которого запрашивают |
+
+
+
+
+
+
+<a name="-GetStudentDataOut"></a>
+
+### GetStudentDataOut
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| login | [string](#string) |  | Логин студента |
+| campusId | [int64](#int64) |  | Id кампуса |
+| className | [string](#string) |  | Название класса/группы |
+| parallelName | [string](#string) |  | Наименование волны |
+| tribeId | [int64](#int64) |  | Id трайба |
+| status | [string](#string) |  | Статус |
+| created_at | [string](#string) |  | Время зачисления |
+| exp_value | [int64](#int64) |  | Кол-во опыта |
+| level | [int64](#int64) |  | Уровень |
+| exp_to_next_level | [int64](#int64) |  | Кол-во опыта до следующего лвл |
+| crp | [int64](#int64) |  | Кол-во поинтов для проверок |
+| skills | [Skill](#Skill) | repeated | Навыки студента |
+| prp | [int64](#int64) |  | Кол-во поинтов для ревью |
+| coins | [int64](#int64) |  | Кол-во валюты |
+| badges | [Badge](#Badge) | repeated | Достижения студента |
 
 
 
@@ -164,6 +229,22 @@ Response with found match
 
 
 
+
+<a name="-Skill"></a>
+
+### Skill
+Навыки студента
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| name | [string](#string) |  | Название навыка |
+| points | [int32](#int32) |  | Кол-во очков, по данному навыку |
+
+
+
+
+
  
 
  
@@ -183,6 +264,7 @@ Service with peers&#39; info from edu platform
 | GetPeerSchoolData | [.GetSchoolDataIn](#GetSchoolDataIn) | [.GetSchoolDataOut](#GetSchoolDataOut) |  |
 | isUserStaff | [.LoginIn](#LoginIn) | [.IsUserStaffOut](#IsUserStaffOut) |  |
 | RunLoginsWorkerManually | [.google.protobuf.Empty](#google-protobuf-Empty) | [.google.protobuf.Empty](#google-protobuf-Empty) |  |
+| GetStudentData | [.GetStudentDataIn](#GetStudentDataIn) | [.GetStudentDataOut](#GetStudentDataOut) | Ручка получения данных школьников |
 
  
 

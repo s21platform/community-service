@@ -1,10 +1,9 @@
 package model
 
 import (
+	"database/sql/driver"
 	"encoding/json"
 	"fmt"
-
-	"database/sql/driver"
 
 	school "github.com/s21platform/school-proto/school-proto"
 )
@@ -35,6 +34,24 @@ type ParticipantDataValue struct {
 	Coins                int64  `json:"coins"`
 	Badges               Badges `json:"badges"`
 	TribeID              int64  `json:"tribeId"`
+}
+
+type ParticipantData struct {
+	Login          string `json:"login"`
+	CampusId       int64  `db:"campus_id" json:"campus_id"`
+	ClassName      string `db:"class_name" json:"class_name"`
+	ParallelName   string `db:"parallel_name" json:"parallel_name"`
+	TribeID        int64  `db:"tribe_id" json:"tribe_id"`
+	Status         string `json:"status"`
+	CreatedAt      string `db:"created_at" json:"created_at"`
+	ExpValue       int64  `db:"exp_value" json:"exp_value"`
+	Level          int64  `json:"level"`
+	ExpToNextLevel int64  `db:"exp_to_next_level" json:"exp_to_next_level"`
+	Crp            int64  `json:"crp"`
+	Skills         Skills `json:"skills"`
+	Prp            int64  `json:"prp"`
+	Coins          int64  `json:"coins"`
+	Badges         Badges `json:"badges"`
 }
 
 type Participant struct {

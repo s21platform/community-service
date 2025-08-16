@@ -12,6 +12,8 @@ service CommunityService {
   rpc GetPeerSchoolData(GetSchoolDataIn) returns (GetSchoolDataOut){};
   rpc isUserStaff(LoginIn) returns (IsUserStaffOut){};
   rpc RunLoginsWorkerManually(google.protobuf.Empty) returns (google.protobuf.Empty){};
+  // Ручка получения данных школьников
+  rpc GetStudentData(GetStudentDataIn) returns (GetStudentDataOut){};
 }
 
 message IsUserStaffOut {
@@ -54,4 +56,60 @@ message SearchPeer {
 
 message SearchPeersOut {
   repeated SearchPeer searchPeers = 1;
+}
+
+message GetStudentDataIn {
+  // uuid пользователя, которого запрашивают
+  string userUUID = 1;
+}
+
+// Навыки студента
+message Skill {
+  // Название навыка
+  string name = 1;
+  // Кол-во очков, по данному навыку
+  int32 points = 2;
+}
+
+// Достижения студента
+message Badge {
+  // Наименование достижеиня
+  string name = 1;
+  // Ссылка на иконку
+  string icon_url = 2;
+  // Дата получения
+  string receipt_date_time = 3;
+}
+
+message GetStudentDataOut {
+  // Логин студента
+  string login = 1;
+  // Id кампуса
+  int64 campusId = 2;
+  // Название класса/группы
+  string className = 3;
+  // Наименование волны
+  string parallelName = 4;
+  // Id трайба
+  int64 tribeId = 5;
+  // Статус
+  string status = 6;
+  // Время зачисления
+  string created_at = 7;
+  // Кол-во опыта
+  int64 exp_value = 8;
+  // Уровень
+  int64 level = 9;
+  // Кол-во опыта до следующего лвл
+  int64 exp_to_next_level = 10;
+  // Кол-во поинтов для проверок
+  int64 crp = 11;
+  // Навыки студента
+  repeated Skill skills = 12;
+  // Кол-во поинтов для ревью
+  int64 prp = 13;
+  // Кол-во валюты
+  int64 coins = 14;
+  // Достижения студента
+  repeated Badge badges = 15;
 }
