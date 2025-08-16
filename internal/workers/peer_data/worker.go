@@ -21,16 +21,22 @@ const (
 )
 
 type Worker struct {
-	sC  SchoolC
-	dbR DbRepo
-	rR  RedisRepo
+	sC   SchoolC
+	dbR  DbRepo
+	rR   RedisRepo
+	lcP  LevelChangeProducer
+	elcP ExpLevelChangeProducer
+	scP  StatusChangeProducer
 }
 
-func New(school SchoolC, dbR DbRepo, rR RedisRepo) *Worker {
+func New(school SchoolC, dbR DbRepo, rR RedisRepo, lcP LevelChangeProducer, elcP ExpLevelChangeProducer, scP StatusChangeProducer) *Worker {
 	return &Worker{
-		sC:  school,
-		dbR: dbR,
-		rR:  rR,
+		sC:   school,
+		dbR:  dbR,
+		rR:   rR,
+		lcP:  lcP,
+		elcP: elcP,
+		scP:  scP,
 	}
 }
 

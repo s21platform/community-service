@@ -34,7 +34,7 @@ func (r *Repository) GetParticipantsLogin(ctx context.Context, limit, offset int
 func (r *Repository) ParticipantData(ctx context.Context, login string) (*model.Participant, error) {
 	var participant model.Participant
 
-	query, args, err := sq.Select("login", "status").
+	query, args, err := sq.Select("login", "expLevel", "level", "status").
 		From("participant").
 		Where(sq.Eq{"login": login}).
 		Limit(1).

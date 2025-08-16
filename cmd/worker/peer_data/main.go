@@ -8,6 +8,7 @@ import (
 	"github.com/s21platform/metrics-lib/pkg"
 
 	logger_lib "github.com/s21platform/logger-lib"
+	kafkalib "github.com/s21platform/kafka-lib"
 
 	"github.com/s21platform/community-service/internal/client/school"
 	"github.com/s21platform/community-service/internal/config"
@@ -32,11 +33,19 @@ func main() {
 	defer metrics.Disconnect()
 	ctx = context.WithValue(ctx, config.KeyMetrics, metrics)
 
+	producerLevelChangedCfg := kafkalib.DefaultProducerConfig(cfg.Kafka.Host, cfg.Kafka.Port, cfg.Kafka.LevelChangeTopic)
+	producerExpLevelChangedCfg := kafkalib.DefaultProducerConfig(cfg.Kafka.Host, cfg.Kafka.Port, cfg.Kafka.ExpLevelChanged)
+	producerStatusChangedCfg := kafkalib.DefaultProducerConfig(cfg.Kafka.Host, cfg.Kafka.Port, cfg.Kafka.StatusChanged)	
+	producerLevelChanged := kafkalib.NewProducer(producerLevelChangedCfg)
+	producerExpLevelChanged := kafkalib.NewProducer(producerExpLevelChangedCfg)
+	producerStatusChanged := kafkalib.NewProducer(producerStatusChangedCfg)
+
+
 	schoolClient := school.MustConnect(cfg)
 	dbRepo := postgres.New(cfg)
 	defer dbRepo.Close()
 	redisRepo := redis.New(cfg)
-	peerWorker := peerdata.New(schoolClient, dbRepo, redisRepo)
+	peerWorker := peerdata.New(schoolClient, dbRepo, redisRepo, producerLevelChanged, producerExpLevelChanged, producerStatusChanged)
 
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
