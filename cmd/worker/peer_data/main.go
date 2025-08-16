@@ -2,9 +2,10 @@ package main
 
 import (
 	"context"
-	"github.com/s21platform/metrics-lib/pkg"
 	"log"
 	"sync"
+
+	"github.com/s21platform/metrics-lib/pkg"
 
 	logger_lib "github.com/s21platform/logger-lib"
 

@@ -105,3 +105,65 @@ func (s *Service) RunLoginsWorkerManually(ctx context.Context, _ *emptypb.Empty)
 	s.rR.Delete(ctx, config.KeyLoginsLastUpdated)
 	return &emptypb.Empty{}, nil
 }
+
+func (s *Service) GetStudentData(ctx context.Context, in *community.GetStudentDataIn) (*community.GetStudentDataOut, error) {
+	logger := logger_lib.FromContext(ctx, config.KeyLogger)
+	logger.AddFuncName("GetStudentData")
+
+	uuid, ok := ctx.Value(config.KeyUUID).(string)
+	if !ok {
+		logger.Error("failed to not found UUID in context")
+		return nil, status.Error(codes.Internal, "uuid not found in context")
+	}
+
+	flag, err := s.dbR.CheckLinkEduTwoPeers(ctx, uuid, in.UserUUID)
+	if err != nil {
+		logger.Error(fmt.Sprintf("cannot check link edu status, err: %v", err))
+		return nil, status.Errorf(codes.Internal, "cannot check link edu status: %v", err)
+	}
+	if !flag {
+		logger.Error(fmt.Sprintf("one of the peers is not in the list, err: %v", err))
+		return nil, status.Errorf(codes.NotFound, "one of the peers is not in the list, err: %v", err)
+
+	}
+
+	data, err := s.dbR.GetPeerData(ctx, in.UserUUID)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to get peer data: %v", err)
+	}
+	out := &community.GetStudentDataOut{
+		Login:          data.Login,
+		CampusId:       data.CampusId,
+		ClassName:      data.ClassName,
+		ParallelName:   data.ParallelName,
+		TribeId:        data.TribeID,
+		Status:         data.Status,
+		CreatedAt:      data.CreatedAt,
+		ExpValue:       data.ExpValue,
+		Level:          data.Level,
+		ExpToNextLevel: data.ExpToNextLevel,
+		Crp:            data.Crp,
+		Prp:            data.Prp,
+		Coins:          data.Coins,
+	}
+	out.Skills = make([]*community.Skill, len(data.Skills))
+	for i, j := range data.Skills {
+		tmp := &community.Skill{
+			Name:   j.Name,
+			Points: j.Points,
+		}
+		out.Skills[i] = tmp
+	}
+
+	out.Badges = make([]*community.Badge, len(data.Badges))
+	for i, j := range data.Badges {
+		tmp := &community.Badge{
+			Name:            j.Name,
+			ReceiptDateTime: j.ReceiptDateTime,
+			IconUrl:         j.IconURL,
+		}
+		out.Badges[i] = tmp
+	}
+
+	return out, nil
+}
