@@ -59,7 +59,7 @@ type Kafka struct {
 	Port             string `env:"KAFKA_PORT"`
 	LevelChangeTopic string `env:"PARTICIPANT_LEVEL_CHANGED"`
 	ExpLevelChanged  string `env:"PARTICIPANT_EXP_LEVEL_CHANGED"`
-	StatusChanged 	 string `env:"PARTICIPANT_STATUS_CHANGED"`
+	StatusChanged    string `env:"PARTICIPANT_STATUS_CHANGED"`
 }
 
 func MustLoad() *Config {

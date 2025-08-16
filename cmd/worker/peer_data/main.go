@@ -7,8 +7,8 @@ import (
 
 	"github.com/s21platform/metrics-lib/pkg"
 
-	logger_lib "github.com/s21platform/logger-lib"
 	kafkalib "github.com/s21platform/kafka-lib"
+	logger_lib "github.com/s21platform/logger-lib"
 
 	"github.com/s21platform/community-service/internal/client/school"
 	"github.com/s21platform/community-service/internal/config"
@@ -35,11 +35,10 @@ func main() {
 
 	producerLevelChangedCfg := kafkalib.DefaultProducerConfig(cfg.Kafka.Host, cfg.Kafka.Port, cfg.Kafka.LevelChangeTopic)
 	producerExpLevelChangedCfg := kafkalib.DefaultProducerConfig(cfg.Kafka.Host, cfg.Kafka.Port, cfg.Kafka.ExpLevelChanged)
-	producerStatusChangedCfg := kafkalib.DefaultProducerConfig(cfg.Kafka.Host, cfg.Kafka.Port, cfg.Kafka.StatusChanged)	
+	producerStatusChangedCfg := kafkalib.DefaultProducerConfig(cfg.Kafka.Host, cfg.Kafka.Port, cfg.Kafka.StatusChanged)
 	producerLevelChanged := kafkalib.NewProducer(producerLevelChangedCfg)
 	producerExpLevelChanged := kafkalib.NewProducer(producerExpLevelChangedCfg)
 	producerStatusChanged := kafkalib.NewProducer(producerStatusChangedCfg)
-
 
 	schoolClient := school.MustConnect(cfg)
 	dbRepo := postgres.New(cfg)
