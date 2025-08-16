@@ -118,16 +118,21 @@ func (s *Service) GetStudentData(ctx context.Context, in *community.GetStudentDa
 
 	flag, err := s.dbR.CheckLinkEduTwoPeers(ctx, uuid, in.UserUUID)
 	if err != nil {
-		logger.Error(fmt.Sprintf("cannot check link edu status, err: %v", err))
-		return nil, status.Errorf(codes.Internal, "cannot check link edu status: %v", err)
+		logger.Error(fmt.Sprintf("failed to check link edu two peers, err: %v", err))
+		return nil, status.Errorf(codes.Internal, "failed to check link edu two peers: %v", err)
 	}
-	if !flag {
+	if flag != 2 {
 		logger.Error(fmt.Sprintf("one of the peers is not in the list, err: %v", err))
 		return nil, status.Errorf(codes.NotFound, "one of the peers is not in the list, err: %v", err)
 
 	}
+	id, err := s.dbR.GetIdPeer(ctx, in.UserUUID)
+	if err != nil {
+		logger.Error(fmt.Sprintf("failed to get user id, err: %v", err))
+		return nil, status.Errorf(codes.NotFound, "failed to get user id, err: %v", err)
+	}
 
-	data, err := s.dbR.GetPeerData(ctx, in.UserUUID)
+	data, err := s.dbR.GetPeerData(ctx, id)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to get peer data: %v", err)
 	}

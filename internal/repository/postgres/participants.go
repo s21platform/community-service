@@ -101,3 +101,23 @@ func (r *Repository) UpdateParticipantData(ctx context.Context, participantDataV
 
 	return nil
 }
+
+func (r *Repository) GetPeerData(ctx context.Context, id int64) (*model.ParticipantData, error) {
+	var participant model.ParticipantData
+
+	query, args, err := sq.Select("login", "campus_id", "class_name", "parallel_name", "tribe_id", "status", "created_at",
+		"exp_value", "level", "exp_to_next_level", "skills", "crp", "prp", "coins", "badges").
+		From("participant").
+		Where(sq.Eq{"id": id}).
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
+	if err != nil {
+		return nil, fmt.Errorf("failed to build exists query: %v", err)
+	}
+
+	err = r.conn.GetContext(ctx, &participant, query, args...)
+	if err != nil {
+		return nil, err
+	}
+	return &participant, nil
+}

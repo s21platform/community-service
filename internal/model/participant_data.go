@@ -38,15 +38,15 @@ type ParticipantDataValue struct {
 
 type ParticipantData struct {
 	Login          string `json:"login"`
-	CampusId       int64  `json:"campusId"`
-	ClassName      string `json:"className"`
-	ParallelName   string `json:"parallelName"`
-	TribeID        int64  `json:"tribeId"`
+	CampusId       int64  `db:"campus_id" json:"campus_id"`
+	ClassName      string `db:"class_name" json:"class_name"`
+	ParallelName   string `db:"parallel_name" json:"parallel_name"`
+	TribeID        int64  `db:"tribe_id" json:"tribe_id"`
 	Status         string `json:"status"`
-	CreatedAt      string `json:"created_at"`
-	ExpValue       int64  `json:"expValue"`
+	CreatedAt      string `db:"created_at" json:"created_at"`
+	ExpValue       int64  `db:"exp_value" json:"exp_value"`
 	Level          int64  `json:"level"`
-	ExpToNextLevel int64  `json:"expToNextLevel"`
+	ExpToNextLevel int64  `db:"exp_to_next_level" json:"exp_to_next_level"`
 	Crp            int64  `json:"crp"`
 	Skills         Skills `json:"skills"`
 	Prp            int64  `json:"prp"`

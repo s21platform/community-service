@@ -9,6 +9,7 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
+	config "github.com/s21platform/community-service/internal/config"
 	model "github.com/s21platform/community-service/internal/model"
 	community "github.com/s21platform/community-service/pkg/community"
 )
@@ -34,6 +35,51 @@ func NewMockDbRepo(ctrl *gomock.Controller) *MockDbRepo {
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockDbRepo) EXPECT() *MockDbRepoMockRecorder {
 	return m.recorder
+}
+
+// CheckLinkEduTwoPeers mocks base method.
+func (m *MockDbRepo) CheckLinkEduTwoPeers(ctx context.Context, uuidFirstPeer, uuidSecondPeer string) (int64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CheckLinkEduTwoPeers", ctx, uuidFirstPeer, uuidSecondPeer)
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CheckLinkEduTwoPeers indicates an expected call of CheckLinkEduTwoPeers.
+func (mr *MockDbRepoMockRecorder) CheckLinkEduTwoPeers(ctx, uuidFirstPeer, uuidSecondPeer interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckLinkEduTwoPeers", reflect.TypeOf((*MockDbRepo)(nil).CheckLinkEduTwoPeers), ctx, uuidFirstPeer, uuidSecondPeer)
+}
+
+// GetIdPeer mocks base method.
+func (m *MockDbRepo) GetIdPeer(ctx context.Context, uuid string) (int64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetIdPeer", ctx, uuid)
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetIdPeer indicates an expected call of GetIdPeer.
+func (mr *MockDbRepoMockRecorder) GetIdPeer(ctx, uuid interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetIdPeer", reflect.TypeOf((*MockDbRepo)(nil).GetIdPeer), ctx, uuid)
+}
+
+// GetPeerData mocks base method.
+func (m *MockDbRepo) GetPeerData(ctx context.Context, id int64) (*model.ParticipantData, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPeerData", ctx, id)
+	ret0, _ := ret[0].(*model.ParticipantData)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPeerData indicates an expected call of GetPeerData.
+func (mr *MockDbRepoMockRecorder) GetPeerData(ctx, id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPeerData", reflect.TypeOf((*MockDbRepo)(nil).GetPeerData), ctx, id)
 }
 
 // GetPeerSchoolData mocks base method.
@@ -120,7 +166,7 @@ func (m *MockRedisRepo) EXPECT() *MockRedisRepoMockRecorder {
 }
 
 // Delete mocks base method.
-func (m *MockRedisRepo) Delete(ctx context.Context, key string) {
+func (m *MockRedisRepo) Delete(ctx context.Context, key config.Key) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "Delete", ctx, key)
 }

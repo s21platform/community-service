@@ -14,8 +14,9 @@ type DbRepo interface {
 	GetPeerStatus(ctx context.Context, email string) (string, error)
 	GetPeerSchoolData(ctx context.Context, nickName string) (model.PeerSchoolData, error)
 	GetStaffId(ctx context.Context, login string) (int64, error)
-	CheckLinkEduTwoPeers(ctx context.Context, uuidFirstPeer string, uuidSecondPeer string) (bool, error)
-	GetPeerData(ctx context.Context, uuid string) (model.ParticipantData, error)
+	CheckLinkEduTwoPeers(ctx context.Context, uuidFirstPeer string, uuidSecondPeer string) (int64, error)
+	GetPeerData(ctx context.Context, id int64) (*model.ParticipantData, error)
+	GetIdPeer(ctx context.Context, uuid string) (int64, error)
 }
 
 type RedisRepo interface {

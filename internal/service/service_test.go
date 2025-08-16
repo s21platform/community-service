@@ -4,18 +4,16 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"testing"
-
 	"github.com/golang/mock/gomock"
+	"github.com/s21platform/community-service/internal/config"
+	"github.com/s21platform/community-service/internal/model"
 	"github.com/s21platform/community-service/pkg/community"
 	logger_lib "github.com/s21platform/logger-lib"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-
-	"github.com/s21platform/community-service/internal/config"
-	"github.com/s21platform/community-service/internal/model"
+	"testing"
 )
 
 var env = "prod"
