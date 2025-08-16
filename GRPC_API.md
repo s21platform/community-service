@@ -129,7 +129,7 @@ Response with found match
 | ----- | ---- | ----- | ----------- |
 | login | [string](#string) |  |  |
 | old_value_str | [string](#string) |  |  |
-| value_int | [int32](#int32) |  |  |
+| old_value_int | [int32](#int32) |  |  |
 | new_value_str | [string](#string) |  |  |
 | new_value_int | [int32](#int32) |  |  |
 | at | [google.protobuf.Timestamp](#google-protobuf-Timestamp) |  |  |

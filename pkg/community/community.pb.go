@@ -452,7 +452,7 @@ type ParticipantChangeEvent struct {
 	// Types that are valid to be assigned to OldValue:
 	//
 	//	*ParticipantChangeEvent_OldValueStr
-	//	*ParticipantChangeEvent_ValueInt
+	//	*ParticipantChangeEvent_OldValueInt
 	OldValue isParticipantChangeEvent_OldValue `protobuf_oneof:"old_value"`
 	// Types that are valid to be assigned to NewValue:
 	//
@@ -517,10 +517,10 @@ func (x *ParticipantChangeEvent) GetOldValueStr() string {
 	return ""
 }
 
-func (x *ParticipantChangeEvent) GetValueInt() int32 {
+func (x *ParticipantChangeEvent) GetOldValueInt() int32 {
 	if x != nil {
-		if x, ok := x.OldValue.(*ParticipantChangeEvent_ValueInt); ok {
-			return x.ValueInt
+		if x, ok := x.OldValue.(*ParticipantChangeEvent_OldValueInt); ok {
+			return x.OldValueInt
 		}
 	}
 	return 0
@@ -566,13 +566,13 @@ type ParticipantChangeEvent_OldValueStr struct {
 	OldValueStr string `protobuf:"bytes,2,opt,name=old_value_str,json=oldValueStr,proto3,oneof"`
 }
 
-type ParticipantChangeEvent_ValueInt struct {
-	ValueInt int32 `protobuf:"varint,3,opt,name=value_int,json=valueInt,proto3,oneof"`
+type ParticipantChangeEvent_OldValueInt struct {
+	OldValueInt int32 `protobuf:"varint,3,opt,name=old_value_int,json=oldValueInt,proto3,oneof"`
 }
 
 func (*ParticipantChangeEvent_OldValueStr) isParticipantChangeEvent_OldValue() {}
 
-func (*ParticipantChangeEvent_ValueInt) isParticipantChangeEvent_OldValue() {}
+func (*ParticipantChangeEvent_OldValueInt) isParticipantChangeEvent_OldValue() {}
 
 type isParticipantChangeEvent_NewValue interface {
 	isParticipantChangeEvent_NewValue()
@@ -616,11 +616,11 @@ const file_api_community_proto_rawDesc = "" +
 	"SearchPeer\x12\x14\n" +
 	"\x05login\x18\x01 \x01(\tR\x05login\"?\n" +
 	"\x0eSearchPeersOut\x12-\n" +
-	"\vsearchPeers\x18\x01 \x03(\v2\v.SearchPeerR\vsearchPeers\"\x85\x02\n" +
+	"\vsearchPeers\x18\x01 \x03(\v2\v.SearchPeerR\vsearchPeers\"\x8c\x02\n" +
 	"\x16ParticipantChangeEvent\x12\x14\n" +
 	"\x05login\x18\x01 \x01(\tR\x05login\x12$\n" +
-	"\rold_value_str\x18\x02 \x01(\tH\x00R\voldValueStr\x12\x1d\n" +
-	"\tvalue_int\x18\x03 \x01(\x05H\x00R\bvalueInt\x12$\n" +
+	"\rold_value_str\x18\x02 \x01(\tH\x00R\voldValueStr\x12$\n" +
+	"\rold_value_int\x18\x03 \x01(\x05H\x00R\voldValueInt\x12$\n" +
 	"\rnew_value_str\x18\x04 \x01(\tH\x01R\vnewValueStr\x12$\n" +
 	"\rnew_value_int\x18\x05 \x01(\x05H\x01R\vnewValueInt\x12*\n" +
 	"\x02at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\x02atB\v\n" +
@@ -687,7 +687,7 @@ func file_api_community_proto_init() {
 	}
 	file_api_community_proto_msgTypes[9].OneofWrappers = []any{
 		(*ParticipantChangeEvent_OldValueStr)(nil),
-		(*ParticipantChangeEvent_ValueInt)(nil),
+		(*ParticipantChangeEvent_OldValueInt)(nil),
 		(*ParticipantChangeEvent_NewValueStr)(nil),
 		(*ParticipantChangeEvent_NewValueInt)(nil),
 	}

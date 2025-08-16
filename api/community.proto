@@ -62,7 +62,7 @@ message ParticipantChangeEvent {
 
   oneof old_value {
     string old_value_str = 2;
-    int32 value_int = 3;
+    int32 old_value_int = 3;
   }
 
   oneof new_value {
