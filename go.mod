@@ -12,7 +12,7 @@ require (
 	github.com/redis/go-redis/v9 v9.7.0
 	github.com/s21platform/logger-lib v0.0.6
 	github.com/s21platform/metrics-lib v0.0.9
-	github.com/s21platform/notification-service v0.0.4
+	github.com/s21platform/notification-service v0.0.5
 	github.com/s21platform/school-proto v0.0.5
 	github.com/stretchr/testify v1.10.0
 	golang.org/x/net v0.38.0

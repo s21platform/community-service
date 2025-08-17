@@ -286,11 +286,10 @@ func TestServer_SendEduLinkingCode(t *testing.T) {
 
 	t.Run("send_code_email_ok", func(t *testing.T) {
 		login := "aboba"
-		email := login + "@student.21-school.ru"
-		mockRepo.EXPECT().GetPeerStatus(gomock.Any(), email).Return("ACTIVE", nil)
+		mockRepo.EXPECT().GetPeerStatus(gomock.Any(), login).Return("ACTIVE", nil)
 		mockRedisRepo.EXPECT().Set(gomock.Any(), config.Key("code_"+login), gomock.Any(), gomock.Any()).Return(nil)
 		mockLogger.EXPECT().AddFuncName("SendEduLinkingCode")
-		mockNotCl.EXPECT().SendVerificationCode(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil)
+		mockNotCl.EXPECT().SendEduCode(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil)
 
 		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil)
 		_, err := s.SendEduLinkingCode(ctx, &community.SendEduLinkingCodeIn{Login: login})
@@ -299,9 +298,8 @@ func TestServer_SendEduLinkingCode(t *testing.T) {
 
 	t.Run("send_code_email_err", func(t *testing.T) {
 		login := "aboba"
-		email := login + "@student.21-school.ru"
 		expectedErr := errors.New("set err")
-		mockRepo.EXPECT().GetPeerStatus(gomock.Any(), email).Return("ACTIVE", nil)
+		mockRepo.EXPECT().GetPeerStatus(gomock.Any(), login).Return("ACTIVE", nil)
 		mockRedisRepo.EXPECT().Set(gomock.Any(), config.Key("code_"+login), gomock.Any(), gomock.Any()).Return(expectedErr)
 		mockLogger.EXPECT().AddFuncName("SendEduLinkingCode")
 		mockLogger.EXPECT().Error(fmt.Sprintf("failed to set code to redis, err: %v", expectedErr))

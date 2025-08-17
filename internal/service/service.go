@@ -137,7 +137,7 @@ func (s *Service) SendEduLinkingCode(ctx context.Context, in *community.SendEduL
 
 	email := in.Login + "@student.21-school.ru"
 
-	err = s.notCl.SendVerificationCode(ctx, email, code)
+	err = s.notCl.SendEduCode(ctx, email, code)
 	if err != nil {
 		logger.Error(fmt.Sprintf("failed to send verification code, err: %v", err))
 		return nil, status.Errorf(codes.Internal, "failed to send verification code, err: %v", err)

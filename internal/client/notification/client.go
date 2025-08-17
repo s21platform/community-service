@@ -25,8 +25,8 @@ func New(cfg *config.Config) *Client {
 	return &Client{client: client}
 }
 
-func (c *Client) SendVerificationCode(ctx context.Context, email, code string) error {
-	_, err := c.client.SendVerificationCode(ctx, &notification.SendVerificationCodeIn{
+func (c *Client) SendEduCode(ctx context.Context, email, code string) error {
+	_, err := c.client.SendEduCode(ctx, &notification.SendEduCodeIn{
 		Email: email,
 		Code:  code,
 	})

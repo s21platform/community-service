@@ -62,8 +62,8 @@ github.com/s21platform/logger-lib v0.0.6 h1:Aa3wV7zsaUSUkLa4P8stKNKxmKpZEn9dNBsk
 github.com/s21platform/logger-lib v0.0.6/go.mod h1:KjnZvBFSCUriTW9QCp9y1LAPU4gUo3m8PmWNR3Th7MI=
 github.com/s21platform/metrics-lib v0.0.9 h1:nFz4W+xps2nlxpOyGW/JLjZf2sTN/YXomumuC9nXwQ0=
 github.com/s21platform/metrics-lib v0.0.9/go.mod h1:Z1Aiy5uuyEmM//rQmhqkVh0JR8l5sVwe83TQegdNFxQ=
-github.com/s21platform/notification-service v0.0.4 h1:o0PP7tRGTqSXamz/NUniTnrdE68jCxooLL1hhkZ7TL0=
-github.com/s21platform/notification-service v0.0.4/go.mod h1:hx2tTur02F9MD9TYvoKlO1lgPlcts/h/3okGII00xfs=
+github.com/s21platform/notification-service v0.0.5 h1:CM4cYuKU4NxyEj+BnxAtNQ7uWLHd/8Lv6rpi0llJwgE=
+github.com/s21platform/notification-service v0.0.5/go.mod h1:hx2tTur02F9MD9TYvoKlO1lgPlcts/h/3okGII00xfs=
 github.com/s21platform/school-proto v0.0.5 h1:+/mpLQJvRTiYfdUZj8tvT4/ogGW4H2W3FWODPMmXzto=
 github.com/s21platform/school-proto v0.0.5/go.mod h1:OHdop/i6tGCF6TfX1Wgh9rcjlJaX5OK8AMD5XnBYtm8=
 github.com/segmentio/kafka-go v0.4.47 h1:IqziR4pA3vrZq7YdRxaT3w1/5fvIH5qpCwstUanQQB0=

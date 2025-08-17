@@ -24,5 +24,5 @@ type RedisRepo interface {
 }
 
 type NotificationS interface {
-	SendVerificationCode(ctx context.Context, email, code string) error
+	SendEduCode(ctx context.Context, email, code string) error
 }

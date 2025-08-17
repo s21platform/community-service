@@ -185,16 +185,16 @@ func (m *MockNotificationS) EXPECT() *MockNotificationSMockRecorder {
 	return m.recorder
 }
 
-// SendVerificationCode mocks base method.
-func (m *MockNotificationS) SendVerificationCode(ctx context.Context, email, code string) error {
+// SendEduCode mocks base method.
+func (m *MockNotificationS) SendEduCode(ctx context.Context, email, code string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SendVerificationCode", ctx, email, code)
+	ret := m.ctrl.Call(m, "SendEduCode", ctx, email, code)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// SendVerificationCode indicates an expected call of SendVerificationCode.
-func (mr *MockNotificationSMockRecorder) SendVerificationCode(ctx, email, code interface{}) *gomock.Call {
+// SendEduCode indicates an expected call of SendEduCode.
+func (mr *MockNotificationSMockRecorder) SendEduCode(ctx, email, code interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendVerificationCode", reflect.TypeOf((*MockNotificationS)(nil).SendVerificationCode), ctx, email, code)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendEduCode", reflect.TypeOf((*MockNotificationS)(nil).SendEduCode), ctx, email, code)
 }
