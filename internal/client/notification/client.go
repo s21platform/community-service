@@ -27,19 +27,7 @@ func New(cfg *config.Config) *Client {
 }
 
 func (c *Client) SendEduCode(ctx context.Context, email, code string) error {
-	md, ok := metadata.FromIncomingContext(ctx)
-	if !ok {
-		return fmt.Errorf("no metadata in context")
-	}
-
-	userIDs, ok := md["uuid"]
-	if !ok || len(userIDs) != 1 {
-		return fmt.Errorf("no uuid or more than one in metadata")
-	}
-
-	uuid := userIDs[0]
-
-	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("uuid", uuid))
+	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("uuid", ctx.Value(config.KeyUUID).(string)))
 
 	_, err := c.client.SendEduCode(ctx, &notification.SendEduCodeIn{
 		Email: email,
