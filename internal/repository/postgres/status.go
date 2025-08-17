@@ -9,11 +9,11 @@ import (
 	sq "github.com/Masterminds/squirrel"
 )
 
-func (r *Repository) GetPeerStatus(ctx context.Context, email string) (string, error) {
+func (r *Repository) GetPeerStatus(ctx context.Context, login string) (string, error) {
 	var status string
 	query, args, err := sq.Select("status").
 		From("participant").
-		Where(sq.Eq{"login": email}).
+		Where(sq.Eq{"login": login}).
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
 	if err != nil {

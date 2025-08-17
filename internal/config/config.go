@@ -7,14 +7,15 @@ import (
 )
 
 type Config struct {
-	Service  Service
-	Postgres Postgres
-	Metrics  Metrics
-	Platform Platform
-	School   School
-	Logger   Logger
-	Cache    Cache
-	Kafka    Kafka
+	Service      Service
+	Postgres     Postgres
+	Metrics      Metrics
+	Platform     Platform
+	School       School
+	Logger       Logger
+	Cache        Cache
+	Notification Notification
+	Kafka        Kafka
 }
 
 type Cache struct {
@@ -54,12 +55,17 @@ type School struct {
 	Port string `env:"SCHOOL_SERVICE_PORT"`
 }
 
+type Notification struct {
+	Host string `env:"NOTIFICATION_SERVICE_HOST"`
+	Port string `env:"NOTIFICATION_SERVICE_PORT"`
+}
+
 type Kafka struct {
 	Host             string `env:"KAFKA_HOST"`
 	Port             string `env:"KAFKA_PORT"`
 	LevelChangeTopic string `env:"PARTICIPANT_LEVEL_CHANGED"`
 	ExpLevelChanged  string `env:"PARTICIPANT_EXP_LEVEL_CHANGED"`
-	StatusChanged 	 string `env:"PARTICIPANT_STATUS_CHANGED"`
+	StatusChanged    string `env:"PARTICIPANT_STATUS_CHANGED"`
 }
 
 func MustLoad() *Config {
