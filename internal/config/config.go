@@ -15,6 +15,7 @@ type Config struct {
 	Logger       Logger
 	Cache        Cache
 	Notification Notification
+	Kafka        Kafka
 }
 
 type Cache struct {
@@ -57,6 +58,14 @@ type School struct {
 type Notification struct {
 	Host string `env:"NOTIFICATION_SERVICE_HOST"`
 	Port string `env:"NOTIFICATION_SERVICE_PORT"`
+}
+
+type Kafka struct {
+	Host             string `env:"KAFKA_HOST"`
+	Port             string `env:"KAFKA_PORT"`
+	LevelChangeTopic string `env:"PARTICIPANT_LEVEL_CHANGED"`
+	ExpLevelChanged  string `env:"PARTICIPANT_EXP_LEVEL_CHANGED"`
+	StatusChanged    string `env:"PARTICIPANT_STATUS_CHANGED"`
 }
 
 func MustLoad() *Config {

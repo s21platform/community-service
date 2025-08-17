@@ -21,6 +21,12 @@ require (
 )
 
 require (
+	github.com/klauspost/compress v1.18.0 // indirect
+	github.com/pierrec/lz4/v4 v4.1.22 // indirect
+	github.com/segmentio/kafka-go v0.4.47 // indirect
+)
+
+require (
 	github.com/BurntSushi/toml v1.5.0 // indirect
 	github.com/alexcesaro/statsd v2.0.0+incompatible // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
@@ -30,6 +36,7 @@ require (
 	github.com/lann/builder v0.0.0-20180802200727-47ae307949d0 // indirect
 	github.com/lann/ps v0.0.0-20150810152359-62de8c46ede0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/s21platform/kafka-lib v1.0.2
 	golang.org/x/sys v0.31.0 // indirect
 	golang.org/x/text v0.23.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250404141209-ee84b53bf3d0 // indirect
