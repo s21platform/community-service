@@ -112,13 +112,11 @@ func (s *Service) RunLoginsWorkerManually(ctx context.Context, _ *emptypb.Empty)
 	return &emptypb.Empty{}, nil
 }
 
-func (s *Service) SendCodeEmail(ctx context.Context, in *community.LoginIn) (*emptypb.Empty, error) {
+func (s *Service) SendEduLinkingCode(ctx context.Context, in *community.SendEduLinkingCodeIn) (*emptypb.Empty, error) {
 	logger := logger_lib.FromContext(ctx, config.KeyLogger)
-	logger.AddFuncName("SendCodeEmail")
+	logger.AddFuncName("SendEduLinkingCode")
 
-	email := in.Login + "@student.21-school.ru"
-
-	peerStatus, err := s.dbR.GetPeerStatus(ctx, email)
+	peerStatus, err := s.dbR.GetPeerStatus(ctx, in.Login)
 	if err != nil {
 		logger.Error(fmt.Sprintf("failed to get peer status, err: %v", err))
 		return nil, status.Errorf(codes.Internal, "failed to get peer status, err: %v", err)
@@ -136,6 +134,8 @@ func (s *Service) SendCodeEmail(ctx context.Context, in *community.LoginIn) (*em
 		logger.Error(fmt.Sprintf("failed to set code to redis, err: %v", err))
 		return nil, status.Errorf(codes.Internal, "failed to set code to redis, err: %v", err)
 	}
+
+	email := in.Login + "@student.21-school.ru"
 
 	err = s.notCl.SendVerificationCode(ctx, email, code)
 	if err != nil {

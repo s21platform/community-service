@@ -25,7 +25,7 @@ const (
 	CommunityService_GetPeerSchoolData_FullMethodName       = "/CommunityService/GetPeerSchoolData"
 	CommunityService_IsUserStaff_FullMethodName             = "/CommunityService/isUserStaff"
 	CommunityService_RunLoginsWorkerManually_FullMethodName = "/CommunityService/RunLoginsWorkerManually"
-	CommunityService_SendCodeEmail_FullMethodName           = "/CommunityService/SendCodeEmail"
+	CommunityService_SendEduLinkingCode_FullMethodName      = "/CommunityService/SendEduLinkingCode"
 )
 
 // CommunityServiceClient is the client API for CommunityService service.
@@ -40,7 +40,7 @@ type CommunityServiceClient interface {
 	GetPeerSchoolData(ctx context.Context, in *GetSchoolDataIn, opts ...grpc.CallOption) (*GetSchoolDataOut, error)
 	IsUserStaff(ctx context.Context, in *LoginIn, opts ...grpc.CallOption) (*IsUserStaffOut, error)
 	RunLoginsWorkerManually(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*empty.Empty, error)
-	SendCodeEmail(ctx context.Context, in *LoginIn, opts ...grpc.CallOption) (*empty.Empty, error)
+	SendEduLinkingCode(ctx context.Context, in *SendEduLinkingCodeIn, opts ...grpc.CallOption) (*empty.Empty, error)
 }
 
 type communityServiceClient struct {
@@ -101,10 +101,10 @@ func (c *communityServiceClient) RunLoginsWorkerManually(ctx context.Context, in
 	return out, nil
 }
 
-func (c *communityServiceClient) SendCodeEmail(ctx context.Context, in *LoginIn, opts ...grpc.CallOption) (*empty.Empty, error) {
+func (c *communityServiceClient) SendEduLinkingCode(ctx context.Context, in *SendEduLinkingCodeIn, opts ...grpc.CallOption) (*empty.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(empty.Empty)
-	err := c.cc.Invoke(ctx, CommunityService_SendCodeEmail_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, CommunityService_SendEduLinkingCode_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -123,7 +123,7 @@ type CommunityServiceServer interface {
 	GetPeerSchoolData(context.Context, *GetSchoolDataIn) (*GetSchoolDataOut, error)
 	IsUserStaff(context.Context, *LoginIn) (*IsUserStaffOut, error)
 	RunLoginsWorkerManually(context.Context, *empty.Empty) (*empty.Empty, error)
-	SendCodeEmail(context.Context, *LoginIn) (*empty.Empty, error)
+	SendEduLinkingCode(context.Context, *SendEduLinkingCodeIn) (*empty.Empty, error)
 	mustEmbedUnimplementedCommunityServiceServer()
 }
 
@@ -149,8 +149,8 @@ func (UnimplementedCommunityServiceServer) IsUserStaff(context.Context, *LoginIn
 func (UnimplementedCommunityServiceServer) RunLoginsWorkerManually(context.Context, *empty.Empty) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RunLoginsWorkerManually not implemented")
 }
-func (UnimplementedCommunityServiceServer) SendCodeEmail(context.Context, *LoginIn) (*empty.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SendCodeEmail not implemented")
+func (UnimplementedCommunityServiceServer) SendEduLinkingCode(context.Context, *SendEduLinkingCodeIn) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SendEduLinkingCode not implemented")
 }
 func (UnimplementedCommunityServiceServer) mustEmbedUnimplementedCommunityServiceServer() {}
 func (UnimplementedCommunityServiceServer) testEmbeddedByValue()                          {}
@@ -263,20 +263,20 @@ func _CommunityService_RunLoginsWorkerManually_Handler(srv interface{}, ctx cont
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CommunityService_SendCodeEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(LoginIn)
+func _CommunityService_SendEduLinkingCode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SendEduLinkingCodeIn)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(CommunityServiceServer).SendCodeEmail(ctx, in)
+		return srv.(CommunityServiceServer).SendEduLinkingCode(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: CommunityService_SendCodeEmail_FullMethodName,
+		FullMethod: CommunityService_SendEduLinkingCode_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CommunityServiceServer).SendCodeEmail(ctx, req.(*LoginIn))
+		return srv.(CommunityServiceServer).SendEduLinkingCode(ctx, req.(*SendEduLinkingCodeIn))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -309,8 +309,8 @@ var CommunityService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _CommunityService_RunLoginsWorkerManually_Handler,
 		},
 		{
-			MethodName: "SendCodeEmail",
-			Handler:    _CommunityService_SendCodeEmail_Handler,
+			MethodName: "SendEduLinkingCode",
+			Handler:    _CommunityService_SendEduLinkingCode_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

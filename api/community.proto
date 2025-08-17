@@ -12,7 +12,7 @@ service CommunityService {
   rpc GetPeerSchoolData(GetSchoolDataIn) returns (GetSchoolDataOut){};
   rpc isUserStaff(LoginIn) returns (IsUserStaffOut){};
   rpc RunLoginsWorkerManually(google.protobuf.Empty) returns (google.protobuf.Empty){};
-  rpc SendCodeEmail(LoginIn) returns (google.protobuf.Empty){};
+  rpc SendEduLinkingCode(SendEduLinkingCodeIn) returns (google.protobuf.Empty){};
 }
 
 message IsUserStaffOut {
@@ -55,4 +55,8 @@ message SearchPeer {
 
 message SearchPeersOut {
   repeated SearchPeer searchPeers = 1;
+}
+
+message SendEduLinkingCodeIn {
+  string login = 1;
 }

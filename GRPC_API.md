@@ -13,6 +13,7 @@
     - [SearchPeer](#-SearchPeer)
     - [SearchPeersIn](#-SearchPeersIn)
     - [SearchPeersOut](#-SearchPeersOut)
+    - [SendEduLinkingCodeIn](#-SendEduLinkingCodeIn)
   
     - [CommunityService](#-CommunityService)
   
@@ -164,6 +165,21 @@ Response with found match
 
 
 
+
+<a name="-SendEduLinkingCodeIn"></a>
+
+### SendEduLinkingCodeIn
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| login | [string](#string) |  |  |
+
+
+
+
+
  
 
  
@@ -183,7 +199,7 @@ Service with peers&#39; info from edu platform
 | GetPeerSchoolData | [.GetSchoolDataIn](#GetSchoolDataIn) | [.GetSchoolDataOut](#GetSchoolDataOut) |  |
 | isUserStaff | [.LoginIn](#LoginIn) | [.IsUserStaffOut](#IsUserStaffOut) |  |
 | RunLoginsWorkerManually | [.google.protobuf.Empty](#google-protobuf-Empty) | [.google.protobuf.Empty](#google-protobuf-Empty) |  |
-| SendCodeEmail | [.LoginIn](#LoginIn) | [.google.protobuf.Empty](#google-protobuf-Empty) |  |
+| SendEduLinkingCode | [.SendEduLinkingCodeIn](#SendEduLinkingCodeIn) | [.google.protobuf.Empty](#google-protobuf-Empty) |  |
 
  
 

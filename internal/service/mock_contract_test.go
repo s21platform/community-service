@@ -54,18 +54,18 @@ func (mr *MockDbRepoMockRecorder) GetPeerSchoolData(ctx, nickName interface{}) *
 }
 
 // GetPeerStatus mocks base method.
-func (m *MockDbRepo) GetPeerStatus(ctx context.Context, email string) (string, error) {
+func (m *MockDbRepo) GetPeerStatus(ctx context.Context, login string) (string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetPeerStatus", ctx, email)
+	ret := m.ctrl.Call(m, "GetPeerStatus", ctx, login)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetPeerStatus indicates an expected call of GetPeerStatus.
-func (mr *MockDbRepoMockRecorder) GetPeerStatus(ctx, email interface{}) *gomock.Call {
+func (mr *MockDbRepoMockRecorder) GetPeerStatus(ctx, login interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPeerStatus", reflect.TypeOf((*MockDbRepo)(nil).GetPeerStatus), ctx, email)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPeerStatus", reflect.TypeOf((*MockDbRepo)(nil).GetPeerStatus), ctx, login)
 }
 
 // GetStaffId mocks base method.
