@@ -7,6 +7,7 @@ import (
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/metadata"
 
 	"github.com/s21platform/community-service/internal/config"
 	"github.com/s21platform/notification-service/pkg/notification"
@@ -26,6 +27,20 @@ func New(cfg *config.Config) *Client {
 }
 
 func (c *Client) SendEduCode(ctx context.Context, email, code string) error {
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return fmt.Errorf("no metadata in context")
+	}
+
+	userIDs, ok := md["uuid"]
+	if !ok || len(userIDs) != 1 {
+		return fmt.Errorf("no uuid or more than one in metadata")
+	}
+
+	uuid := userIDs[0]
+
+	ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs("uuid", uuid))
+
 	_, err := c.client.SendEduCode(ctx, &notification.SendEduCodeIn{
 		Email: email,
 		Code:  code,
