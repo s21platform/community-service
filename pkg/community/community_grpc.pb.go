@@ -26,6 +26,7 @@ const (
 	CommunityService_GetPeerSchoolData_FullMethodName       = "/CommunityService/GetPeerSchoolData"
 	CommunityService_IsUserStaff_FullMethodName             = "/CommunityService/isUserStaff"
 	CommunityService_RunLoginsWorkerManually_FullMethodName = "/CommunityService/RunLoginsWorkerManually"
+	CommunityService_SendEduLinkingCode_FullMethodName      = "/CommunityService/SendEduLinkingCode"
 	CommunityService_GetStudentData_FullMethodName          = "/CommunityService/GetStudentData"
 )
 
@@ -41,6 +42,7 @@ type CommunityServiceClient interface {
 	GetPeerSchoolData(ctx context.Context, in *GetSchoolDataIn, opts ...grpc.CallOption) (*GetSchoolDataOut, error)
 	IsUserStaff(ctx context.Context, in *LoginIn, opts ...grpc.CallOption) (*IsUserStaffOut, error)
 	RunLoginsWorkerManually(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	SendEduLinkingCode(ctx context.Context, in *SendEduLinkingCodeIn, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// Ручка получения данных школьников
 	GetStudentData(ctx context.Context, in *GetStudentDataIn, opts ...grpc.CallOption) (*GetStudentDataOut, error)
 }
@@ -103,6 +105,16 @@ func (c *communityServiceClient) RunLoginsWorkerManually(ctx context.Context, in
 	return out, nil
 }
 
+func (c *communityServiceClient) SendEduLinkingCode(ctx context.Context, in *SendEduLinkingCodeIn, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, CommunityService_SendEduLinkingCode_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *communityServiceClient) GetStudentData(ctx context.Context, in *GetStudentDataIn, opts ...grpc.CallOption) (*GetStudentDataOut, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetStudentDataOut)
@@ -125,6 +137,7 @@ type CommunityServiceServer interface {
 	GetPeerSchoolData(context.Context, *GetSchoolDataIn) (*GetSchoolDataOut, error)
 	IsUserStaff(context.Context, *LoginIn) (*IsUserStaffOut, error)
 	RunLoginsWorkerManually(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
+	SendEduLinkingCode(context.Context, *SendEduLinkingCodeIn) (*emptypb.Empty, error)
 	// Ручка получения данных школьников
 	GetStudentData(context.Context, *GetStudentDataIn) (*GetStudentDataOut, error)
 	mustEmbedUnimplementedCommunityServiceServer()
@@ -151,6 +164,9 @@ func (UnimplementedCommunityServiceServer) IsUserStaff(context.Context, *LoginIn
 }
 func (UnimplementedCommunityServiceServer) RunLoginsWorkerManually(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RunLoginsWorkerManually not implemented")
+}
+func (UnimplementedCommunityServiceServer) SendEduLinkingCode(context.Context, *SendEduLinkingCodeIn) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SendEduLinkingCode not implemented")
 }
 func (UnimplementedCommunityServiceServer) GetStudentData(context.Context, *GetStudentDataIn) (*GetStudentDataOut, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetStudentData not implemented")
@@ -266,6 +282,24 @@ func _CommunityService_RunLoginsWorkerManually_Handler(srv interface{}, ctx cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CommunityService_SendEduLinkingCode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SendEduLinkingCodeIn)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CommunityServiceServer).SendEduLinkingCode(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CommunityService_SendEduLinkingCode_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CommunityServiceServer).SendEduLinkingCode(ctx, req.(*SendEduLinkingCodeIn))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _CommunityService_GetStudentData_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetStudentDataIn)
 	if err := dec(in); err != nil {
@@ -310,6 +344,10 @@ var CommunityService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RunLoginsWorkerManually",
 			Handler:    _CommunityService_RunLoginsWorkerManually_Handler,
+		},
+		{
+			MethodName: "SendEduLinkingCode",
+			Handler:    _CommunityService_SendEduLinkingCode_Handler,
 		},
 		{
 			MethodName: "GetStudentData",

@@ -3,6 +3,7 @@ syntax = "proto3";
 option go_package = "pkg/community";
 
 import  "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
 
 // Service with peers' info from edu platform
 service CommunityService {
@@ -12,6 +13,7 @@ service CommunityService {
   rpc GetPeerSchoolData(GetSchoolDataIn) returns (GetSchoolDataOut){};
   rpc isUserStaff(LoginIn) returns (IsUserStaffOut){};
   rpc RunLoginsWorkerManually(google.protobuf.Empty) returns (google.protobuf.Empty){};
+  rpc SendEduLinkingCode(SendEduLinkingCodeIn) returns (google.protobuf.Empty){};
   // Ручка получения данных школьников
   rpc GetStudentData(GetStudentDataIn) returns (GetStudentDataOut){};
 }
@@ -57,6 +59,27 @@ message SearchPeer {
 message SearchPeersOut {
   repeated SearchPeer searchPeers = 1;
 }
+
+message SendEduLinkingCodeIn {
+  string login = 1;
+}
+
+message ParticipantChangeEvent {
+  string login = 1;
+
+  oneof old_value {
+    string old_value_str = 2;
+    int32 old_value_int = 3;
+  }
+
+  oneof new_value {
+    string new_value_str = 4;
+    int32 new_value_int = 5;
+  }
+
+  google.protobuf.Timestamp at = 6;
+}
+
 
 message GetStudentDataIn {
   // uuid пользователя, которого запрашивают

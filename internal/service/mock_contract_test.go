@@ -7,6 +7,7 @@ package service
 import (
 	context "context"
 	reflect "reflect"
+	time "time"
 
 	gomock "github.com/golang/mock/gomock"
 	config "github.com/s21platform/community-service/internal/config"
@@ -98,18 +99,18 @@ func (mr *MockDbRepoMockRecorder) GetPeerSchoolData(ctx, nickName interface{}) *
 }
 
 // GetPeerStatus mocks base method.
-func (m *MockDbRepo) GetPeerStatus(ctx context.Context, email string) (string, error) {
+func (m *MockDbRepo) GetPeerStatus(ctx context.Context, login string) (string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetPeerStatus", ctx, email)
+	ret := m.ctrl.Call(m, "GetPeerStatus", ctx, login)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetPeerStatus indicates an expected call of GetPeerStatus.
-func (mr *MockDbRepoMockRecorder) GetPeerStatus(ctx, email interface{}) *gomock.Call {
+func (mr *MockDbRepoMockRecorder) GetPeerStatus(ctx, login interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPeerStatus", reflect.TypeOf((*MockDbRepo)(nil).GetPeerStatus), ctx, email)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPeerStatus", reflect.TypeOf((*MockDbRepo)(nil).GetPeerStatus), ctx, login)
 }
 
 // GetStaffId mocks base method.
@@ -175,4 +176,70 @@ func (m *MockRedisRepo) Delete(ctx context.Context, key config.Key) {
 func (mr *MockRedisRepoMockRecorder) Delete(ctx, key interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockRedisRepo)(nil).Delete), ctx, key)
+}
+
+// GetByKey mocks base method.
+func (m *MockRedisRepo) GetByKey(ctx context.Context, key config.Key) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetByKey", ctx, key)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetByKey indicates an expected call of GetByKey.
+func (mr *MockRedisRepoMockRecorder) GetByKey(ctx, key interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByKey", reflect.TypeOf((*MockRedisRepo)(nil).GetByKey), ctx, key)
+}
+
+// Set mocks base method.
+func (m *MockRedisRepo) Set(ctx context.Context, key config.Key, value string, expiration time.Duration) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Set", ctx, key, value, expiration)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Set indicates an expected call of Set.
+func (mr *MockRedisRepoMockRecorder) Set(ctx, key, value, expiration interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Set", reflect.TypeOf((*MockRedisRepo)(nil).Set), ctx, key, value, expiration)
+}
+
+// MockNotificationS is a mock of NotificationS interface.
+type MockNotificationS struct {
+	ctrl     *gomock.Controller
+	recorder *MockNotificationSMockRecorder
+}
+
+// MockNotificationSMockRecorder is the mock recorder for MockNotificationS.
+type MockNotificationSMockRecorder struct {
+	mock *MockNotificationS
+}
+
+// NewMockNotificationS creates a new mock instance.
+func NewMockNotificationS(ctrl *gomock.Controller) *MockNotificationS {
+	mock := &MockNotificationS{ctrl: ctrl}
+	mock.recorder = &MockNotificationSMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockNotificationS) EXPECT() *MockNotificationSMockRecorder {
+	return m.recorder
+}
+
+// SendEduCode mocks base method.
+func (m *MockNotificationS) SendEduCode(ctx context.Context, email, code string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SendEduCode", ctx, email, code)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SendEduCode indicates an expected call of SendEduCode.
+func (mr *MockNotificationSMockRecorder) SendEduCode(ctx, email, code interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendEduCode", reflect.TypeOf((*MockNotificationS)(nil).SendEduCode), ctx, email, code)
 }

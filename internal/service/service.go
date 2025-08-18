@@ -6,11 +6,15 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math/rand"
+	"strconv"
+	"time"
 
-	logger_lib "github.com/s21platform/logger-lib"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
+
+	logger_lib "github.com/s21platform/logger-lib"
 
 	"github.com/s21platform/community-service/internal/config"
 	"github.com/s21platform/community-service/pkg/community"
@@ -18,16 +22,18 @@ import (
 
 type Service struct {
 	community.UnimplementedCommunityServiceServer
-	dbR DbRepo
-	env string
-	rR  RedisRepo
+	dbR   DbRepo
+	env   string
+	rR    RedisRepo
+	notCl NotificationS
 }
 
-func New(dbR DbRepo, env string, rR RedisRepo) *Service {
+func New(dbR DbRepo, env string, rR RedisRepo, notCl NotificationS, cfg *config.Config) *Service {
 	return &Service{
-		dbR: dbR,
-		env: env,
-		rR:  rR,
+		dbR:   dbR,
+		env:   env,
+		rR:    rR,
+		notCl: notCl,
 	}
 }
 
@@ -103,6 +109,40 @@ func (s *Service) SearchPeers(ctx context.Context, in *community.SearchPeersIn) 
 
 func (s *Service) RunLoginsWorkerManually(ctx context.Context, _ *emptypb.Empty) (*emptypb.Empty, error) {
 	s.rR.Delete(ctx, config.KeyLoginsLastUpdated)
+	return &emptypb.Empty{}, nil
+}
+
+func (s *Service) SendEduLinkingCode(ctx context.Context, in *community.SendEduLinkingCodeIn) (*emptypb.Empty, error) {
+	logger := logger_lib.FromContext(ctx, config.KeyLogger)
+	logger.AddFuncName("SendEduLinkingCode")
+
+	peerStatus, err := s.dbR.GetPeerStatus(ctx, in.Login)
+	if err != nil {
+		logger.Error(fmt.Sprintf("failed to get peer status, err: %v", err))
+		return nil, status.Errorf(codes.Internal, "failed to get peer status, err: %v", err)
+	}
+
+	if peerStatus != "ACTIVE" {
+		logger.Info(fmt.Sprintf("peer=%s has status: %s", in.Login, peerStatus))
+		return &emptypb.Empty{}, nil
+	}
+
+	code := strconv.Itoa(rand.Intn(89999) + 10000)
+
+	err = s.rR.Set(ctx, config.Key("code_"+in.Login), code, time.Minute*10)
+	if err != nil {
+		logger.Error(fmt.Sprintf("failed to set code to redis, err: %v", err))
+		return nil, status.Errorf(codes.Internal, "failed to set code to redis, err: %v", err)
+	}
+
+	email := in.Login + "@student.21-school.ru"
+
+	err = s.notCl.SendEduCode(ctx, email, code)
+	if err != nil {
+		logger.Error(fmt.Sprintf("failed to send verification code, err: %v", err))
+		return nil, status.Errorf(codes.Internal, "failed to send verification code, err: %v", err)
+	}
+
 	return &emptypb.Empty{}, nil
 }
 

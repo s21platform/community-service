@@ -13,9 +13,11 @@
     - [GetStudentDataOut](#-GetStudentDataOut)
     - [IsUserStaffOut](#-IsUserStaffOut)
     - [LoginIn](#-LoginIn)
+    - [ParticipantChangeEvent](#-ParticipantChangeEvent)
     - [SearchPeer](#-SearchPeer)
     - [SearchPeersIn](#-SearchPeersIn)
     - [SearchPeersOut](#-SearchPeersOut)
+    - [SendEduLinkingCodeIn](#-SendEduLinkingCodeIn)
     - [Skill](#-Skill)
   
     - [CommunityService](#-CommunityService)
@@ -183,6 +185,26 @@ Response with found match
 
 
 
+<a name="-ParticipantChangeEvent"></a>
+
+### ParticipantChangeEvent
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| login | [string](#string) |  |  |
+| old_value_str | [string](#string) |  |  |
+| old_value_int | [int32](#int32) |  |  |
+| new_value_str | [string](#string) |  |  |
+| new_value_int | [int32](#int32) |  |  |
+| at | [google.protobuf.Timestamp](#google-protobuf-Timestamp) |  |  |
+
+
+
+
+
+
 <a name="-SearchPeer"></a>
 
 ### SearchPeer
@@ -230,6 +252,21 @@ Response with found match
 
 
 
+<a name="-SendEduLinkingCodeIn"></a>
+
+### SendEduLinkingCodeIn
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| login | [string](#string) |  |  |
+
+
+
+
+
+
 <a name="-Skill"></a>
 
 ### Skill
@@ -264,6 +301,7 @@ Service with peers&#39; info from edu platform
 | GetPeerSchoolData | [.GetSchoolDataIn](#GetSchoolDataIn) | [.GetSchoolDataOut](#GetSchoolDataOut) |  |
 | isUserStaff | [.LoginIn](#LoginIn) | [.IsUserStaffOut](#IsUserStaffOut) |  |
 | RunLoginsWorkerManually | [.google.protobuf.Empty](#google-protobuf-Empty) | [.google.protobuf.Empty](#google-protobuf-Empty) |  |
+| SendEduLinkingCode | [.SendEduLinkingCodeIn](#SendEduLinkingCodeIn) | [.google.protobuf.Empty](#google-protobuf-Empty) |  |
 | GetStudentData | [.GetStudentDataIn](#GetStudentDataIn) | [.GetStudentDataOut](#GetStudentDataOut) | Ручка получения данных школьников |
 
  
