@@ -1,0 +1,77 @@
+# Конфигурация локального окружения разработки
+
+[creds]
+enabled = true
+endpoint = "217.28.222.68:6001"
+
+# Перечисляются методы, креды которых необходимо подгрузить
+services = [
+    "notification",
+    "school",
+    "metrics",
+    "logger"
+]
+
+[env]
+# ======= Креды изменяемые =======
+# Порты для разработки
+COMMUNITY_SERVICE_PORT = "2222"
+REDIS_PORT = "2122"
+POSTGRES_PORT = "20001"
+KAFKA_PORT = "20002"
+REDPANDA_CONSOLE_PORT = "26003"
+
+# Добавить топик для тестирования
+PARTICIPANT_LEVEL_CHANGED="level.changed"
+PARTICIPANT_STATUS_CHANGED="status.changed"
+PARTICIPANT_EXP_LEVEL_CHANGED="exp.level.changed"
+
+# ======= Креды, которые стоит менять, если вы понимаете, что делаете :) =======
+POSTGRES_USER = "master"
+POSTGRES_DB = "master"
+POSTGRES_PASSWORD = "master"
+POSTGRES_HOST = "localhost"
+REDIS_HOST = "localhost"
+COMMUNITY_SERVICE_NAME = "community"
+
+[[env_maps]]
+from = "POSTGRES_USER"     # Исходная переменная
+to = "COMMUNITY_SERVICE_POSTGRES_USER"  # Целевая переменная
+
+[[env_maps]]
+from = "POSTGRES_PASSWORD"
+to = "COMMUNITY_SERVICE_POSTGRES_PASSWORD"
+
+[[env_maps]]
+from = "POSTGRES_DB"
+to = "COMMUNITY_SERVICE_POSTGRES_DB"
+
+[[env_maps]]
+from = "POSTGRES_PORT"
+to = "COMMUNITY_SERVICE_POSTGRES_PORT"
+
+[[env_maps]]
+from = "POSTGRES_HOST"
+to = "COMMUNITY_SERVICE_POSTGRES_HOST"
+
+[[env_maps]]
+from = "REDIS_PORT"
+to = "COMMUNITY_SERVICE_REDIS_PORT"
+
+[services.postgres]
+enabled = true
+
+[services.redis]
+enabled = true
+
+[services.redpanda]
+enabled = true
+
+topics = [
+    { name = "level.changed", partitions = 2, replication_factor = 1 },
+    { name = "status.changed", partitions = 2, replication_factor = 1 },
+    { name = "exp.level.changed", partitions = 2, replication_factor = 1 }
+]
+
+[services.redpanda_console]
+enabled = true

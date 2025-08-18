@@ -10,6 +10,7 @@ import (
 	logger_lib "github.com/s21platform/logger-lib"
 	"github.com/s21platform/metrics-lib/pkg"
 
+	"github.com/s21platform/community-service/internal/client/notification"
 	"github.com/s21platform/community-service/internal/config"
 	"github.com/s21platform/community-service/internal/infra"
 	"github.com/s21platform/community-service/internal/repository/postgres"
@@ -27,7 +28,9 @@ func main() {
 
 	redisRepo := redis.New(cfg)
 
-	thisService := service.New(dbRepo, cfg.Platform.Env, redisRepo)
+	notCl := notification.New(cfg)
+
+	thisService := service.New(dbRepo, cfg.Platform.Env, redisRepo, notCl, cfg)
 
 	metrics, err := pkg.NewMetrics(cfg.Metrics.Host, cfg.Metrics.Port, cfg.Service.Name, cfg.Platform.Env)
 	if err != nil {
