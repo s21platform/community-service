@@ -10,6 +10,7 @@
     - [GetSchoolDataOut](#-GetSchoolDataOut)
     - [IsUserStaffOut](#-IsUserStaffOut)
     - [LoginIn](#-LoginIn)
+    - [ParticipantChangeEvent](#-ParticipantChangeEvent)
     - [SearchPeer](#-SearchPeer)
     - [SearchPeersIn](#-SearchPeersIn)
     - [SearchPeersOut](#-SearchPeersOut)
@@ -113,6 +114,26 @@ Response with found match
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | login | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="-ParticipantChangeEvent"></a>
+
+### ParticipantChangeEvent
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| login | [string](#string) |  |  |
+| old_value_str | [string](#string) |  |  |
+| old_value_int | [int32](#int32) |  |  |
+| new_value_str | [string](#string) |  |  |
+| new_value_int | [int32](#int32) |  |  |
+| at | [google.protobuf.Timestamp](#google-protobuf-Timestamp) |  |  |
 
 
 
