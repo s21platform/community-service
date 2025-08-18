@@ -14,6 +14,9 @@ import (
 
 	"github.com/s21platform/community-service/internal/config"
 	"github.com/s21platform/community-service/internal/model"
+	"github.com/s21platform/community-service/pkg/community"
+
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 const (
@@ -144,6 +147,43 @@ func (s *Worker) uploadDataParticipant(ctx context.Context) error {
 				logger.Error(fmt.Sprintf("failed to save participant data for login %s, err: %v", login, err))
 				continue
 			}
+
+			if participant.Level != participantData.Level {
+				event := &community.ParticipantChangeEvent{
+					Login:    login,
+					OldValue: &community.ParticipantChangeEvent_OldValueInt{OldValueInt: int32(participant.Level)},
+					NewValue: &community.ParticipantChangeEvent_NewValueInt{NewValueInt: int32(participantData.Level)},
+					At:       timestamppb.Now(),
+				}
+				if err := s.lcP.ProduceMessage(ctx, event, login); err != nil {
+					logger.Error(fmt.Sprintf("failed to produce level change event for %s: %v", login, err))
+				}
+			}
+
+			if participant.ExpLevel != participantData.ExpValue {
+				event := &community.ParticipantChangeEvent{
+					Login:    login,
+					OldValue: &community.ParticipantChangeEvent_OldValueInt{OldValueInt: int32(participant.ExpLevel)},
+					NewValue: &community.ParticipantChangeEvent_NewValueInt{NewValueInt: int32(participantData.ExpValue)},
+					At:       timestamppb.Now(),
+				}
+				if err := s.elcP.ProduceMessage(ctx, event, login); err != nil {
+					logger.Error(fmt.Sprintf("failed to produce exp level change event for %s: %v", login, err))
+				}
+			}
+
+			if participant.Status != participantData.Status {
+				event := &community.ParticipantChangeEvent{
+					Login:    login,
+					OldValue: &community.ParticipantChangeEvent_OldValueStr{OldValueStr: participant.Status},
+					NewValue: &community.ParticipantChangeEvent_NewValueStr{NewValueStr: participantData.Status},
+					At:       timestamppb.Now(),
+				}
+				if err := s.scP.ProduceMessage(ctx, event, login); err != nil {
+					logger.Error(fmt.Sprintf("failed to produce status change event for %s: %v", login, err))
+				}
+			}
+
 			mtx.Increment("update_participant_data.ok")
 		}
 
