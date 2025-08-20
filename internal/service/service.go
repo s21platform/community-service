@@ -161,6 +161,9 @@ func (s *Service) GetStudentData(ctx context.Context, in *community.GetStudentDa
 		logger.Error(fmt.Sprintf("failed to check link edu two peers, err: %v", err))
 		return nil, status.Errorf(codes.Internal, "failed to check link edu two peers: %v", err)
 	}
+	if uuid == in.UserUUID {
+		flag = 2
+	}
 	if flag != 2 {
 		logger.Error(fmt.Sprintf("one of the peers is not in the list, err: %v", err))
 		return nil, status.Errorf(codes.NotFound, "one of the peers is not in the list, err: %v", err)
