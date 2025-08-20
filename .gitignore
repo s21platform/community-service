@@ -1,5 +1,5 @@
 .idea
-.env
+env.env
 .env.s21-cli
 docker-compose.yml
 docker-compose.s21-cli.yml

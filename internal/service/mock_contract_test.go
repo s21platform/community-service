@@ -38,21 +38,6 @@ func (m *MockDbRepo) EXPECT() *MockDbRepoMockRecorder {
 	return m.recorder
 }
 
-// CheckLinkEduTwoPeers mocks base method.
-func (m *MockDbRepo) CheckLinkEduTwoPeers(ctx context.Context, uuidFirstPeer, uuidSecondPeer string) (int64, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CheckLinkEduTwoPeers", ctx, uuidFirstPeer, uuidSecondPeer)
-	ret0, _ := ret[0].(int64)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// CheckLinkEduTwoPeers indicates an expected call of CheckLinkEduTwoPeers.
-func (mr *MockDbRepoMockRecorder) CheckLinkEduTwoPeers(ctx, uuidFirstPeer, uuidSecondPeer interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckLinkEduTwoPeers", reflect.TypeOf((*MockDbRepo)(nil).CheckLinkEduTwoPeers), ctx, uuidFirstPeer, uuidSecondPeer)
-}
-
 // GetIdPeer mocks base method.
 func (m *MockDbRepo) GetIdPeer(ctx context.Context, uuid string) (int64, error) {
 	m.ctrl.T.Helper()

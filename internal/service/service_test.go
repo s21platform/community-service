@@ -327,18 +327,18 @@ func TestService_GetStudentData(t *testing.T) {
 		mockLogger.EXPECT().AddFuncName("GetStudentData")
 
 		inputUUID := "user-2"
-		request := &community.GetStudentDataIn{UserUUID: inputUUID}
 		ctxUUID := "uuid-1"
-
+		request := &community.GetStudentDataIn{UserUUID: inputUUID}
+		var idFirst int64 = 1
+		var idSecond int64 = 2
 		mockRepo.EXPECT().
-			CheckLinkEduTwoPeers(ctx, ctxUUID, inputUUID).
-			Return(int64(2), nil).
+			GetIdPeer(ctx, ctxUUID).
+			Return(idFirst, nil).
 			Times(1)
 
-		expectedID := int64(123) // Пример ID
 		mockRepo.EXPECT().
 			GetIdPeer(ctx, inputUUID).
-			Return(expectedID, nil).
+			Return(idSecond, nil).
 			Times(1)
 
 		mockData := &model.ParticipantData{
@@ -359,7 +359,7 @@ func TestService_GetStudentData(t *testing.T) {
 			Badges:         []model.Badge{{Name: "badge1", ReceiptDateTime: "2025-08-16", IconURL: "url"}},
 		}
 		mockRepo.EXPECT().
-			GetPeerData(ctx, expectedID).
+			GetPeerData(ctx, idSecond).
 			Return(mockData, nil).
 			Times(1)
 
