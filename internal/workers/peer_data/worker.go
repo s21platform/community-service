@@ -58,24 +58,25 @@ func (s *Worker) RunParticipantWorker(ctx context.Context, wg *sync.WaitGroup) {
 			return
 
 		case <-ticker.C:
-			lastUpdate, err := s.rR.GetByKey(ctx, config.KeyParticipantDataLastUpdated)
-			if err != nil {
-				logger.Error(fmt.Sprintf("failed to get last update time, err: %v", err))
-			}
-
+			fmt.Println(("case <-ticker.C"))
+			// lastUpdate, err := s.rR.GetByKey(ctx, config.KeyParticipantDataLastUpdated)
+			// if err != nil {
+			// 	fmt.Println("failed to get last update time")
+			// 	logger.Error(fmt.Sprintf("failed to get last update time, err: %v", err))
+			// }
+			lastUpdate := ""
 			if lastUpdate == "" {
 				err := s.uploadDataParticipant(ctx)
 				if err != nil {
 					logger.Error(fmt.Sprintf("failed to upload participants, err: %v", err))
 				}
 
-				// по сути мы тут указываем через сколько запустить следующий цикл опроса. 5 часов много, поставил 10 минут передышки
-				err = s.rR.Set(ctx, config.KeyParticipantDataLastUpdated, "upd", 10*time.Minute)
-				if err != nil {
-					logger.Error(fmt.Sprintf("failed to save participant last updated, err: %v", err))
-				}
+				//по сути мы тут указываем через сколько запустить следующий цикл опроса. 5 часов много, поставил 10 минут передышки
+				// err = s.rR.Set(ctx, config.KeyParticipantDataLastUpdated, "upd", 10*time.Minute)
+				// if err != nil {
+				// 	logger.Error(fmt.Sprintf("failed to save participant last updated, err: %v", err))
+				// }
 			}
-			logger.Info("participant worker done")
 		}
 	}
 }
@@ -120,16 +121,13 @@ func (s *Worker) uploadDataParticipant(ctx context.Context) error {
 				} else {
 					mtx.Increment("update_participant_data.unknown_error")
 				}
-
 				logger.Error(fmt.Sprintf("failed to get participant data for login %s, err: %v", login, err))
 				continue
 			}
-
 			if participantData == nil {
 				mtx.Increment("update_participant_data.not_exists")
 				continue
 			}
-
 			campus, err := s.dbR.GetCampusByUUID(ctx, participantData.CampusUUID)
 			if err != nil {
 				mtx.Increment("update_participant_data.error_get_campus")
@@ -147,7 +145,6 @@ func (s *Worker) uploadDataParticipant(ctx context.Context) error {
 				logger.Error(fmt.Sprintf("failed to save participant data for login %s, err: %v", login, err))
 				continue
 			}
-
 			if participant.Level != participantData.Level {
 				event := &community.ParticipantChangeEvent{
 					Login:    login,

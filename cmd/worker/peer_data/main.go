@@ -2,12 +2,13 @@ package main
 
 import (
 	"context"
-	"github.com/s21platform/metrics-lib/pkg"
 	"log"
 	"sync"
 
-	logger_lib "github.com/s21platform/logger-lib"
+	"github.com/s21platform/metrics-lib/pkg"
+
 	kafkalib "github.com/s21platform/kafka-lib"
+	logger_lib "github.com/s21platform/logger-lib"
 
 	"github.com/s21platform/community-service/internal/client/school"
 	"github.com/s21platform/community-service/internal/config"
