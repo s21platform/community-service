@@ -26,6 +26,7 @@ const (
 	CommunityService_IsUserStaff_FullMethodName             = "/CommunityService/isUserStaff"
 	CommunityService_RunLoginsWorkerManually_FullMethodName = "/CommunityService/RunLoginsWorkerManually"
 	CommunityService_SendEduLinkingCode_FullMethodName      = "/CommunityService/SendEduLinkingCode"
+	CommunityService_InvitePeer_FullMethodName              = "/CommunityService/InvitePeer"
 )
 
 // CommunityServiceClient is the client API for CommunityService service.
@@ -41,6 +42,7 @@ type CommunityServiceClient interface {
 	IsUserStaff(ctx context.Context, in *LoginIn, opts ...grpc.CallOption) (*IsUserStaffOut, error)
 	RunLoginsWorkerManually(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	SendEduLinkingCode(ctx context.Context, in *SendEduLinkingCodeIn, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	InvitePeer(ctx context.Context, in *InvitePeerRequest, opts ...grpc.CallOption) (*InvitePeerResponse, error)
 }
 
 type communityServiceClient struct {
@@ -111,6 +113,16 @@ func (c *communityServiceClient) SendEduLinkingCode(ctx context.Context, in *Sen
 	return out, nil
 }
 
+func (c *communityServiceClient) InvitePeer(ctx context.Context, in *InvitePeerRequest, opts ...grpc.CallOption) (*InvitePeerResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(InvitePeerResponse)
+	err := c.cc.Invoke(ctx, CommunityService_InvitePeer_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CommunityServiceServer is the server API for CommunityService service.
 // All implementations must embed UnimplementedCommunityServiceServer
 // for forward compatibility.
@@ -124,6 +136,7 @@ type CommunityServiceServer interface {
 	IsUserStaff(context.Context, *LoginIn) (*IsUserStaffOut, error)
 	RunLoginsWorkerManually(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
 	SendEduLinkingCode(context.Context, *SendEduLinkingCodeIn) (*emptypb.Empty, error)
+	InvitePeer(context.Context, *InvitePeerRequest) (*InvitePeerResponse, error)
 	mustEmbedUnimplementedCommunityServiceServer()
 }
 
@@ -151,6 +164,9 @@ func (UnimplementedCommunityServiceServer) RunLoginsWorkerManually(context.Conte
 }
 func (UnimplementedCommunityServiceServer) SendEduLinkingCode(context.Context, *SendEduLinkingCodeIn) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendEduLinkingCode not implemented")
+}
+func (UnimplementedCommunityServiceServer) InvitePeer(context.Context, *InvitePeerRequest) (*InvitePeerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method InvitePeer not implemented")
 }
 func (UnimplementedCommunityServiceServer) mustEmbedUnimplementedCommunityServiceServer() {}
 func (UnimplementedCommunityServiceServer) testEmbeddedByValue()                          {}
@@ -281,6 +297,24 @@ func _CommunityService_SendEduLinkingCode_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CommunityService_InvitePeer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(InvitePeerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CommunityServiceServer).InvitePeer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CommunityService_InvitePeer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CommunityServiceServer).InvitePeer(ctx, req.(*InvitePeerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CommunityService_ServiceDesc is the grpc.ServiceDesc for CommunityService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -311,6 +345,10 @@ var CommunityService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SendEduLinkingCode",
 			Handler:    _CommunityService_SendEduLinkingCode_Handler,
+		},
+		{
+			MethodName: "InvitePeer",
+			Handler:    _CommunityService_InvitePeer_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

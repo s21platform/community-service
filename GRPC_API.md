@@ -8,6 +8,8 @@
     - [EmailOut](#-EmailOut)
     - [GetSchoolDataIn](#-GetSchoolDataIn)
     - [GetSchoolDataOut](#-GetSchoolDataOut)
+    - [InvitePeerRequest](#-InvitePeerRequest)
+    - [InvitePeerResponse](#-InvitePeerResponse)
     - [IsUserStaffOut](#-IsUserStaffOut)
     - [LoginIn](#-LoginIn)
     - [ParticipantChangeEvent](#-ParticipantChangeEvent)
@@ -84,6 +86,36 @@ Response with found match
 | ----- | ---- | ----- | ----------- |
 | className | [string](#string) |  |  |
 | parallelName | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="-InvitePeerRequest"></a>
+
+### InvitePeerRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| login | [string](#string) |  | логин того, кого приглашают |
+
+
+
+
+
+
+<a name="-InvitePeerResponse"></a>
+
+### InvitePeerResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| success | [bool](#bool) |  |  |
 
 
 
@@ -221,6 +253,7 @@ Service with peers&#39; info from edu platform
 | isUserStaff | [.LoginIn](#LoginIn) | [.IsUserStaffOut](#IsUserStaffOut) |  |
 | RunLoginsWorkerManually | [.google.protobuf.Empty](#google-protobuf-Empty) | [.google.protobuf.Empty](#google-protobuf-Empty) |  |
 | SendEduLinkingCode | [.SendEduLinkingCodeIn](#SendEduLinkingCodeIn) | [.google.protobuf.Empty](#google-protobuf-Empty) |  |
+| InvitePeer | [.InvitePeerRequest](#InvitePeerRequest) | [.InvitePeerResponse](#InvitePeerResponse) |  |
 
  
 
