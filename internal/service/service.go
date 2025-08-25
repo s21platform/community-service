@@ -153,10 +153,10 @@ func (s *Service) GetStudentData(ctx context.Context, in *community.GetStudentDa
 	uuid, ok := ctx.Value(config.KeyUUID).(string)
 	if !ok {
 		logger.Error("failed to not found UUID in context")
-		return nil, status.Error(codes.Internal, "uuid not found in context")
+		return nil, status.Error(codes.Internal, "failed to not found UUID in context")
 	}
 
-	selfID, err := s.dbR.GetIdPeer(ctx, uuid)
+	_, err := s.dbR.GetIdPeer(ctx, uuid)
 	if err != nil {
 		logger.Error(fmt.Sprintf("failed to get user id, err: %v", err))
 		return nil, status.Errorf(codes.NotFound, "failed to get user id, err: %v", err)
@@ -165,10 +165,6 @@ func (s *Service) GetStudentData(ctx context.Context, in *community.GetStudentDa
 	if err != nil {
 		logger.Error(fmt.Sprintf("failed to get user id, err: %v", err))
 		return nil, status.Errorf(codes.NotFound, "failed to get user id, err: %v", err)
-	}
-	if selfID == 0 || peerID == 0 {
-		logger.Error(fmt.Sprintf("one of the peers is not in the list, err: %v", err))
-		return nil, status.Errorf(codes.NotFound, "one of the peers is not in the list, err: %v", err)
 	}
 
 	data, err := s.dbR.GetPeerData(ctx, peerID)
@@ -192,21 +188,19 @@ func (s *Service) GetStudentData(ctx context.Context, in *community.GetStudentDa
 	}
 	out.Skills = make([]*community.Skill, len(data.Skills))
 	for i, j := range data.Skills {
-		tmp := &community.Skill{
+		out.Skills[i] = &community.Skill{
 			Name:   j.Name,
 			Points: j.Points,
 		}
-		out.Skills[i] = tmp
 	}
 
 	out.Badges = make([]*community.Badge, len(data.Badges))
 	for i, j := range data.Badges {
-		tmp := &community.Badge{
+		out.Badges[i] = &community.Badge{
 			Name:            j.Name,
 			ReceiptDateTime: j.ReceiptDateTime,
 			IconUrl:         j.IconURL,
 		}
-		out.Badges[i] = tmp
 	}
 
 	return out, nil

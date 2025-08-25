@@ -7,9 +7,6 @@ import (
 
 	"google.golang.org/grpc"
 
-	logger_lib "github.com/s21platform/logger-lib"
-	"github.com/s21platform/metrics-lib/pkg"
-
 	"github.com/s21platform/community-service/internal/client/notification"
 	"github.com/s21platform/community-service/internal/config"
 	"github.com/s21platform/community-service/internal/infra"
@@ -17,6 +14,8 @@ import (
 	"github.com/s21platform/community-service/internal/repository/redis"
 	"github.com/s21platform/community-service/internal/service"
 	"github.com/s21platform/community-service/pkg/community"
+	logger_lib "github.com/s21platform/logger-lib"
+	"github.com/s21platform/metrics-lib/pkg"
 )
 
 func main() {

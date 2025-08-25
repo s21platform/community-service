@@ -321,7 +321,6 @@ func TestService_GetStudentData(t *testing.T) {
 
 	mockLogger := logger_lib.NewMockLoggerInterface(controller)
 	ctx = context.WithValue(ctx, config.KeyLogger, mockLogger)
-
 	t.Run("success_case", func(t *testing.T) {
 
 		mockLogger.EXPECT().AddFuncName("GetStudentData")
