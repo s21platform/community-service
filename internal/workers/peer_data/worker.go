@@ -11,7 +11,6 @@ import (
 
 	logger_lib "github.com/s21platform/logger-lib"
 	"github.com/s21platform/metrics-lib/pkg"
-
 	"github.com/s21platform/community-service/internal/config"
 	"github.com/s21platform/community-service/internal/model"
 	"github.com/s21platform/community-service/pkg/community"
@@ -58,13 +57,11 @@ func (s *Worker) RunParticipantWorker(ctx context.Context, wg *sync.WaitGroup) {
 			return
 
 		case <-ticker.C:
-			fmt.Println(("case <-ticker.C"))
-			// lastUpdate, err := s.rR.GetByKey(ctx, config.KeyParticipantDataLastUpdated)
-			// if err != nil {
-			// 	fmt.Println("failed to get last update time")
-			// 	logger.Error(fmt.Sprintf("failed to get last update time, err: %v", err))
-			// }
-			lastUpdate := ""
+			lastUpdate, err := s.rR.GetByKey(ctx, config.KeyParticipantDataLastUpdated)
+			if err != nil {
+				fmt.Println("failed to get last update time")
+				logger.Error(fmt.Sprintf("failed to get last update time, err: %v", err))
+			}
 			if lastUpdate == "" {
 				err := s.uploadDataParticipant(ctx)
 				if err != nil {
@@ -72,10 +69,10 @@ func (s *Worker) RunParticipantWorker(ctx context.Context, wg *sync.WaitGroup) {
 				}
 
 				//по сути мы тут указываем через сколько запустить следующий цикл опроса. 5 часов много, поставил 10 минут передышки
-				// err = s.rR.Set(ctx, config.KeyParticipantDataLastUpdated, "upd", 10*time.Minute)
-				// if err != nil {
-				// 	logger.Error(fmt.Sprintf("failed to save participant last updated, err: %v", err))
-				// }
+				err = s.rR.Set(ctx, config.KeyParticipantDataLastUpdated, "upd", 10*time.Minute)
+				if err != nil {
+					logger.Error(fmt.Sprintf("failed to save participant last updated, err: %v", err))
+				}
 			}
 		}
 	}
@@ -157,10 +154,10 @@ func (s *Worker) uploadDataParticipant(ctx context.Context) error {
 				}
 			}
 
-			if participant.ExpLevel != participantData.ExpValue {
+			if participant.ExpValue != participantData.ExpValue {
 				event := &community.ParticipantChangeEvent{
 					Login:    login,
-					OldValue: &community.ParticipantChangeEvent_OldValueInt{OldValueInt: int32(participant.ExpLevel)},
+					OldValue: &community.ParticipantChangeEvent_OldValueInt{OldValueInt: int32(participant.ExpValue)},
 					NewValue: &community.ParticipantChangeEvent_NewValueInt{NewValueInt: int32(participantData.ExpValue)},
 					At:       timestamppb.Now(),
 				}

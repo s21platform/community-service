@@ -39,7 +39,7 @@ type ParticipantDataValue struct {
 
 type Participant struct {
 	Login    string `db:"login"`
-	ExpLevel int64  `db:"exp_value"`
+	ExpValue int64  `db:"exp_value"`
 	Level    int32  `db:"level"`
 	Status   string `db:"status"`
 }
