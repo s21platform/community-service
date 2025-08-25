@@ -1,23 +1,22 @@
 package model
 
 import (
+	"database/sql/driver"
 	"encoding/json"
 	"fmt"
-
-	"database/sql/driver"
 
 	school "github.com/s21platform/school-proto/school-proto"
 )
 
 type Skill struct {
-	Name   string `json:"name"`
-	Points int32  `json:"points"`
+	Name   string `db:"badges" json:"name"`
+	Points int32  `db:"badges" json:"points"`
 }
 
 type Badge struct {
-	Name            string `json:"name"`
-	ReceiptDateTime string `json:"receiptDateTime"`
-	IconURL         string `json:"iconURL"`
+	Name            string `db:"badges" json:"name"`
+	ReceiptDateTime string `db:"badges" json:"receiptDateTime"`
+	IconURL         string `db:"badges" json:"iconURL"`
 }
 type Skills []Skill
 type Badges []Badge
@@ -35,6 +34,24 @@ type ParticipantDataValue struct {
 	Coins                int64  `json:"coins"`
 	Badges               Badges `json:"badges"`
 	TribeID              int64  `json:"tribeId"`
+}
+
+type ParticipantData struct {
+	Login          string `db:"login"`
+	CampusId       int64  `db:"campus_id"`
+	ClassName      string `db:"class_name"`
+	ParallelName   string `db:"parallel_name"`
+	TribeID        int64  `db:"tribe_id"`
+	Status         string `db:"status"`
+	CreatedAt      string `db:"created_at"`
+	ExpValue       int64  `db:"exp_value"`
+	Level          int64  `db:"level"`
+	ExpToNextLevel int64  `db:"exp_to_next_level"`
+	Crp            int64  `db:"crp"`
+	Skills         Skills `db:"skills"`
+	Prp            int64  `db:"prp"`
+	Coins          int64  `db:"coins"`
+	Badges         Badges `db:"badges"`
 }
 
 type Participant struct {

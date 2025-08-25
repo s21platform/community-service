@@ -38,6 +38,36 @@ func (m *MockDbRepo) EXPECT() *MockDbRepoMockRecorder {
 	return m.recorder
 }
 
+// GetIdPeer mocks base method.
+func (m *MockDbRepo) GetIdPeer(ctx context.Context, uuid string) (int64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetIdPeer", ctx, uuid)
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetIdPeer indicates an expected call of GetIdPeer.
+func (mr *MockDbRepoMockRecorder) GetIdPeer(ctx, uuid interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetIdPeer", reflect.TypeOf((*MockDbRepo)(nil).GetIdPeer), ctx, uuid)
+}
+
+// GetPeerData mocks base method.
+func (m *MockDbRepo) GetPeerData(ctx context.Context, id int64) (*model.ParticipantData, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPeerData", ctx, id)
+	ret0, _ := ret[0].(*model.ParticipantData)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPeerData indicates an expected call of GetPeerData.
+func (mr *MockDbRepoMockRecorder) GetPeerData(ctx, id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPeerData", reflect.TypeOf((*MockDbRepo)(nil).GetPeerData), ctx, id)
+}
+
 // GetPeerSchoolData mocks base method.
 func (m *MockDbRepo) GetPeerSchoolData(ctx context.Context, nickName string) (model.PeerSchoolData, error) {
 	m.ctrl.T.Helper()
