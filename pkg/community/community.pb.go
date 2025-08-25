@@ -634,6 +634,94 @@ func (*ParticipantChangeEvent_NewValueStr) isParticipantChangeEvent_NewValue() {
 
 func (*ParticipantChangeEvent_NewValueInt) isParticipantChangeEvent_NewValue() {}
 
+type InvitePeerRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Login         string                 `protobuf:"bytes,1,opt,name=login,proto3" json:"login,omitempty"` // логин того, кого приглашают
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *InvitePeerRequest) Reset() {
+	*x = InvitePeerRequest{}
+	mi := &file_api_community_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *InvitePeerRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*InvitePeerRequest) ProtoMessage() {}
+
+func (x *InvitePeerRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_community_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use InvitePeerRequest.ProtoReflect.Descriptor instead.
+func (*InvitePeerRequest) Descriptor() ([]byte, []int) {
+	return file_api_community_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *InvitePeerRequest) GetLogin() string {
+	if x != nil {
+		return x.Login
+	}
+	return ""
+}
+
+type InvitePeerResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *InvitePeerResponse) Reset() {
+	*x = InvitePeerResponse{}
+	mi := &file_api_community_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *InvitePeerResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*InvitePeerResponse) ProtoMessage() {}
+
+func (x *InvitePeerResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_community_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use InvitePeerResponse.ProtoReflect.Descriptor instead.
+func (*InvitePeerResponse) Descriptor() ([]byte, []int) {
+	return file_api_community_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *InvitePeerResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
 var File_api_community_proto protoreflect.FileDescriptor
 
 const file_api_community_proto_rawDesc = "" +
@@ -671,14 +759,20 @@ const file_api_community_proto_rawDesc = "" +
 	"\rnew_value_int\x18\x05 \x01(\x05H\x01R\vnewValueInt\x12*\n" +
 	"\x02at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\x02atB\v\n" +
 	"\told_valueB\v\n" +
-	"\tnew_value2\xe4\x02\n" +
+	"\tnew_value\")\n" +
+	"\x11InvitePeerRequest\x12\x14\n" +
+	"\x05login\x18\x01 \x01(\tR\x05login\".\n" +
+	"\x12InvitePeerResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess2\x9b\x03\n" +
 	"\x10CommunityService\x12\"\n" +
 	"\vIsPeerExist\x12\b.EmailIn\x1a\t.EmailOut\x120\n" +
 	"\vSearchPeers\x12\x0e.SearchPeersIn\x1a\x0f.SearchPeersOut\"\x00\x12:\n" +
 	"\x11GetPeerSchoolData\x12\x10.GetSchoolDataIn\x1a\x11.GetSchoolDataOut\"\x00\x12*\n" +
 	"\visUserStaff\x12\b.LoginIn\x1a\x0f.IsUserStaffOut\"\x00\x12K\n" +
 	"\x17RunLoginsWorkerManually\x12\x16.google.protobuf.Empty\x1a\x16.google.protobuf.Empty\"\x00\x12E\n" +
-	"\x12SendEduLinkingCode\x12\x15.SendEduLinkingCodeIn\x1a\x16.google.protobuf.Empty\"\x00B\x0fZ\rpkg/communityb\x06proto3"
+	"\x12SendEduLinkingCode\x12\x15.SendEduLinkingCodeIn\x1a\x16.google.protobuf.Empty\"\x00\x125\n" +
+	"\n" +
+	"InvitePeer\x12\x12.InvitePeerRequest\x1a\x13.InvitePeerResponseB\x0fZ\rpkg/communityb\x06proto3"
 
 var (
 	file_api_community_proto_rawDescOnce sync.Once
@@ -692,7 +786,7 @@ func file_api_community_proto_rawDescGZIP() []byte {
 	return file_api_community_proto_rawDescData
 }
 
-var file_api_community_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_api_community_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_api_community_proto_goTypes = []any{
 	(*IsUserStaffOut)(nil),         // 0: IsUserStaffOut
 	(*LoginIn)(nil),                // 1: LoginIn
@@ -705,26 +799,30 @@ var file_api_community_proto_goTypes = []any{
 	(*SearchPeersOut)(nil),         // 8: SearchPeersOut
 	(*SendEduLinkingCodeIn)(nil),   // 9: SendEduLinkingCodeIn
 	(*ParticipantChangeEvent)(nil), // 10: ParticipantChangeEvent
-	(*timestamppb.Timestamp)(nil),  // 11: google.protobuf.Timestamp
-	(*emptypb.Empty)(nil),          // 12: google.protobuf.Empty
+	(*InvitePeerRequest)(nil),      // 11: InvitePeerRequest
+	(*InvitePeerResponse)(nil),     // 12: InvitePeerResponse
+	(*timestamppb.Timestamp)(nil),  // 13: google.protobuf.Timestamp
+	(*emptypb.Empty)(nil),          // 14: google.protobuf.Empty
 }
 var file_api_community_proto_depIdxs = []int32{
 	7,  // 0: SearchPeersOut.searchPeers:type_name -> SearchPeer
-	11, // 1: ParticipantChangeEvent.at:type_name -> google.protobuf.Timestamp
+	13, // 1: ParticipantChangeEvent.at:type_name -> google.protobuf.Timestamp
 	4,  // 2: CommunityService.IsPeerExist:input_type -> EmailIn
 	6,  // 3: CommunityService.SearchPeers:input_type -> SearchPeersIn
 	2,  // 4: CommunityService.GetPeerSchoolData:input_type -> GetSchoolDataIn
 	1,  // 5: CommunityService.isUserStaff:input_type -> LoginIn
-	12, // 6: CommunityService.RunLoginsWorkerManually:input_type -> google.protobuf.Empty
+	14, // 6: CommunityService.RunLoginsWorkerManually:input_type -> google.protobuf.Empty
 	9,  // 7: CommunityService.SendEduLinkingCode:input_type -> SendEduLinkingCodeIn
-	5,  // 8: CommunityService.IsPeerExist:output_type -> EmailOut
-	8,  // 9: CommunityService.SearchPeers:output_type -> SearchPeersOut
-	3,  // 10: CommunityService.GetPeerSchoolData:output_type -> GetSchoolDataOut
-	0,  // 11: CommunityService.isUserStaff:output_type -> IsUserStaffOut
-	12, // 12: CommunityService.RunLoginsWorkerManually:output_type -> google.protobuf.Empty
-	12, // 13: CommunityService.SendEduLinkingCode:output_type -> google.protobuf.Empty
-	8,  // [8:14] is the sub-list for method output_type
-	2,  // [2:8] is the sub-list for method input_type
+	11, // 8: CommunityService.InvitePeer:input_type -> InvitePeerRequest
+	5,  // 9: CommunityService.IsPeerExist:output_type -> EmailOut
+	8,  // 10: CommunityService.SearchPeers:output_type -> SearchPeersOut
+	3,  // 11: CommunityService.GetPeerSchoolData:output_type -> GetSchoolDataOut
+	0,  // 12: CommunityService.isUserStaff:output_type -> IsUserStaffOut
+	14, // 13: CommunityService.RunLoginsWorkerManually:output_type -> google.protobuf.Empty
+	14, // 14: CommunityService.SendEduLinkingCode:output_type -> google.protobuf.Empty
+	12, // 15: CommunityService.InvitePeer:output_type -> InvitePeerResponse
+	9,  // [9:16] is the sub-list for method output_type
+	2,  // [2:9] is the sub-list for method input_type
 	2,  // [2:2] is the sub-list for extension type_name
 	2,  // [2:2] is the sub-list for extension extendee
 	0,  // [0:2] is the sub-list for field type_name
@@ -747,7 +845,7 @@ func file_api_community_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_community_proto_rawDesc), len(file_api_community_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   11,
+			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

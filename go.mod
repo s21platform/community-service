@@ -5,11 +5,10 @@ go 1.24
 require (
 	github.com/Masterminds/squirrel v1.5.4
 	github.com/golang/mock v1.6.0
-	github.com/golang/protobuf v1.5.4
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/lib/pq v1.10.9
-	github.com/redis/go-redis/v9 v9.7.0
+	github.com/redis/go-redis/v9 v9.12.1
 	github.com/s21platform/logger-lib v0.0.6
 	github.com/s21platform/metrics-lib v0.0.9
 	github.com/s21platform/notification-service v0.0.5

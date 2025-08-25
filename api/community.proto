@@ -14,6 +14,7 @@ service CommunityService {
   rpc isUserStaff(LoginIn) returns (IsUserStaffOut){};
   rpc RunLoginsWorkerManually(google.protobuf.Empty) returns (google.protobuf.Empty){};
   rpc SendEduLinkingCode(SendEduLinkingCodeIn) returns (google.protobuf.Empty){};
+  rpc InvitePeer(InvitePeerRequest) returns (InvitePeerResponse);
 }
 
 message IsUserStaffOut {
@@ -76,4 +77,12 @@ message ParticipantChangeEvent {
   }
 
   google.protobuf.Timestamp at = 6;
+}
+
+message InvitePeerRequest {
+  string login = 1; // логин того, кого приглашают
+}
+
+message InvitePeerResponse {
+  bool success = 1;
 }
