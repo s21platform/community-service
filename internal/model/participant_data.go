@@ -9,14 +9,14 @@ import (
 )
 
 type Skill struct {
-	Name   string `db:"badges" json:"name"`
-	Points int32  `db:"badges" json:"points"`
+	Name   string `json:"name"`
+	Points int32  `json:"points"`
 }
 
 type Badge struct {
-	Name            string `db:"badges" json:"name"`
-	ReceiptDateTime string `db:"badges" json:"receiptDateTime"`
-	IconURL         string `db:"badges" json:"iconURL"`
+	Name            string `json:"name"`
+	ReceiptDateTime string `json:"receiptDateTime"`
+	IconURL         string `json:"iconURL"`
 }
 type Skills []Skill
 type Badges []Badge

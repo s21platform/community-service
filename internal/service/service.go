@@ -155,12 +155,13 @@ func (s *Service) GetStudentData(ctx context.Context, in *community.GetStudentDa
 		logger.Error("failed to not found UUID in context")
 		return nil, status.Error(codes.Internal, "failed to not found UUID in context")
 	}
-
+	// проверка вхождения uuid инициатора в таблицу link_edu
 	_, err := s.dbR.GetIdPeer(ctx, uuid)
 	if err != nil {
 		logger.Error(fmt.Sprintf("failed to get user id, err: %v", err))
 		return nil, status.Errorf(codes.NotFound, "failed to get user id, err: %v", err)
 	}
+	// проверка вхождения uuid целевого пользователя в таблицу link_edu
 	peerID, err := s.dbR.GetIdPeer(ctx, in.UserUUID)
 	if err != nil {
 		logger.Error(fmt.Sprintf("failed to get user id, err: %v", err))

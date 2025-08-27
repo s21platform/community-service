@@ -2,4 +2,4 @@
 .env
 .env.s21-cli
 docker-compose.yml
-docker-compose.s21-пше cli.yml
+docker-compose.s21-cli.yml
