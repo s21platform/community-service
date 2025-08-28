@@ -309,3 +309,58 @@ func TestServer_SendEduLinkingCode(t *testing.T) {
 		assert.Error(t, err)
 	})
 }
+
+func TestService_GetStudentData(t *testing.T) {
+	t.Parallel()
+	ctx := context.WithValue(context.Background(), config.KeyUUID, "uuid-1")
+	controller := gomock.NewController(t)
+	defer controller.Finish()
+	mockRepo := NewMockDbRepo(controller)
+	mockRedisRepo := NewMockRedisRepo(controller)
+	mockNotCl := NewMockNotificationS(controller)
+	mockLogger := logger_lib.NewMockLoggerInterface(controller)
+	ctx = context.WithValue(ctx, config.KeyLogger, mockLogger)
+
+	t.Run("success_case", func(t *testing.T) {
+		mockLogger.EXPECT().AddFuncName("GetStudentData")
+		inputUUID := "user-2"
+		ctxUUID := "uuid-1"
+		request := &community.GetStudentDataIn{UserUUID: inputUUID}
+		var idFirst int64 = 1
+		var idSecond int64 = 2
+
+		mockRepo.EXPECT().
+			GetIdPeer(ctx, ctxUUID).
+			Return(idFirst, nil).
+			Times(1)
+		mockRepo.EXPECT().
+			GetIdPeer(ctx, inputUUID).
+			Return(idSecond, nil).
+			Times(1)
+		mockData := &model.ParticipantData{
+			Login:          "login1",
+			CampusId:       1,
+			ClassName:      "10A",
+			ParallelName:   "10",
+			TribeID:        5,
+			Status:         "active",
+			CreatedAt:      "2025-08-16",
+			ExpValue:       1000,
+			Level:          5,
+			ExpToNextLevel: 200,
+			Crp:            10,
+			Prp:            20,
+			Coins:          50,
+			Skills:         []model.Skill{{Name: "skill1", Points: 100}},
+			Badges:         []model.Badge{{Name: "badge1", ReceiptDateTime: "2025-08-16", IconURL: "url"}},
+		}
+		mockRepo.EXPECT().
+			GetPeerData(ctx, idSecond).
+			Return(mockData, nil).
+			Times(1)
+
+		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil)
+		_, err := s.GetStudentData(ctx, request)
+		assert.NoError(t, err)
+	})
+}

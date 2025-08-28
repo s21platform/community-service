@@ -145,3 +145,64 @@ func (s *Service) SendEduLinkingCode(ctx context.Context, in *community.SendEduL
 
 	return &emptypb.Empty{}, nil
 }
+
+func (s *Service) GetStudentData(ctx context.Context, in *community.GetStudentDataIn) (*community.GetStudentDataOut, error) {
+	logger := logger_lib.FromContext(ctx, config.KeyLogger)
+	logger.AddFuncName("GetStudentData")
+
+	uuid, ok := ctx.Value(config.KeyUUID).(string)
+	if !ok {
+		logger.Error("failed to not found UUID in context")
+		return nil, status.Error(codes.Internal, "failed to not found UUID in context")
+	}
+	// проверка вхождения uuid инициатора в таблицу link_edu
+	_, err := s.dbR.GetIdPeer(ctx, uuid)
+	if err != nil {
+		logger.Error(fmt.Sprintf("failed to get user id, err: %v", err))
+		return nil, status.Errorf(codes.NotFound, "failed to get user id, err: %v", err)
+	}
+	// проверка вхождения uuid целевого пользователя в таблицу link_edu
+	peerID, err := s.dbR.GetIdPeer(ctx, in.UserUUID)
+	if err != nil {
+		logger.Error(fmt.Sprintf("failed to get user id, err: %v", err))
+		return nil, status.Errorf(codes.NotFound, "failed to get user id, err: %v", err)
+	}
+
+	data, err := s.dbR.GetPeerData(ctx, peerID)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to get peer data: %v", err)
+	}
+	out := &community.GetStudentDataOut{
+		Login:          data.Login,
+		CampusId:       data.CampusId,
+		ClassName:      data.ClassName,
+		ParallelName:   data.ParallelName,
+		TribeId:        data.TribeID,
+		Status:         data.Status,
+		CreatedAt:      data.CreatedAt,
+		ExpValue:       data.ExpValue,
+		Level:          data.Level,
+		ExpToNextLevel: data.ExpToNextLevel,
+		Crp:            data.Crp,
+		Prp:            data.Prp,
+		Coins:          data.Coins,
+	}
+	out.Skills = make([]*community.Skill, len(data.Skills))
+	for i, j := range data.Skills {
+		out.Skills[i] = &community.Skill{
+			Name:   j.Name,
+			Points: j.Points,
+		}
+	}
+
+	out.Badges = make([]*community.Badge, len(data.Badges))
+	for i, j := range data.Badges {
+		out.Badges[i] = &community.Badge{
+			Name:            j.Name,
+			ReceiptDateTime: j.ReceiptDateTime,
+			IconUrl:         j.IconURL,
+		}
+	}
+
+	return out, nil
+}
