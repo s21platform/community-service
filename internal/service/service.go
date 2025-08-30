@@ -170,6 +170,7 @@ func (s *Service) GetStudentData(ctx context.Context, in *community.GetStudentDa
 
 	data, err := s.dbR.GetPeerData(ctx, peerID)
 	if err != nil {
+		logger.Error(fmt.Sprintf("failed to get peer data, err: %v", err))
 		return nil, status.Errorf(codes.Internal, "failed to get peer data: %v", err)
 	}
 	out := &community.GetStudentDataOut{
@@ -205,4 +206,40 @@ func (s *Service) GetStudentData(ctx context.Context, in *community.GetStudentDa
 	}
 
 	return out, nil
+}
+
+func (s *Service) ValidateCode(ctx context.Context, in *community.ValidateCodeIn) (*community.ValidateCodeOut, error) {
+	logger := logger_lib.FromContext(ctx, config.KeyLogger)
+	logger.AddFuncName("ValidateCode")
+	uuid, ok := ctx.Value(config.KeyUUID).(string)
+	if !ok {
+		logger.Error("failed to not found UUID in context")
+		return &community.ValidateCodeOut{Message: ""}, status.Error(codes.Internal, "failed to not found UUID in context")
+	}
+	code, err := s.rR.GetByKey(ctx, config.Key(in.Login))
+	if err != nil {
+		logger.Error(fmt.Sprintf("failed to get by key, err: %v", err))
+		return &community.ValidateCodeOut{Message: ""}, status.Errorf(codes.Internal, "failed to get by key: %v", err)
+	}
+	if code == "" {
+		return &community.ValidateCodeOut{Message: "Код не найден"}, nil
+	}
+	codeInt, err := strconv.Atoi(code)
+	if err != nil {
+		return &community.ValidateCodeOut{Message: ""}, status.Errorf(codes.Internal, "failed to convert code: %v", err)
+	}
+	if int64(codeInt) != in.Code {
+		return &community.ValidateCodeOut{Message: "Не совпадает код"}, nil
+	}
+	id, err := s.dbR.GetIdFromParticipant(ctx, uuid)
+	if err != nil {
+		logger.Error(fmt.Sprintf("failed to get user id, err: %v", err))
+		return &community.ValidateCodeOut{Message: ""}, status.Errorf(codes.NotFound, "failed to get user id, err: %v", err)
+	}
+	err = s.dbR.InsertLinkEdu(ctx, id, uuid)
+	if err != nil {
+		logger.Error(fmt.Sprintf("failed to insert link edu, err: %v", err))
+		return &community.ValidateCodeOut{Message: ""}, status.Errorf(codes.NotFound, "failed to insert link edu, err: %v", err)
+	}
+	return nil, nil
 }

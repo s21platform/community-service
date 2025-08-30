@@ -121,3 +121,22 @@ func (r *Repository) GetPeerData(ctx context.Context, id int64) (*model.Particip
 	}
 	return &participant, nil
 }
+
+func (r *Repository) GetIdFromParticipant(ctx context.Context, login string) (int64, error) {
+	var id int64
+
+	query, args, err := sq.Select("id").
+		From("participant").
+		Where(sq.Eq{"login": login}).
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
+	if err != nil {
+		return 0, fmt.Errorf("failed to build exists query: %v", err)
+	}
+
+	err = r.conn.GetContext(ctx, &id, query, args...)
+	if err != nil {
+		return 0, err
+	}
+	return id, nil
+}
