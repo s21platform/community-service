@@ -16,6 +16,8 @@ service CommunityService {
   rpc SendEduLinkingCode(SendEduLinkingCodeIn) returns (google.protobuf.Empty){};
   // Ручка получения данных школьников
   rpc GetStudentData(GetStudentDataIn) returns (GetStudentDataOut){};
+  // Ручка подтверждения кода
+  rpc ValidateCode(ValidateCodeIn) returns (ValidateCodeOut){};
 }
 
 message IsUserStaffOut {
@@ -135,4 +137,16 @@ message GetStudentDataOut {
   int64 coins = 14;
   // Достижения студента
   repeated Badge badges = 15;
+}
+
+message ValidateCodeIn {
+  // Логин
+  string login = 1;
+  // Код
+  int64 code = 2;
+}
+
+message ValidateCodeOut {
+  // Сообщение
+  string message = 2;
 }

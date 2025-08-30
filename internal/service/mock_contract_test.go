@@ -38,6 +38,21 @@ func (m *MockDbRepo) EXPECT() *MockDbRepoMockRecorder {
 	return m.recorder
 }
 
+// GetIdFromParticipant mocks base method.
+func (m *MockDbRepo) GetIdFromParticipant(ctx context.Context, login string) (int64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetIdFromParticipant", ctx, login)
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetIdFromParticipant indicates an expected call of GetIdFromParticipant.
+func (mr *MockDbRepoMockRecorder) GetIdFromParticipant(ctx, login interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetIdFromParticipant", reflect.TypeOf((*MockDbRepo)(nil).GetIdFromParticipant), ctx, login)
+}
+
 // GetIdPeer mocks base method.
 func (m *MockDbRepo) GetIdPeer(ctx context.Context, uuid string) (int64, error) {
 	m.ctrl.T.Helper()
@@ -98,6 +113,21 @@ func (mr *MockDbRepoMockRecorder) GetPeerStatus(ctx, login interface{}) *gomock.
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPeerStatus", reflect.TypeOf((*MockDbRepo)(nil).GetPeerStatus), ctx, login)
 }
 
+// GetPendingLink mocks base method.
+func (m *MockDbRepo) GetPendingLink(ctx context.Context, login string) (*model.PendingLinkData, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPendingLink", ctx, login)
+	ret0, _ := ret[0].(*model.PendingLinkData)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPendingLink indicates an expected call of GetPendingLink.
+func (mr *MockDbRepoMockRecorder) GetPendingLink(ctx, login interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPendingLink", reflect.TypeOf((*MockDbRepo)(nil).GetPendingLink), ctx, login)
+}
+
 // GetStaffId mocks base method.
 func (m *MockDbRepo) GetStaffId(ctx context.Context, login string) (int64, error) {
 	m.ctrl.T.Helper()
@@ -111,6 +141,20 @@ func (m *MockDbRepo) GetStaffId(ctx context.Context, login string) (int64, error
 func (mr *MockDbRepoMockRecorder) GetStaffId(ctx, login interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetStaffId", reflect.TypeOf((*MockDbRepo)(nil).GetStaffId), ctx, login)
+}
+
+// InsertLinkEdu mocks base method.
+func (m *MockDbRepo) InsertLinkEdu(ctx context.Context, id int64, uuid string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "InsertLinkEdu", ctx, id, uuid)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// InsertLinkEdu indicates an expected call of InsertLinkEdu.
+func (mr *MockDbRepoMockRecorder) InsertLinkEdu(ctx, id, uuid interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertLinkEdu", reflect.TypeOf((*MockDbRepo)(nil).InsertLinkEdu), ctx, id, uuid)
 }
 
 // SearchPeersBySubstring mocks base method.
