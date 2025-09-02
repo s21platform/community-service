@@ -113,21 +113,6 @@ func (mr *MockDbRepoMockRecorder) GetPeerStatus(ctx, login interface{}) *gomock.
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPeerStatus", reflect.TypeOf((*MockDbRepo)(nil).GetPeerStatus), ctx, login)
 }
 
-// GetPendingLink mocks base method.
-func (m *MockDbRepo) GetPendingLink(ctx context.Context, login string) (*model.PendingLinkData, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetPendingLink", ctx, login)
-	ret0, _ := ret[0].(*model.PendingLinkData)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetPendingLink indicates an expected call of GetPendingLink.
-func (mr *MockDbRepoMockRecorder) GetPendingLink(ctx, login interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPendingLink", reflect.TypeOf((*MockDbRepo)(nil).GetPendingLink), ctx, login)
-}
-
 // GetStaffId mocks base method.
 func (m *MockDbRepo) GetStaffId(ctx context.Context, login string) (int64, error) {
 	m.ctrl.T.Helper()

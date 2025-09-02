@@ -226,6 +226,7 @@ func (s *Service) ValidateCode(ctx context.Context, in *community.ValidateCodeIn
 	}
 	codeInt, err := strconv.Atoi(code)
 	if err != nil {
+		logger.Error(fmt.Sprintf("failed to convert code: %v", err))
 		return &community.ValidateCodeOut{Message: ""}, status.Errorf(codes.Internal, "failed to convert code: %v", err)
 	}
 	if int64(codeInt) != in.Code {
