@@ -364,3 +364,87 @@ func TestService_GetStudentData(t *testing.T) {
 		assert.NoError(t, err)
 	})
 }
+
+func TestService_ValidateCode(t *testing.T) {
+	t.Parallel()
+	ctx := context.WithValue(context.Background(), config.KeyUUID, "uuid-1")
+	controller := gomock.NewController(t)
+	defer controller.Finish()
+	mockRepo := NewMockDbRepo(controller)
+	mockRedisRepo := NewMockRedisRepo(controller)
+	mockNotCl := NewMockNotificationS(controller)
+	mockLogger := logger_lib.NewMockLoggerInterface(controller)
+	ctx = context.WithValue(ctx, config.KeyLogger, mockLogger)
+
+	t.Run("success_case", func(t *testing.T) {
+		mockLogger.EXPECT().AddFuncName("ValidateCode")
+		key := "15"
+		ctxUUID := "uuid-1"
+		var id int64 = 15
+		request := &community.ValidateCodeIn{Login: "test1", Code: 15}
+
+		mockRedisRepo.EXPECT().
+			GetByKey(ctx, gomock.Any()).
+			Return(key, nil).
+			Times(1)
+		mockRepo.EXPECT().
+			GetIdFromParticipant(ctx, ctxUUID).
+			Return(id, nil).
+			Times(1)
+		mockRepo.EXPECT().
+			InsertLinkEdu(ctx, id, ctxUUID).
+			Return(nil).
+			Times(1)
+
+		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil)
+		_, err := s.ValidateCode(ctx, request)
+		assert.NoError(t, err)
+	})
+
+	t.Run("GetByKey_err", func(t *testing.T) {
+		mockLogger.EXPECT().AddFuncName("ValidateCode")
+		expectedErr := errors.New("get err")
+		request := &community.ValidateCodeIn{Login: "test1", Code: 15}
+
+		mockRedisRepo.EXPECT().
+			GetByKey(ctx, gomock.Any()).
+			Return("", expectedErr).
+			Times(1)
+		mockLogger.EXPECT().Error(fmt.Sprintf("failed to get by key, err: %v", expectedErr))
+
+		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil)
+		_, err := s.ValidateCode(ctx, request)
+		assert.Error(t, err)
+	})
+
+	t.Run("code_err", func(t *testing.T) {
+		mockLogger.EXPECT().AddFuncName("ValidateCode")
+		request := &community.ValidateCodeIn{Login: "test1", Code: 15}
+
+		mockRedisRepo.EXPECT().
+			GetByKey(ctx, gomock.Any()).
+			Return("", nil).
+			Times(1)
+
+		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil)
+		_, err := s.ValidateCode(ctx, request)
+		assert.NoError(t, err)
+	})
+
+	t.Run("atoi_err", func(t *testing.T) {
+		mockLogger.EXPECT().AddFuncName("ValidateCode")
+		key := "test"
+		expectedErr := errors.New("strconv.Atoi: parsing \"test\": invalid syntax")
+		request := &community.ValidateCodeIn{Login: "test1", Code: 15}
+
+		mockRedisRepo.EXPECT().
+			GetByKey(ctx, gomock.Any()).
+			Return(key, nil).
+			Times(1)
+		mockLogger.EXPECT().Error(fmt.Sprintf("failed to convert code: %v", expectedErr))
+
+		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil)
+		_, err := s.ValidateCode(ctx, request)
+		assert.Error(t, err)
+	})
+}

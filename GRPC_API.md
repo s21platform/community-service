@@ -19,6 +19,8 @@
     - [SearchPeersOut](#-SearchPeersOut)
     - [SendEduLinkingCodeIn](#-SendEduLinkingCodeIn)
     - [Skill](#-Skill)
+    - [ValidateCodeIn](#-ValidateCodeIn)
+    - [ValidateCodeOut](#-ValidateCodeOut)
   
     - [CommunityService](#-CommunityService)
   
@@ -282,6 +284,37 @@ Response with found match
 
 
 
+
+<a name="-ValidateCodeIn"></a>
+
+### ValidateCodeIn
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| login | [string](#string) |  | Логин |
+| code | [int64](#int64) |  | Код |
+
+
+
+
+
+
+<a name="-ValidateCodeOut"></a>
+
+### ValidateCodeOut
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| message | [string](#string) |  | Сообщение |
+
+
+
+
+
  
 
  
@@ -303,6 +336,7 @@ Service with peers&#39; info from edu platform
 | RunLoginsWorkerManually | [.google.protobuf.Empty](#google-protobuf-Empty) | [.google.protobuf.Empty](#google-protobuf-Empty) |  |
 | SendEduLinkingCode | [.SendEduLinkingCodeIn](#SendEduLinkingCodeIn) | [.google.protobuf.Empty](#google-protobuf-Empty) |  |
 | GetStudentData | [.GetStudentDataIn](#GetStudentDataIn) | [.GetStudentDataOut](#GetStudentDataOut) | Ручка получения данных школьников |
+| ValidateCode | [.ValidateCodeIn](#ValidateCodeIn) | [.ValidateCodeOut](#ValidateCodeOut) | Ручка подтверждения кода |
 
  
 
