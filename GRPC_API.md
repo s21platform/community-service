@@ -9,12 +9,8 @@
     - [GetSchoolDataOut](#-GetSchoolDataOut)
     - [GetStudentDataIn](#-GetStudentDataIn)
     - [GetStudentDataOut](#-GetStudentDataOut)
-    - [IsUserStaffOut](#-IsUserStaffOut)
-    - [LoginIn](#-LoginIn)
     - [ParticipantChangeEvent](#-ParticipantChangeEvent)
     - [SearchPeer](#-SearchPeer)
-    - [SearchPeersIn](#-SearchPeersIn)
-    - [SearchPeersOut](#-SearchPeersOut)
     - [Skill](#-Skill)
     - [ValidateCodeIn](#-ValidateCodeIn)
     - [ValidateCodeOut](#-ValidateCodeOut)
@@ -124,36 +120,6 @@
 
 
 
-<a name="-IsUserStaffOut"></a>
-
-### IsUserStaffOut
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| isStaff | [bool](#bool) |  |  |
-
-
-
-
-
-
-<a name="-LoginIn"></a>
-
-### LoginIn
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| login | [string](#string) |  |  |
-
-
-
-
-
-
 <a name="-ParticipantChangeEvent"></a>
 
 ### ParticipantChangeEvent
@@ -183,38 +149,6 @@
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | login | [string](#string) |  |  |
-
-
-
-
-
-
-<a name="-SearchPeersIn"></a>
-
-### SearchPeersIn
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| substring | [string](#string) |  |  |
-| limit | [int64](#int64) |  |  |
-| offset | [int64](#int64) |  |  |
-
-
-
-
-
-
-<a name="-SearchPeersOut"></a>
-
-### SearchPeersOut
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| searchPeers | [SearchPeer](#SearchPeer) | repeated |  |
 
 
 
@@ -281,10 +215,7 @@ Service with peers&#39; info from edu platform
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| SearchPeers | [.SearchPeersIn](#SearchPeersIn) | [.SearchPeersOut](#SearchPeersOut) |  |
 | GetPeerSchoolData | [.GetSchoolDataIn](#GetSchoolDataIn) | [.GetSchoolDataOut](#GetSchoolDataOut) |  |
-| isUserStaff | [.LoginIn](#LoginIn) | [.IsUserStaffOut](#IsUserStaffOut) |  |
-| RunLoginsWorkerManually | [.google.protobuf.Empty](#google-protobuf-Empty) | [.google.protobuf.Empty](#google-protobuf-Empty) |  |
 | GetStudentData | [.GetStudentDataIn](#GetStudentDataIn) | [.GetStudentDataOut](#GetStudentDataOut) | Ручка получения данных школьников |
 | ValidateCode | [.ValidateCodeIn](#ValidateCodeIn) | [.ValidateCodeOut](#ValidateCodeOut) | Ручка подтверждения кода |
 

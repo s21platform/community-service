@@ -9,7 +9,6 @@ package community
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
@@ -23,94 +22,6 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type IsUserStaffOut struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	IsStaff       bool                   `protobuf:"varint,1,opt,name=isStaff,proto3" json:"isStaff,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *IsUserStaffOut) Reset() {
-	*x = IsUserStaffOut{}
-	mi := &file_api_community_proto_msgTypes[0]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *IsUserStaffOut) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*IsUserStaffOut) ProtoMessage() {}
-
-func (x *IsUserStaffOut) ProtoReflect() protoreflect.Message {
-	mi := &file_api_community_proto_msgTypes[0]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use IsUserStaffOut.ProtoReflect.Descriptor instead.
-func (*IsUserStaffOut) Descriptor() ([]byte, []int) {
-	return file_api_community_proto_rawDescGZIP(), []int{0}
-}
-
-func (x *IsUserStaffOut) GetIsStaff() bool {
-	if x != nil {
-		return x.IsStaff
-	}
-	return false
-}
-
-type LoginIn struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Login         string                 `protobuf:"bytes,1,opt,name=login,proto3" json:"login,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *LoginIn) Reset() {
-	*x = LoginIn{}
-	mi := &file_api_community_proto_msgTypes[1]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *LoginIn) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*LoginIn) ProtoMessage() {}
-
-func (x *LoginIn) ProtoReflect() protoreflect.Message {
-	mi := &file_api_community_proto_msgTypes[1]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use LoginIn.ProtoReflect.Descriptor instead.
-func (*LoginIn) Descriptor() ([]byte, []int) {
-	return file_api_community_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *LoginIn) GetLogin() string {
-	if x != nil {
-		return x.Login
-	}
-	return ""
-}
-
 type GetSchoolDataIn struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	NickName      string                 `protobuf:"bytes,1,opt,name=nickName,proto3" json:"nickName,omitempty"`
@@ -120,7 +31,7 @@ type GetSchoolDataIn struct {
 
 func (x *GetSchoolDataIn) Reset() {
 	*x = GetSchoolDataIn{}
-	mi := &file_api_community_proto_msgTypes[2]
+	mi := &file_api_community_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -132,7 +43,7 @@ func (x *GetSchoolDataIn) String() string {
 func (*GetSchoolDataIn) ProtoMessage() {}
 
 func (x *GetSchoolDataIn) ProtoReflect() protoreflect.Message {
-	mi := &file_api_community_proto_msgTypes[2]
+	mi := &file_api_community_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -145,7 +56,7 @@ func (x *GetSchoolDataIn) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSchoolDataIn.ProtoReflect.Descriptor instead.
 func (*GetSchoolDataIn) Descriptor() ([]byte, []int) {
-	return file_api_community_proto_rawDescGZIP(), []int{2}
+	return file_api_community_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *GetSchoolDataIn) GetNickName() string {
@@ -165,7 +76,7 @@ type GetSchoolDataOut struct {
 
 func (x *GetSchoolDataOut) Reset() {
 	*x = GetSchoolDataOut{}
-	mi := &file_api_community_proto_msgTypes[3]
+	mi := &file_api_community_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -177,7 +88,7 @@ func (x *GetSchoolDataOut) String() string {
 func (*GetSchoolDataOut) ProtoMessage() {}
 
 func (x *GetSchoolDataOut) ProtoReflect() protoreflect.Message {
-	mi := &file_api_community_proto_msgTypes[3]
+	mi := &file_api_community_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -190,7 +101,7 @@ func (x *GetSchoolDataOut) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSchoolDataOut.ProtoReflect.Descriptor instead.
 func (*GetSchoolDataOut) Descriptor() ([]byte, []int) {
-	return file_api_community_proto_rawDescGZIP(), []int{3}
+	return file_api_community_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *GetSchoolDataOut) GetClassName() string {
@@ -207,66 +118,6 @@ func (x *GetSchoolDataOut) GetParallelName() string {
 	return ""
 }
 
-type SearchPeersIn struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Substring     string                 `protobuf:"bytes,1,opt,name=substring,proto3" json:"substring,omitempty"`
-	Limit         int64                  `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`
-	Offset        int64                  `protobuf:"varint,3,opt,name=offset,proto3" json:"offset,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *SearchPeersIn) Reset() {
-	*x = SearchPeersIn{}
-	mi := &file_api_community_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *SearchPeersIn) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SearchPeersIn) ProtoMessage() {}
-
-func (x *SearchPeersIn) ProtoReflect() protoreflect.Message {
-	mi := &file_api_community_proto_msgTypes[4]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SearchPeersIn.ProtoReflect.Descriptor instead.
-func (*SearchPeersIn) Descriptor() ([]byte, []int) {
-	return file_api_community_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *SearchPeersIn) GetSubstring() string {
-	if x != nil {
-		return x.Substring
-	}
-	return ""
-}
-
-func (x *SearchPeersIn) GetLimit() int64 {
-	if x != nil {
-		return x.Limit
-	}
-	return 0
-}
-
-func (x *SearchPeersIn) GetOffset() int64 {
-	if x != nil {
-		return x.Offset
-	}
-	return 0
-}
-
 type SearchPeer struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Login         string                 `protobuf:"bytes,1,opt,name=login,proto3" json:"login,omitempty"`
@@ -276,7 +127,7 @@ type SearchPeer struct {
 
 func (x *SearchPeer) Reset() {
 	*x = SearchPeer{}
-	mi := &file_api_community_proto_msgTypes[5]
+	mi := &file_api_community_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -288,7 +139,7 @@ func (x *SearchPeer) String() string {
 func (*SearchPeer) ProtoMessage() {}
 
 func (x *SearchPeer) ProtoReflect() protoreflect.Message {
-	mi := &file_api_community_proto_msgTypes[5]
+	mi := &file_api_community_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -301,7 +152,7 @@ func (x *SearchPeer) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SearchPeer.ProtoReflect.Descriptor instead.
 func (*SearchPeer) Descriptor() ([]byte, []int) {
-	return file_api_community_proto_rawDescGZIP(), []int{5}
+	return file_api_community_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *SearchPeer) GetLogin() string {
@@ -309,50 +160,6 @@ func (x *SearchPeer) GetLogin() string {
 		return x.Login
 	}
 	return ""
-}
-
-type SearchPeersOut struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	SearchPeers   []*SearchPeer          `protobuf:"bytes,1,rep,name=searchPeers,proto3" json:"searchPeers,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *SearchPeersOut) Reset() {
-	*x = SearchPeersOut{}
-	mi := &file_api_community_proto_msgTypes[6]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *SearchPeersOut) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SearchPeersOut) ProtoMessage() {}
-
-func (x *SearchPeersOut) ProtoReflect() protoreflect.Message {
-	mi := &file_api_community_proto_msgTypes[6]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SearchPeersOut.ProtoReflect.Descriptor instead.
-func (*SearchPeersOut) Descriptor() ([]byte, []int) {
-	return file_api_community_proto_rawDescGZIP(), []int{6}
-}
-
-func (x *SearchPeersOut) GetSearchPeers() []*SearchPeer {
-	if x != nil {
-		return x.SearchPeers
-	}
-	return nil
 }
 
 type ParticipantChangeEvent struct {
@@ -375,7 +182,7 @@ type ParticipantChangeEvent struct {
 
 func (x *ParticipantChangeEvent) Reset() {
 	*x = ParticipantChangeEvent{}
-	mi := &file_api_community_proto_msgTypes[7]
+	mi := &file_api_community_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -387,7 +194,7 @@ func (x *ParticipantChangeEvent) String() string {
 func (*ParticipantChangeEvent) ProtoMessage() {}
 
 func (x *ParticipantChangeEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_api_community_proto_msgTypes[7]
+	mi := &file_api_community_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -400,7 +207,7 @@ func (x *ParticipantChangeEvent) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ParticipantChangeEvent.ProtoReflect.Descriptor instead.
 func (*ParticipantChangeEvent) Descriptor() ([]byte, []int) {
-	return file_api_community_proto_rawDescGZIP(), []int{7}
+	return file_api_community_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *ParticipantChangeEvent) GetLogin() string {
@@ -509,7 +316,7 @@ type GetStudentDataIn struct {
 
 func (x *GetStudentDataIn) Reset() {
 	*x = GetStudentDataIn{}
-	mi := &file_api_community_proto_msgTypes[8]
+	mi := &file_api_community_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -521,7 +328,7 @@ func (x *GetStudentDataIn) String() string {
 func (*GetStudentDataIn) ProtoMessage() {}
 
 func (x *GetStudentDataIn) ProtoReflect() protoreflect.Message {
-	mi := &file_api_community_proto_msgTypes[8]
+	mi := &file_api_community_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -534,7 +341,7 @@ func (x *GetStudentDataIn) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetStudentDataIn.ProtoReflect.Descriptor instead.
 func (*GetStudentDataIn) Descriptor() ([]byte, []int) {
-	return file_api_community_proto_rawDescGZIP(), []int{8}
+	return file_api_community_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *GetStudentDataIn) GetUserUUID() string {
@@ -557,7 +364,7 @@ type Skill struct {
 
 func (x *Skill) Reset() {
 	*x = Skill{}
-	mi := &file_api_community_proto_msgTypes[9]
+	mi := &file_api_community_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -569,7 +376,7 @@ func (x *Skill) String() string {
 func (*Skill) ProtoMessage() {}
 
 func (x *Skill) ProtoReflect() protoreflect.Message {
-	mi := &file_api_community_proto_msgTypes[9]
+	mi := &file_api_community_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -582,7 +389,7 @@ func (x *Skill) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Skill.ProtoReflect.Descriptor instead.
 func (*Skill) Descriptor() ([]byte, []int) {
-	return file_api_community_proto_rawDescGZIP(), []int{9}
+	return file_api_community_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *Skill) GetName() string {
@@ -614,7 +421,7 @@ type Badge struct {
 
 func (x *Badge) Reset() {
 	*x = Badge{}
-	mi := &file_api_community_proto_msgTypes[10]
+	mi := &file_api_community_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -626,7 +433,7 @@ func (x *Badge) String() string {
 func (*Badge) ProtoMessage() {}
 
 func (x *Badge) ProtoReflect() protoreflect.Message {
-	mi := &file_api_community_proto_msgTypes[10]
+	mi := &file_api_community_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -639,7 +446,7 @@ func (x *Badge) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Badge.ProtoReflect.Descriptor instead.
 func (*Badge) Descriptor() ([]byte, []int) {
-	return file_api_community_proto_rawDescGZIP(), []int{10}
+	return file_api_community_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *Badge) GetName() string {
@@ -701,7 +508,7 @@ type GetStudentDataOut struct {
 
 func (x *GetStudentDataOut) Reset() {
 	*x = GetStudentDataOut{}
-	mi := &file_api_community_proto_msgTypes[11]
+	mi := &file_api_community_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -713,7 +520,7 @@ func (x *GetStudentDataOut) String() string {
 func (*GetStudentDataOut) ProtoMessage() {}
 
 func (x *GetStudentDataOut) ProtoReflect() protoreflect.Message {
-	mi := &file_api_community_proto_msgTypes[11]
+	mi := &file_api_community_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -726,7 +533,7 @@ func (x *GetStudentDataOut) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetStudentDataOut.ProtoReflect.Descriptor instead.
 func (*GetStudentDataOut) Descriptor() ([]byte, []int) {
-	return file_api_community_proto_rawDescGZIP(), []int{11}
+	return file_api_community_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *GetStudentDataOut) GetLogin() string {
@@ -846,7 +653,7 @@ type ValidateCodeIn struct {
 
 func (x *ValidateCodeIn) Reset() {
 	*x = ValidateCodeIn{}
-	mi := &file_api_community_proto_msgTypes[12]
+	mi := &file_api_community_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -858,7 +665,7 @@ func (x *ValidateCodeIn) String() string {
 func (*ValidateCodeIn) ProtoMessage() {}
 
 func (x *ValidateCodeIn) ProtoReflect() protoreflect.Message {
-	mi := &file_api_community_proto_msgTypes[12]
+	mi := &file_api_community_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -871,7 +678,7 @@ func (x *ValidateCodeIn) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ValidateCodeIn.ProtoReflect.Descriptor instead.
 func (*ValidateCodeIn) Descriptor() ([]byte, []int) {
-	return file_api_community_proto_rawDescGZIP(), []int{12}
+	return file_api_community_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *ValidateCodeIn) GetLogin() string {
@@ -898,7 +705,7 @@ type ValidateCodeOut struct {
 
 func (x *ValidateCodeOut) Reset() {
 	*x = ValidateCodeOut{}
-	mi := &file_api_community_proto_msgTypes[13]
+	mi := &file_api_community_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -910,7 +717,7 @@ func (x *ValidateCodeOut) String() string {
 func (*ValidateCodeOut) ProtoMessage() {}
 
 func (x *ValidateCodeOut) ProtoReflect() protoreflect.Message {
-	mi := &file_api_community_proto_msgTypes[13]
+	mi := &file_api_community_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -923,7 +730,7 @@ func (x *ValidateCodeOut) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ValidateCodeOut.ProtoReflect.Descriptor instead.
 func (*ValidateCodeOut) Descriptor() ([]byte, []int) {
-	return file_api_community_proto_rawDescGZIP(), []int{13}
+	return file_api_community_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *ValidateCodeOut) GetMessage() string {
@@ -937,25 +744,15 @@ var File_api_community_proto protoreflect.FileDescriptor
 
 const file_api_community_proto_rawDesc = "" +
 	"\n" +
-	"\x13api/community.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"*\n" +
-	"\x0eIsUserStaffOut\x12\x18\n" +
-	"\aisStaff\x18\x01 \x01(\bR\aisStaff\"\x1f\n" +
-	"\aLoginIn\x12\x14\n" +
-	"\x05login\x18\x01 \x01(\tR\x05login\"-\n" +
+	"\x13api/community.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"-\n" +
 	"\x0fGetSchoolDataIn\x12\x1a\n" +
 	"\bnickName\x18\x01 \x01(\tR\bnickName\"T\n" +
 	"\x10GetSchoolDataOut\x12\x1c\n" +
 	"\tclassName\x18\x01 \x01(\tR\tclassName\x12\"\n" +
-	"\fparallelName\x18\x02 \x01(\tR\fparallelName\"[\n" +
-	"\rSearchPeersIn\x12\x1c\n" +
-	"\tsubstring\x18\x01 \x01(\tR\tsubstring\x12\x14\n" +
-	"\x05limit\x18\x02 \x01(\x03R\x05limit\x12\x16\n" +
-	"\x06offset\x18\x03 \x01(\x03R\x06offset\"\"\n" +
+	"\fparallelName\x18\x02 \x01(\tR\fparallelName\"\"\n" +
 	"\n" +
 	"SearchPeer\x12\x14\n" +
-	"\x05login\x18\x01 \x01(\tR\x05login\"?\n" +
-	"\x0eSearchPeersOut\x12-\n" +
-	"\vsearchPeers\x18\x01 \x03(\v2\v.SearchPeerR\vsearchPeers\"\x8c\x02\n" +
+	"\x05login\x18\x01 \x01(\tR\x05login\"\x8c\x02\n" +
 	"\x16ParticipantChangeEvent\x12\x14\n" +
 	"\x05login\x18\x01 \x01(\tR\x05login\x12$\n" +
 	"\rold_value_str\x18\x02 \x01(\tH\x00R\voldValueStr\x12$\n" +
@@ -996,12 +793,9 @@ const file_api_community_proto_rawDesc = "" +
 	"\x05login\x18\x01 \x01(\tR\x05login\x12\x12\n" +
 	"\x04code\x18\x02 \x01(\x03R\x04code\"+\n" +
 	"\x0fValidateCodeOut\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage2\xe9\x02\n" +
-	"\x10CommunityService\x120\n" +
-	"\vSearchPeers\x12\x0e.SearchPeersIn\x1a\x0f.SearchPeersOut\"\x00\x12:\n" +
-	"\x11GetPeerSchoolData\x12\x10.GetSchoolDataIn\x1a\x11.GetSchoolDataOut\"\x00\x12*\n" +
-	"\visUserStaff\x12\b.LoginIn\x1a\x0f.IsUserStaffOut\"\x00\x12K\n" +
-	"\x17RunLoginsWorkerManually\x12\x16.google.protobuf.Empty\x1a\x16.google.protobuf.Empty\"\x00\x129\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage2\xbe\x01\n" +
+	"\x10CommunityService\x12:\n" +
+	"\x11GetPeerSchoolData\x12\x10.GetSchoolDataIn\x1a\x11.GetSchoolDataOut\"\x00\x129\n" +
 	"\x0eGetStudentData\x12\x11.GetStudentDataIn\x1a\x12.GetStudentDataOut\"\x00\x123\n" +
 	"\fValidateCode\x12\x0f.ValidateCodeIn\x1a\x10.ValidateCodeOut\"\x00B\x0fZ\rpkg/communityb\x06proto3"
 
@@ -1017,47 +811,35 @@ func file_api_community_proto_rawDescGZIP() []byte {
 	return file_api_community_proto_rawDescData
 }
 
-var file_api_community_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
+var file_api_community_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_api_community_proto_goTypes = []any{
-	(*IsUserStaffOut)(nil),         // 0: IsUserStaffOut
-	(*LoginIn)(nil),                // 1: LoginIn
-	(*GetSchoolDataIn)(nil),        // 2: GetSchoolDataIn
-	(*GetSchoolDataOut)(nil),       // 3: GetSchoolDataOut
-	(*SearchPeersIn)(nil),          // 4: SearchPeersIn
-	(*SearchPeer)(nil),             // 5: SearchPeer
-	(*SearchPeersOut)(nil),         // 6: SearchPeersOut
-	(*ParticipantChangeEvent)(nil), // 7: ParticipantChangeEvent
-	(*GetStudentDataIn)(nil),       // 8: GetStudentDataIn
-	(*Skill)(nil),                  // 9: Skill
-	(*Badge)(nil),                  // 10: Badge
-	(*GetStudentDataOut)(nil),      // 11: GetStudentDataOut
-	(*ValidateCodeIn)(nil),         // 12: ValidateCodeIn
-	(*ValidateCodeOut)(nil),        // 13: ValidateCodeOut
-	(*timestamppb.Timestamp)(nil),  // 14: google.protobuf.Timestamp
-	(*emptypb.Empty)(nil),          // 15: google.protobuf.Empty
+	(*GetSchoolDataIn)(nil),        // 0: GetSchoolDataIn
+	(*GetSchoolDataOut)(nil),       // 1: GetSchoolDataOut
+	(*SearchPeer)(nil),             // 2: SearchPeer
+	(*ParticipantChangeEvent)(nil), // 3: ParticipantChangeEvent
+	(*GetStudentDataIn)(nil),       // 4: GetStudentDataIn
+	(*Skill)(nil),                  // 5: Skill
+	(*Badge)(nil),                  // 6: Badge
+	(*GetStudentDataOut)(nil),      // 7: GetStudentDataOut
+	(*ValidateCodeIn)(nil),         // 8: ValidateCodeIn
+	(*ValidateCodeOut)(nil),        // 9: ValidateCodeOut
+	(*timestamppb.Timestamp)(nil),  // 10: google.protobuf.Timestamp
 }
 var file_api_community_proto_depIdxs = []int32{
-	5,  // 0: SearchPeersOut.searchPeers:type_name -> SearchPeer
-	14, // 1: ParticipantChangeEvent.at:type_name -> google.protobuf.Timestamp
-	9,  // 2: GetStudentDataOut.skills:type_name -> Skill
-	10, // 3: GetStudentDataOut.badges:type_name -> Badge
-	4,  // 4: CommunityService.SearchPeers:input_type -> SearchPeersIn
-	2,  // 5: CommunityService.GetPeerSchoolData:input_type -> GetSchoolDataIn
-	1,  // 6: CommunityService.isUserStaff:input_type -> LoginIn
-	15, // 7: CommunityService.RunLoginsWorkerManually:input_type -> google.protobuf.Empty
-	8,  // 8: CommunityService.GetStudentData:input_type -> GetStudentDataIn
-	12, // 9: CommunityService.ValidateCode:input_type -> ValidateCodeIn
-	6,  // 10: CommunityService.SearchPeers:output_type -> SearchPeersOut
-	3,  // 11: CommunityService.GetPeerSchoolData:output_type -> GetSchoolDataOut
-	0,  // 12: CommunityService.isUserStaff:output_type -> IsUserStaffOut
-	15, // 13: CommunityService.RunLoginsWorkerManually:output_type -> google.protobuf.Empty
-	11, // 14: CommunityService.GetStudentData:output_type -> GetStudentDataOut
-	13, // 15: CommunityService.ValidateCode:output_type -> ValidateCodeOut
-	10, // [10:16] is the sub-list for method output_type
-	4,  // [4:10] is the sub-list for method input_type
-	4,  // [4:4] is the sub-list for extension type_name
-	4,  // [4:4] is the sub-list for extension extendee
-	0,  // [0:4] is the sub-list for field type_name
+	10, // 0: ParticipantChangeEvent.at:type_name -> google.protobuf.Timestamp
+	5,  // 1: GetStudentDataOut.skills:type_name -> Skill
+	6,  // 2: GetStudentDataOut.badges:type_name -> Badge
+	0,  // 3: CommunityService.GetPeerSchoolData:input_type -> GetSchoolDataIn
+	4,  // 4: CommunityService.GetStudentData:input_type -> GetStudentDataIn
+	8,  // 5: CommunityService.ValidateCode:input_type -> ValidateCodeIn
+	1,  // 6: CommunityService.GetPeerSchoolData:output_type -> GetSchoolDataOut
+	7,  // 7: CommunityService.GetStudentData:output_type -> GetStudentDataOut
+	9,  // 8: CommunityService.ValidateCode:output_type -> ValidateCodeOut
+	6,  // [6:9] is the sub-list for method output_type
+	3,  // [3:6] is the sub-list for method input_type
+	3,  // [3:3] is the sub-list for extension type_name
+	3,  // [3:3] is the sub-list for extension extendee
+	0,  // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_api_community_proto_init() }
@@ -1065,7 +847,7 @@ func file_api_community_proto_init() {
 	if File_api_community_proto != nil {
 		return
 	}
-	file_api_community_proto_msgTypes[7].OneofWrappers = []any{
+	file_api_community_proto_msgTypes[3].OneofWrappers = []any{
 		(*ParticipantChangeEvent_OldValueStr)(nil),
 		(*ParticipantChangeEvent_OldValueInt)(nil),
 		(*ParticipantChangeEvent_NewValueStr)(nil),
@@ -1077,7 +859,7 @@ func file_api_community_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_community_proto_rawDesc), len(file_api_community_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   14,
+			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

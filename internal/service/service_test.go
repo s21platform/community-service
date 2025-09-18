@@ -105,6 +105,75 @@ func TestService_GetStudentData(t *testing.T) {
 		_, err := s.GetStudentData(ctx, request)
 		assert.NoError(t, err)
 	})
+
+	t.Run("get_first_id_error", func(t *testing.T) {
+		inputUUID := "user-2"
+		ctxUUID := "uuid-1"
+		request := &community.GetStudentDataIn{UserUUID: inputUUID}
+		expectedErr := errors.New("get id error")
+
+		mockRepo.EXPECT().
+			GetIdPeer(ctx, ctxUUID).
+			Return(int64(0), expectedErr).
+			Times(1)
+
+		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil)
+		data, err := s.GetStudentData(ctx, request)
+		assert.Nil(t, data)
+		st, ok := status.FromError(err)
+		assert.True(t, ok)
+		assert.Equal(t, codes.NotFound, st.Code())
+	})
+
+	t.Run("get_second_id_error", func(t *testing.T) {
+		inputUUID := "user-2"
+		ctxUUID := "uuid-1"
+		request := &community.GetStudentDataIn{UserUUID: inputUUID}
+		expectedErr := errors.New("get id error")
+
+		mockRepo.EXPECT().
+			GetIdPeer(ctx, ctxUUID).
+			Return(int64(1), nil).
+			Times(1)
+		mockRepo.EXPECT().
+			GetIdPeer(ctx, inputUUID).
+			Return(int64(0), expectedErr).
+			Times(1)
+
+		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil)
+		data, err := s.GetStudentData(ctx, request)
+		assert.Nil(t, data)
+		st, ok := status.FromError(err)
+		assert.True(t, ok)
+		assert.Equal(t, codes.NotFound, st.Code())
+	})
+
+	t.Run("get_peer_data_error", func(t *testing.T) {
+		inputUUID := "user-2"
+		ctxUUID := "uuid-1"
+		request := &community.GetStudentDataIn{UserUUID: inputUUID}
+		expectedErr := errors.New("get peer data error")
+
+		mockRepo.EXPECT().
+			GetIdPeer(ctx, ctxUUID).
+			Return(int64(1), nil).
+			Times(1)
+		mockRepo.EXPECT().
+			GetIdPeer(ctx, inputUUID).
+			Return(int64(2), nil).
+			Times(1)
+		mockRepo.EXPECT().
+			GetPeerData(ctx, int64(2)).
+			Return(nil, expectedErr).
+			Times(1)
+
+		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil)
+		data, err := s.GetStudentData(ctx, request)
+		assert.Nil(t, data)
+		st, ok := status.FromError(err)
+		assert.True(t, ok)
+		assert.Equal(t, codes.Internal, st.Code())
+	})
 }
 
 func TestService_ValidateCode(t *testing.T) {
@@ -176,6 +245,51 @@ func TestService_ValidateCode(t *testing.T) {
 		mockRedisRepo.EXPECT().
 			GetByKey(ctx, gomock.Any()).
 			Return(key, nil).
+			Times(1)
+
+		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil)
+		_, err := s.ValidateCode(ctx, request)
+		assert.Error(t, err)
+	})
+
+	t.Run("get_id_from_participant_err", func(t *testing.T) {
+		key := "15"
+		ctxUUID := "uuid-1"
+		request := &community.ValidateCodeIn{Login: "test1", Code: 15}
+		expectedErr := errors.New("get id error")
+
+		mockRedisRepo.EXPECT().
+			GetByKey(ctx, gomock.Any()).
+			Return(key, nil).
+			Times(1)
+		mockRepo.EXPECT().
+			GetIdFromParticipant(ctx, ctxUUID).
+			Return(int64(0), expectedErr).
+			Times(1)
+
+		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil)
+		_, err := s.ValidateCode(ctx, request)
+		assert.Error(t, err)
+	})
+
+	t.Run("insert_link_edu_err", func(t *testing.T) {
+		key := "15"
+		ctxUUID := "uuid-1"
+		var id int64 = 15
+		request := &community.ValidateCodeIn{Login: "test1", Code: 15}
+		expectedErr := errors.New("insert error")
+
+		mockRedisRepo.EXPECT().
+			GetByKey(ctx, gomock.Any()).
+			Return(key, nil).
+			Times(1)
+		mockRepo.EXPECT().
+			GetIdFromParticipant(ctx, ctxUUID).
+			Return(id, nil).
+			Times(1)
+		mockRepo.EXPECT().
+			InsertLinkEdu(ctx, id, ctxUUID).
+			Return(expectedErr).
 			Times(1)
 
 		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil)

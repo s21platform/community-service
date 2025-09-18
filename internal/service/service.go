@@ -2,12 +2,8 @@ package service
 
 import (
 	"context"
-	"database/sql"
-	"errors"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/types/known/emptypb"
-	"log"
 	"strconv"
 
 	logger_lib "github.com/s21platform/logger-lib"
@@ -33,22 +29,6 @@ func New(dbR DbRepo, env string, rR RedisRepo, notCl NotificationS, cfg *config.
 	}
 }
 
-func (s *Service) IsUserStaff(ctx context.Context, in *community.LoginIn) (*community.IsUserStaffOut, error) {
-	_, err := s.dbR.GetStaffId(ctx, in.Login)
-	if err != nil {
-		if !errors.Is(err, sql.ErrNoRows) {
-			logger_lib.Error(logger_lib.WithError(ctx, err), "cannot check is user staff")
-			return nil, status.Errorf(codes.Internal, "cannot check is user staff, err: %v", err)
-		}
-
-		if errors.Is(err, sql.ErrNoRows) {
-			return &community.IsUserStaffOut{IsStaff: false}, nil
-		}
-	}
-
-	return &community.IsUserStaffOut{IsStaff: true}, nil
-}
-
 func (s *Service) GetPeerSchoolData(ctx context.Context, in *community.GetSchoolDataIn) (*community.GetSchoolDataOut, error) {
 	schoolData, err := s.dbR.GetPeerSchoolData(ctx, in.NickName)
 	if err != nil {
@@ -56,20 +36,6 @@ func (s *Service) GetPeerSchoolData(ctx context.Context, in *community.GetSchool
 		return nil, status.Errorf(codes.Internal, "cannot get peer school data, err: %s", err)
 	}
 	return &community.GetSchoolDataOut{ClassName: schoolData.ClassName, ParallelName: schoolData.ParallelName}, nil
-}
-
-func (s *Service) SearchPeers(ctx context.Context, in *community.SearchPeersIn) (*community.SearchPeersOut, error) {
-	log.Println("Input SearchPeers: ", in)
-	res, err := s.dbR.SearchPeersBySubstring(ctx, in.Substring)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "search peer error: %s", err)
-	}
-	return &community.SearchPeersOut{SearchPeers: res}, nil
-}
-
-func (s *Service) RunLoginsWorkerManually(ctx context.Context, _ *emptypb.Empty) (*emptypb.Empty, error) {
-	s.rR.Delete(ctx, config.KeyLoginsLastUpdated)
-	return &emptypb.Empty{}, nil
 }
 
 func (s *Service) GetStudentData(ctx context.Context, in *community.GetStudentDataIn) (*community.GetStudentDataOut, error) {
