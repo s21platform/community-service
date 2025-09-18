@@ -5,8 +5,6 @@
 
 - [api/community.proto](#api_community-proto)
     - [Badge](#-Badge)
-    - [EmailIn](#-EmailIn)
-    - [EmailOut](#-EmailOut)
     - [GetSchoolDataIn](#-GetSchoolDataIn)
     - [GetSchoolDataOut](#-GetSchoolDataOut)
     - [GetStudentDataIn](#-GetStudentDataIn)
@@ -17,7 +15,6 @@
     - [SearchPeer](#-SearchPeer)
     - [SearchPeersIn](#-SearchPeersIn)
     - [SearchPeersOut](#-SearchPeersOut)
-    - [SendEduLinkingCodeIn](#-SendEduLinkingCodeIn)
     - [Skill](#-Skill)
     - [ValidateCodeIn](#-ValidateCodeIn)
     - [ValidateCodeOut](#-ValidateCodeOut)
@@ -46,36 +43,6 @@
 | name | [string](#string) |  | Наименование достижеиня |
 | icon_url | [string](#string) |  | Ссылка на иконку |
 | receipt_date_time | [string](#string) |  | Дата получения |
-
-
-
-
-
-
-<a name="-EmailIn"></a>
-
-### EmailIn
-Data for searching for matches in peers&#39; info
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| email | [string](#string) |  | User&#39;s E-mail address |
-
-
-
-
-
-
-<a name="-EmailOut"></a>
-
-### EmailOut
-Response with found match
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| isExist | [bool](#bool) |  |  |
 
 
 
@@ -254,21 +221,6 @@ Response with found match
 
 
 
-<a name="-SendEduLinkingCodeIn"></a>
-
-### SendEduLinkingCodeIn
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| login | [string](#string) |  |  |
-
-
-
-
-
-
 <a name="-Skill"></a>
 
 ### Skill
@@ -329,12 +281,10 @@ Service with peers&#39; info from edu platform
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| IsPeerExist | [.EmailIn](#EmailIn) | [.EmailOut](#EmailOut) | Method for checking that the user is a school 21&#39;s student |
 | SearchPeers | [.SearchPeersIn](#SearchPeersIn) | [.SearchPeersOut](#SearchPeersOut) |  |
 | GetPeerSchoolData | [.GetSchoolDataIn](#GetSchoolDataIn) | [.GetSchoolDataOut](#GetSchoolDataOut) |  |
 | isUserStaff | [.LoginIn](#LoginIn) | [.IsUserStaffOut](#IsUserStaffOut) |  |
 | RunLoginsWorkerManually | [.google.protobuf.Empty](#google-protobuf-Empty) | [.google.protobuf.Empty](#google-protobuf-Empty) |  |
-| SendEduLinkingCode | [.SendEduLinkingCodeIn](#SendEduLinkingCodeIn) | [.google.protobuf.Empty](#google-protobuf-Empty) |  |
 | GetStudentData | [.GetStudentDataIn](#GetStudentDataIn) | [.GetStudentDataOut](#GetStudentDataOut) | Ручка получения данных школьников |
 | ValidateCode | [.ValidateCodeIn](#ValidateCodeIn) | [.ValidateCodeOut](#ValidateCodeOut) | Ручка подтверждения кода |
 
