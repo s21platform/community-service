@@ -7,13 +7,10 @@ import "google/protobuf/timestamp.proto";
 
 // Service with peers' info from edu platform
 service CommunityService {
-  // Method for checking that the user is a school 21's student
-  rpc IsPeerExist (EmailIn) returns (EmailOut);
   rpc SearchPeers (SearchPeersIn) returns (SearchPeersOut){};
   rpc GetPeerSchoolData(GetSchoolDataIn) returns (GetSchoolDataOut){};
   rpc isUserStaff(LoginIn) returns (IsUserStaffOut){};
   rpc RunLoginsWorkerManually(google.protobuf.Empty) returns (google.protobuf.Empty){};
-  rpc SendEduLinkingCode(SendEduLinkingCodeIn) returns (google.protobuf.Empty){};
   // Ручка получения данных школьников
   rpc GetStudentData(GetStudentDataIn) returns (GetStudentDataOut){};
   // Ручка подтверждения кода
@@ -37,17 +34,6 @@ message GetSchoolDataOut {
   string parallelName = 2;
 }
 
-// Data for searching for matches in peers' info
-message EmailIn {
-  // User's E-mail address
-  string email = 1;
-}
-
-// Response with found match
-message EmailOut {
-  bool isExist = 1;
-}
-
 message SearchPeersIn {
   string substring = 1;
   int64 limit = 2;
@@ -60,10 +46,6 @@ message SearchPeer {
 
 message SearchPeersOut {
   repeated SearchPeer searchPeers = 1;
-}
-
-message SendEduLinkingCodeIn {
-  string login = 1;
 }
 
 message ParticipantChangeEvent {

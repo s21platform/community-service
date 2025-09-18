@@ -9,11 +9,11 @@ import (
 	"sync"
 	"time"
 
-	logger_lib "github.com/s21platform/logger-lib"
-	"github.com/s21platform/metrics-lib/pkg"
 	"github.com/s21platform/community-service/internal/config"
 	"github.com/s21platform/community-service/internal/model"
 	"github.com/s21platform/community-service/pkg/community"
+	logger_lib "github.com/s21platform/logger-lib"
+	"github.com/s21platform/metrics-lib/pkg"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -45,33 +45,30 @@ func New(school SchoolC, dbR DbRepo, rR RedisRepo, lcP LevelChangeProducer, elcP
 func (s *Worker) RunParticipantWorker(ctx context.Context, wg *sync.WaitGroup) {
 	defer wg.Done()
 
-	logger := logger_lib.FromContext(ctx, config.KeyLogger)
-	logger.AddFuncName("ParticipantDataWorker")
 	ticker := time.NewTicker(time.Second * 5)
 	defer ticker.Stop()
 
 	for {
 		select {
 		case <-ctx.Done():
-			logger.Info("participant uploading worker shutting down")
+			logger_lib.Info(ctx, "participant uploading worker shutting down")
 			return
 
 		case <-ticker.C:
 			lastUpdate, err := s.rR.GetByKey(ctx, config.KeyParticipantDataLastUpdated)
 			if err != nil {
-				fmt.Println("failed to get last update time")
-				logger.Error(fmt.Sprintf("failed to get last update time, err: %v", err))
+				logger_lib.Error(logger_lib.WithError(ctx, err), "failed to get last update time")
 			}
 			if lastUpdate == "" {
 				err := s.uploadDataParticipant(ctx)
 				if err != nil {
-					logger.Error(fmt.Sprintf("failed to upload participants, err: %v", err))
+					logger_lib.Error(logger_lib.WithError(ctx, err), "failed to upload data participant")
 				}
 
 				//по сути мы тут указываем через сколько запустить следующий цикл опроса. 5 часов много, поставил 10 минут передышки
 				err = s.rR.Set(ctx, config.KeyParticipantDataLastUpdated, "upd", 10*time.Minute)
 				if err != nil {
-					logger.Error(fmt.Sprintf("failed to save participant last updated, err: %v", err))
+					logger_lib.Error(logger_lib.WithError(ctx, err), "failed to set last update time")
 				}
 			}
 		}
@@ -81,7 +78,7 @@ func (s *Worker) RunParticipantWorker(ctx context.Context, wg *sync.WaitGroup) {
 func (s *Worker) uploadDataParticipant(ctx context.Context) error {
 	var offset int64
 	mtx := pkg.FromContext(ctx, config.KeyMetrics)
-	logger := logger_lib.FromContext(ctx, config.KeyLogger)
+
 	for {
 		logins, err := s.dbR.GetParticipantsLogin(ctx, limit, offset)
 		if err != nil {
@@ -94,12 +91,13 @@ func (s *Worker) uploadDataParticipant(ctx context.Context) error {
 		}
 
 		for _, login := range logins {
+			ctx = logger_lib.WithField(ctx, "login", login)
 			exists := true
 			participant, err := s.dbR.ParticipantData(ctx, login)
 			if err != nil {
 				if !errors.Is(err, sql.ErrNoRows) {
 					mtx.Increment("update_participant_data.error_get_participant")
-					logger.Error(fmt.Sprintf("failed to check participant existance: %v", err))
+					logger_lib.Error(logger_lib.WithError(ctx, err), "failed to get participant")
 					continue
 				}
 				exists = false
@@ -118,7 +116,7 @@ func (s *Worker) uploadDataParticipant(ctx context.Context) error {
 				} else {
 					mtx.Increment("update_participant_data.unknown_error")
 				}
-				logger.Error(fmt.Sprintf("failed to get participant data for login %s, err: %v", login, err))
+				logger_lib.Error(logger_lib.WithError(ctx, err), "failed to get participant")
 				continue
 			}
 			if participantData == nil {
@@ -128,7 +126,7 @@ func (s *Worker) uploadDataParticipant(ctx context.Context) error {
 			campus, err := s.dbR.GetCampusByUUID(ctx, participantData.CampusUUID)
 			if err != nil {
 				mtx.Increment("update_participant_data.error_get_campus")
-				logger.Error(fmt.Sprintf("failed to get participant campus: %v", err))
+				logger_lib.Error(logger_lib.WithError(ctx, err), "failed to get campus")
 				continue
 			}
 			participantData.TribeID = 1
@@ -139,7 +137,7 @@ func (s *Worker) uploadDataParticipant(ctx context.Context) error {
 			}
 			if err != nil {
 				mtx.Increment("update_participant_data.not_save")
-				logger.Error(fmt.Sprintf("failed to save participant data for login %s, err: %v", login, err))
+				logger_lib.Error(logger_lib.WithError(ctx, err), "failed to save participant")
 				continue
 			}
 			if participant.Level != participantData.Level {
@@ -150,7 +148,7 @@ func (s *Worker) uploadDataParticipant(ctx context.Context) error {
 					At:       timestamppb.Now(),
 				}
 				if err := s.lcP.ProduceMessage(ctx, event, login); err != nil {
-					logger.Error(fmt.Sprintf("failed to produce level change event for %s: %v", login, err))
+					logger_lib.Error(logger_lib.WithError(ctx, err), "failed to produce level changed message")
 				}
 			}
 
@@ -162,7 +160,7 @@ func (s *Worker) uploadDataParticipant(ctx context.Context) error {
 					At:       timestamppb.Now(),
 				}
 				if err := s.elcP.ProduceMessage(ctx, event, login); err != nil {
-					logger.Error(fmt.Sprintf("failed to produce exp level change event for %s: %v", login, err))
+					logger_lib.Error(logger_lib.WithError(ctx, err), "failed to produce exp level changed message")
 				}
 			}
 
@@ -174,7 +172,7 @@ func (s *Worker) uploadDataParticipant(ctx context.Context) error {
 					At:       timestamppb.Now(),
 				}
 				if err := s.scP.ProduceMessage(ctx, event, login); err != nil {
-					logger.Error(fmt.Sprintf("failed to produce status change event for %s: %v", login, err))
+					logger_lib.Error(logger_lib.WithError(ctx, err), "failed to produce status change message")
 				}
 			}
 

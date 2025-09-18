@@ -24,7 +24,7 @@ func main() {
 	defer cancel()
 
 	logger := logger_lib.New(cfg.Logger.Host, cfg.Logger.Port, cfg.Service.Name, cfg.Platform.Env)
-	ctx = context.WithValue(ctx, config.KeyLogger, logger)
+	ctx = logger_lib.NewContext(ctx, logger)
 
 	metrics, err := pkg.NewMetrics(cfg.Metrics.Host, cfg.Metrics.Port, cfg.Service.Name, cfg.Platform.Env)
 	if err != nil {
