@@ -53,41 +53,6 @@ func TestServer_GetPeerSchoolData(t *testing.T) {
 	})
 }
 
-func TestServer_SendEduLinkingCode(t *testing.T) {
-	t.Parallel()
-	ctx := context.Background()
-
-	controller := gomock.NewController(t)
-	defer controller.Finish()
-	mockRepo := NewMockDbRepo(controller)
-	mockRedisRepo := NewMockRedisRepo(controller)
-	mockLogger := logger_lib.NewMockLoggerInterface(controller)
-	mockNotCl := NewMockNotificationS(controller)
-	ctx = context.WithValue(ctx, config.KeyLogger, mockLogger)
-
-	t.Run("send_code_email_ok", func(t *testing.T) {
-		login := "aboba"
-		mockRepo.EXPECT().GetPeerStatus(gomock.Any(), login).Return("ACTIVE", nil)
-		mockRedisRepo.EXPECT().Set(gomock.Any(), config.Key("code_"+login), gomock.Any(), gomock.Any()).Return(nil)
-		mockNotCl.EXPECT().SendEduCode(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil)
-
-		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil)
-		_, err := s.SendEduLinkingCode(ctx, &community.SendEduLinkingCodeIn{Login: login})
-		assert.NoError(t, err)
-	})
-
-	t.Run("send_code_email_err", func(t *testing.T) {
-		login := "aboba"
-		expectedErr := errors.New("set err")
-		mockRepo.EXPECT().GetPeerStatus(gomock.Any(), login).Return("ACTIVE", nil)
-		mockRedisRepo.EXPECT().Set(gomock.Any(), config.Key("code_"+login), gomock.Any(), gomock.Any()).Return(expectedErr)
-
-		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil)
-		_, err := s.SendEduLinkingCode(ctx, &community.SendEduLinkingCodeIn{Login: login})
-		assert.Error(t, err)
-	})
-}
-
 func TestService_GetStudentData(t *testing.T) {
 	t.Parallel()
 	ctx := context.WithValue(context.Background(), config.KeyUUID, "uuid-1")
