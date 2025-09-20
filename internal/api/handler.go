@@ -2,14 +2,16 @@ package api
 
 import (
 	"encoding/json"
-	"github.com/s21platform/community-service/internal/config"
-	apigen "github.com/s21platform/community-service/internal/generated"
-	logger_lib "github.com/s21platform/logger-lib"
-	"io"
+	"github.com/s21platform/community-service/internal/model"
 	"math/rand"
 	"net/http"
 	"strconv"
 	"time"
+
+	logger_lib "github.com/s21platform/logger-lib"
+
+	"github.com/s21platform/community-service/internal/config"
+	apigen "github.com/s21platform/community-service/internal/generated"
 )
 
 type Handler struct {
@@ -28,20 +30,14 @@ func New(dbR DbRepo, rR RedisRepo, nC NotificationClient) *Handler {
 
 func (h *Handler) SendLinkingCode(w http.ResponseWriter, r *http.Request, params apigen.SendLinkingCodeParams) {
 	ctx := logger_lib.WithUserUuid(r.Context(), params.XUserUuid)
-	bodyByte, err := io.ReadAll(r.Body)
-	if err != nil {
-		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to read request body")
+
+	var body apigen.SendLinkingCodeData
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to decode request body")
 		resolveError(&w, http.StatusInternalServerError)
 		return
 	}
 
-	var body apigen.SendLinkingCodeData
-	err = json.Unmarshal(bodyByte, &body)
-	if err != nil {
-		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to unmarshal body")
-		resolveError(&w, http.StatusInternalServerError)
-		return
-	}
 	ctx = logger_lib.WithField(ctx, "login", body.Login)
 
 	peerStatus, err := h.dbR.GetPeerStatus(ctx, body.Login)
@@ -52,8 +48,8 @@ func (h *Handler) SendLinkingCode(w http.ResponseWriter, r *http.Request, params
 	}
 	ctx = logger_lib.WithField(ctx, "perr_status", peerStatus)
 
-	if peerStatus != "ACTIVE" {
-		logger_lib.Info(ctx, "peer have not active status")
+	if peerStatus != model.ParticipantStatusActive {
+		logger_lib.Info(ctx, "peer have inactive status")
 		resolveError(&w, http.StatusInternalServerError)
 		return
 	}

@@ -11,9 +11,11 @@ import (
 	"time"
 
 	"github.com/golang/mock/gomock"
-	apigen "github.com/s21platform/community-service/internal/generated"
-	logger_lib "github.com/s21platform/logger-lib"
 	"github.com/stretchr/testify/assert"
+
+	logger_lib "github.com/s21platform/logger-lib"
+
+	apigen "github.com/s21platform/community-service/internal/generated"
 )
 
 func TestHandler_SendLinkingCode(t *testing.T) {

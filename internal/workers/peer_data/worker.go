@@ -9,13 +9,14 @@ import (
 	"sync"
 	"time"
 
-	"github.com/s21platform/community-service/internal/config"
-	"github.com/s21platform/community-service/internal/model"
-	"github.com/s21platform/community-service/pkg/community"
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	logger_lib "github.com/s21platform/logger-lib"
 	"github.com/s21platform/metrics-lib/pkg"
 
-	"google.golang.org/protobuf/types/known/timestamppb"
+	"github.com/s21platform/community-service/internal/config"
+	"github.com/s21platform/community-service/internal/model"
+	"github.com/s21platform/community-service/pkg/community"
 )
 
 const (

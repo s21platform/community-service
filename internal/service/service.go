@@ -32,8 +32,8 @@ func New(dbR DbRepo, env string, rR RedisRepo, notCl NotificationS, cfg *config.
 func (s *Service) GetPeerSchoolData(ctx context.Context, in *community.GetSchoolDataIn) (*community.GetSchoolDataOut, error) {
 	schoolData, err := s.dbR.GetPeerSchoolData(ctx, in.NickName)
 	if err != nil {
-		logger_lib.Error(logger_lib.WithError(ctx, err), "cannot get school data")
-		return nil, status.Errorf(codes.Internal, "cannot get peer school data, err: %s", err)
+		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to get school data")
+		return nil, status.Errorf(codes.Internal, "failed to get peer school data, err: %s", err)
 	}
 	return &community.GetSchoolDataOut{ClassName: schoolData.ClassName, ParallelName: schoolData.ParallelName}, nil
 }

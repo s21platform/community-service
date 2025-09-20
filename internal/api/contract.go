@@ -3,8 +3,9 @@ package api
 
 import (
 	"context"
-	"github.com/s21platform/community-service/internal/config"
 	"time"
+
+	"github.com/s21platform/community-service/internal/config"
 )
 
 type DbRepo interface {

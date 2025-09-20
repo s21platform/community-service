@@ -4,22 +4,23 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/go-chi/chi/v5"
-	"github.com/s21platform/community-service/internal/api"
-	apigen "github.com/s21platform/community-service/internal/generated"
-	"github.com/soheilhy/cmux"
-	"golang.org/x/sync/errgroup"
 	"log"
 	"net"
 	"net/http"
+	"os"
 
+	"github.com/go-chi/chi/v5"
+	"github.com/soheilhy/cmux"
+	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc"
 
 	logger_lib "github.com/s21platform/logger-lib"
 	"github.com/s21platform/metrics-lib/pkg"
 
+	"github.com/s21platform/community-service/internal/api"
 	"github.com/s21platform/community-service/internal/client/notification"
 	"github.com/s21platform/community-service/internal/config"
+	apigen "github.com/s21platform/community-service/internal/generated"
 	"github.com/s21platform/community-service/internal/infra"
 	"github.com/s21platform/community-service/internal/repository/postgres"
 	"github.com/s21platform/community-service/internal/repository/redis"
@@ -68,8 +69,8 @@ func main() {
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", cfg.Service.Port))
 	if err != nil {
-		logger_lib.Error(ctx, fmt.Sprintf("cannnot listen port; error: %s", err))
-		log.Fatalf("Cannnot listen port: %s; Error: %s", cfg.Service.Port, err)
+		logger_lib.Error(ctx, fmt.Sprintf("failed to listen port; error: %s", err))
+		os.Exit(1)
 	}
 
 	m := cmux.New(lis)
@@ -104,6 +105,6 @@ func main() {
 
 	if err := g.Wait(); err != nil {
 		logger_lib.Error(ctx, fmt.Sprintf("server error: %v", err))
-		log.Fatalf("Server error: %v", err)
+		os.Exit(1)
 	}
 }
