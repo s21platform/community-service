@@ -12,8 +12,6 @@
     - [ParticipantChangeEvent](#-ParticipantChangeEvent)
     - [SearchPeer](#-SearchPeer)
     - [Skill](#-Skill)
-    - [ValidateCodeIn](#-ValidateCodeIn)
-    - [ValidateCodeOut](#-ValidateCodeOut)
   
     - [CommunityService](#-CommunityService)
   
@@ -170,37 +168,6 @@
 
 
 
-
-<a name="-ValidateCodeIn"></a>
-
-### ValidateCodeIn
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| login | [string](#string) |  | Логин |
-| code | [int64](#int64) |  | Код |
-
-
-
-
-
-
-<a name="-ValidateCodeOut"></a>
-
-### ValidateCodeOut
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| message | [string](#string) |  | Сообщение |
-
-
-
-
-
  
 
  
@@ -217,7 +184,6 @@ Service with peers&#39; info from edu platform
 | ----------- | ------------ | ------------- | ------------|
 | GetPeerSchoolData | [.GetSchoolDataIn](#GetSchoolDataIn) | [.GetSchoolDataOut](#GetSchoolDataOut) |  |
 | GetStudentData | [.GetStudentDataIn](#GetStudentDataIn) | [.GetStudentDataOut](#GetStudentDataOut) | Ручка получения данных школьников |
-| ValidateCode | [.ValidateCodeIn](#ValidateCodeIn) | [.ValidateCodeOut](#ValidateCodeOut) | Ручка подтверждения кода |
 
  
 

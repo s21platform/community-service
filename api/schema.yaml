@@ -37,6 +37,39 @@ paths:
           $ref: '#/components/responses/Forbidden'
         500:
           $ref: '#/components/responses/InternalError'
+  /api/community/validate_linking_code:
+    post:
+      summary: Ручка для подтверждения линковки к School 21
+      operationId: ValidateLinkingCode
+      parameters:
+        - name: X-User-Uuid
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ValidateLinkingCodeData'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        500:
+          $ref: '#/components/responses/InternalError'
 
 
 components:
@@ -48,6 +81,16 @@ components:
       properties:
         login:
           type: string
+    ValidateLinkingCodeData:
+      type: object
+      required:
+        - login
+        - code
+      properties:
+        login:
+          type: string
+        code:
+          type: integer
     Error:
       type: object
       properties:

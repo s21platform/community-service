@@ -641,105 +641,6 @@ func (x *GetStudentDataOut) GetBadges() []*Badge {
 	return nil
 }
 
-type ValidateCodeIn struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Логин
-	Login string `protobuf:"bytes,1,opt,name=login,proto3" json:"login,omitempty"`
-	// Код
-	Code          int64 `protobuf:"varint,2,opt,name=code,proto3" json:"code,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ValidateCodeIn) Reset() {
-	*x = ValidateCodeIn{}
-	mi := &file_api_community_proto_msgTypes[8]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ValidateCodeIn) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ValidateCodeIn) ProtoMessage() {}
-
-func (x *ValidateCodeIn) ProtoReflect() protoreflect.Message {
-	mi := &file_api_community_proto_msgTypes[8]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ValidateCodeIn.ProtoReflect.Descriptor instead.
-func (*ValidateCodeIn) Descriptor() ([]byte, []int) {
-	return file_api_community_proto_rawDescGZIP(), []int{8}
-}
-
-func (x *ValidateCodeIn) GetLogin() string {
-	if x != nil {
-		return x.Login
-	}
-	return ""
-}
-
-func (x *ValidateCodeIn) GetCode() int64 {
-	if x != nil {
-		return x.Code
-	}
-	return 0
-}
-
-type ValidateCodeOut struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Сообщение
-	Message       string `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ValidateCodeOut) Reset() {
-	*x = ValidateCodeOut{}
-	mi := &file_api_community_proto_msgTypes[9]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ValidateCodeOut) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ValidateCodeOut) ProtoMessage() {}
-
-func (x *ValidateCodeOut) ProtoReflect() protoreflect.Message {
-	mi := &file_api_community_proto_msgTypes[9]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ValidateCodeOut.ProtoReflect.Descriptor instead.
-func (*ValidateCodeOut) Descriptor() ([]byte, []int) {
-	return file_api_community_proto_rawDescGZIP(), []int{9}
-}
-
-func (x *ValidateCodeOut) GetMessage() string {
-	if x != nil {
-		return x.Message
-	}
-	return ""
-}
-
 var File_api_community_proto protoreflect.FileDescriptor
 
 const file_api_community_proto_rawDesc = "" +
@@ -788,16 +689,10 @@ const file_api_community_proto_rawDesc = "" +
 	"\x06skills\x18\f \x03(\v2\x06.SkillR\x06skills\x12\x10\n" +
 	"\x03prp\x18\r \x01(\x03R\x03prp\x12\x14\n" +
 	"\x05coins\x18\x0e \x01(\x03R\x05coins\x12\x1e\n" +
-	"\x06badges\x18\x0f \x03(\v2\x06.BadgeR\x06badges\":\n" +
-	"\x0eValidateCodeIn\x12\x14\n" +
-	"\x05login\x18\x01 \x01(\tR\x05login\x12\x12\n" +
-	"\x04code\x18\x02 \x01(\x03R\x04code\"+\n" +
-	"\x0fValidateCodeOut\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage2\xbe\x01\n" +
+	"\x06badges\x18\x0f \x03(\v2\x06.BadgeR\x06badges2\x89\x01\n" +
 	"\x10CommunityService\x12:\n" +
 	"\x11GetPeerSchoolData\x12\x10.GetSchoolDataIn\x1a\x11.GetSchoolDataOut\"\x00\x129\n" +
-	"\x0eGetStudentData\x12\x11.GetStudentDataIn\x1a\x12.GetStudentDataOut\"\x00\x123\n" +
-	"\fValidateCode\x12\x0f.ValidateCodeIn\x1a\x10.ValidateCodeOut\"\x00B\x0fZ\rpkg/communityb\x06proto3"
+	"\x0eGetStudentData\x12\x11.GetStudentDataIn\x1a\x12.GetStudentDataOut\"\x00B\x0fZ\rpkg/communityb\x06proto3"
 
 var (
 	file_api_community_proto_rawDescOnce sync.Once
@@ -811,7 +706,7 @@ func file_api_community_proto_rawDescGZIP() []byte {
 	return file_api_community_proto_rawDescData
 }
 
-var file_api_community_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_api_community_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_api_community_proto_goTypes = []any{
 	(*GetSchoolDataIn)(nil),        // 0: GetSchoolDataIn
 	(*GetSchoolDataOut)(nil),       // 1: GetSchoolDataOut
@@ -821,25 +716,21 @@ var file_api_community_proto_goTypes = []any{
 	(*Skill)(nil),                  // 5: Skill
 	(*Badge)(nil),                  // 6: Badge
 	(*GetStudentDataOut)(nil),      // 7: GetStudentDataOut
-	(*ValidateCodeIn)(nil),         // 8: ValidateCodeIn
-	(*ValidateCodeOut)(nil),        // 9: ValidateCodeOut
-	(*timestamppb.Timestamp)(nil),  // 10: google.protobuf.Timestamp
+	(*timestamppb.Timestamp)(nil),  // 8: google.protobuf.Timestamp
 }
 var file_api_community_proto_depIdxs = []int32{
-	10, // 0: ParticipantChangeEvent.at:type_name -> google.protobuf.Timestamp
-	5,  // 1: GetStudentDataOut.skills:type_name -> Skill
-	6,  // 2: GetStudentDataOut.badges:type_name -> Badge
-	0,  // 3: CommunityService.GetPeerSchoolData:input_type -> GetSchoolDataIn
-	4,  // 4: CommunityService.GetStudentData:input_type -> GetStudentDataIn
-	8,  // 5: CommunityService.ValidateCode:input_type -> ValidateCodeIn
-	1,  // 6: CommunityService.GetPeerSchoolData:output_type -> GetSchoolDataOut
-	7,  // 7: CommunityService.GetStudentData:output_type -> GetStudentDataOut
-	9,  // 8: CommunityService.ValidateCode:output_type -> ValidateCodeOut
-	6,  // [6:9] is the sub-list for method output_type
-	3,  // [3:6] is the sub-list for method input_type
-	3,  // [3:3] is the sub-list for extension type_name
-	3,  // [3:3] is the sub-list for extension extendee
-	0,  // [0:3] is the sub-list for field type_name
+	8, // 0: ParticipantChangeEvent.at:type_name -> google.protobuf.Timestamp
+	5, // 1: GetStudentDataOut.skills:type_name -> Skill
+	6, // 2: GetStudentDataOut.badges:type_name -> Badge
+	0, // 3: CommunityService.GetPeerSchoolData:input_type -> GetSchoolDataIn
+	4, // 4: CommunityService.GetStudentData:input_type -> GetStudentDataIn
+	1, // 5: CommunityService.GetPeerSchoolData:output_type -> GetSchoolDataOut
+	7, // 6: CommunityService.GetStudentData:output_type -> GetStudentDataOut
+	5, // [5:7] is the sub-list for method output_type
+	3, // [3:5] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_api_community_proto_init() }
@@ -859,7 +750,7 @@ func file_api_community_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_community_proto_rawDesc), len(file_api_community_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   10,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

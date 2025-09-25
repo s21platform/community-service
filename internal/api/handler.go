@@ -76,6 +76,51 @@ func (h *Handler) SendLinkingCode(w http.ResponseWriter, r *http.Request, params
 	w.WriteHeader(http.StatusOK)
 }
 
+func (h *Handler) ValidateLinkingCode(w http.ResponseWriter, r *http.Request, params apigen.ValidateLinkingCodeParams) {
+	ctx := logger_lib.WithUserUuid(r.Context(), params.XUserUuid)
+
+	var body apigen.ValidateLinkingCodeData
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to decode request body")
+		resolveError(&w, http.StatusInternalServerError)
+		return
+	}
+
+	code, err := h.rR.GetByKey(ctx, config.Key(body.Login))
+	if err != nil {
+		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to get user code")
+		resolveError(&w, http.StatusInternalServerError)
+		return
+	}
+	if code == "" {
+		resolveError(&w, http.StatusForbidden)
+		return
+	}
+	codeInt, err := strconv.Atoi(code)
+	if err != nil {
+		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to convert code to int")
+		resolveError(&w, http.StatusInternalServerError)
+		return
+	}
+	if codeInt != body.Code {
+		resolveError(&w, http.StatusForbidden)
+		return
+	}
+	id, err := h.dbR.GetIdFromParticipant(ctx, params.XUserUuid)
+	if err != nil {
+		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to get user id")
+		resolveError(&w, http.StatusInternalServerError)
+		return
+	}
+	err = h.dbR.InsertLinkEdu(ctx, id, params.XUserUuid)
+	if err != nil {
+		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to insert link")
+		resolveError(&w, http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+}
+
 func resolveError(w *http.ResponseWriter, status int) {
 	var message string
 	switch status {

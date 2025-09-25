@@ -16,6 +16,9 @@ type ServerInterface interface {
 	// Ручка для отправки кода линковки к School 21
 	// (POST /api/community/send_linking_code)
 	SendLinkingCode(w http.ResponseWriter, r *http.Request, params SendLinkingCodeParams)
+	// Ручка для подтверждения линковки к School 21
+	// (POST /api/community/validate_linking_code)
+	ValidateLinkingCode(w http.ResponseWriter, r *http.Request, params ValidateLinkingCodeParams)
 }
 
 // Unimplemented server implementation that returns http.StatusNotImplemented for each endpoint.
@@ -25,6 +28,12 @@ type Unimplemented struct{}
 // Ручка для отправки кода линковки к School 21
 // (POST /api/community/send_linking_code)
 func (_ Unimplemented) SendLinkingCode(w http.ResponseWriter, r *http.Request, params SendLinkingCodeParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Ручка для подтверждения линковки к School 21
+// (POST /api/community/validate_linking_code)
+func (_ Unimplemented) ValidateLinkingCode(w http.ResponseWriter, r *http.Request, params ValidateLinkingCodeParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -73,6 +82,51 @@ func (siw *ServerInterfaceWrapper) SendLinkingCode(w http.ResponseWriter, r *htt
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.SendLinkingCode(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// ValidateLinkingCode operation middleware
+func (siw *ServerInterfaceWrapper) ValidateLinkingCode(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ValidateLinkingCodeParams
+
+	headers := r.Header
+
+	// ------------- Required header parameter "X-User-Uuid" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-User-Uuid")]; found {
+		var XUserUuid string
+		n := len(valueList)
+		if n != 1 {
+			siw.ErrorHandlerFunc(w, r, &TooManyValuesForParamError{ParamName: "X-User-Uuid", Count: n})
+			return
+		}
+
+		err = runtime.BindStyledParameterWithLocation("simple", false, "X-User-Uuid", runtime.ParamLocationHeader, valueList[0], &XUserUuid)
+		if err != nil {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "X-User-Uuid", Err: err})
+			return
+		}
+
+		params.XUserUuid = XUserUuid
+
+	} else {
+		err := fmt.Errorf("Header parameter X-User-Uuid is required, but not found")
+		siw.ErrorHandlerFunc(w, r, &RequiredHeaderError{ParamName: "X-User-Uuid", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ValidateLinkingCode(w, r, params)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -197,6 +251,9 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 
 	r.Group(func(r chi.Router) {
 		r.Post(options.BaseURL+"/api/community/send_linking_code", wrapper.SendLinkingCode)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/api/community/validate_linking_code", wrapper.ValidateLinkingCode)
 	})
 
 	return r

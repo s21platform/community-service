@@ -13,6 +13,12 @@ type SendLinkingCodeData struct {
 	Login string `json:"login"`
 }
 
+// ValidateLinkingCodeData defines model for ValidateLinkingCodeData.
+type ValidateLinkingCodeData struct {
+	Code  int    `json:"code"`
+	Login string `json:"login"`
+}
+
 // BadRequest defines model for BadRequest.
 type BadRequest = Error
 
@@ -30,5 +36,13 @@ type SendLinkingCodeParams struct {
 	XUserUuid string `json:"X-User-Uuid"`
 }
 
+// ValidateLinkingCodeParams defines parameters for ValidateLinkingCode.
+type ValidateLinkingCodeParams struct {
+	XUserUuid string `json:"X-User-Uuid"`
+}
+
 // SendLinkingCodeJSONRequestBody defines body for SendLinkingCode for application/json ContentType.
 type SendLinkingCodeJSONRequestBody = SendLinkingCodeData
+
+// ValidateLinkingCodeJSONRequestBody defines body for ValidateLinkingCode for application/json ContentType.
+type ValidateLinkingCodeJSONRequestBody = ValidateLinkingCodeData

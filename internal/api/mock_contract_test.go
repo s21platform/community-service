@@ -36,6 +36,21 @@ func (m *MockDbRepo) EXPECT() *MockDbRepoMockRecorder {
 	return m.recorder
 }
 
+// GetIdFromParticipant mocks base method.
+func (m *MockDbRepo) GetIdFromParticipant(ctx context.Context, login string) (int64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetIdFromParticipant", ctx, login)
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetIdFromParticipant indicates an expected call of GetIdFromParticipant.
+func (mr *MockDbRepoMockRecorder) GetIdFromParticipant(ctx, login interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetIdFromParticipant", reflect.TypeOf((*MockDbRepo)(nil).GetIdFromParticipant), ctx, login)
+}
+
 // GetPeerStatus mocks base method.
 func (m *MockDbRepo) GetPeerStatus(ctx context.Context, login string) (string, error) {
 	m.ctrl.T.Helper()
@@ -49,6 +64,20 @@ func (m *MockDbRepo) GetPeerStatus(ctx context.Context, login string) (string, e
 func (mr *MockDbRepoMockRecorder) GetPeerStatus(ctx, login interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPeerStatus", reflect.TypeOf((*MockDbRepo)(nil).GetPeerStatus), ctx, login)
+}
+
+// InsertLinkEdu mocks base method.
+func (m *MockDbRepo) InsertLinkEdu(ctx context.Context, id int64, uuid string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "InsertLinkEdu", ctx, id, uuid)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// InsertLinkEdu indicates an expected call of InsertLinkEdu.
+func (mr *MockDbRepoMockRecorder) InsertLinkEdu(ctx, id, uuid interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertLinkEdu", reflect.TypeOf((*MockDbRepo)(nil).InsertLinkEdu), ctx, id, uuid)
 }
 
 // MockRedisRepo is a mock of RedisRepo interface.
@@ -72,6 +101,21 @@ func NewMockRedisRepo(ctrl *gomock.Controller) *MockRedisRepo {
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockRedisRepo) EXPECT() *MockRedisRepoMockRecorder {
 	return m.recorder
+}
+
+// GetByKey mocks base method.
+func (m *MockRedisRepo) GetByKey(ctx context.Context, key config.Key) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetByKey", ctx, key)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetByKey indicates an expected call of GetByKey.
+func (mr *MockRedisRepoMockRecorder) GetByKey(ctx, key interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByKey", reflect.TypeOf((*MockRedisRepo)(nil).GetByKey), ctx, key)
 }
 
 // Set mocks base method.

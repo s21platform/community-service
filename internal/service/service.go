@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"strconv"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -96,39 +95,4 @@ func (s *Service) GetStudentData(ctx context.Context, in *community.GetStudentDa
 	}
 
 	return out, nil
-}
-
-func (s *Service) ValidateCode(ctx context.Context, in *community.ValidateCodeIn) (*community.ValidateCodeOut, error) {
-	uuid, ok := ctx.Value(config.KeyUUID).(string)
-	if !ok {
-		logger_lib.Error(ctx, "failed to not found UUID in context")
-		return &community.ValidateCodeOut{Message: ""}, status.Error(codes.Internal, "failed to not found UUID in context")
-	}
-	code, err := s.rR.GetByKey(ctx, config.Key(in.Login))
-	if err != nil {
-		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to get user code")
-		return &community.ValidateCodeOut{Message: ""}, status.Errorf(codes.Internal, "failed to get by key: %v", err)
-	}
-	if code == "" {
-		return &community.ValidateCodeOut{Message: "Код не найден"}, nil
-	}
-	codeInt, err := strconv.Atoi(code)
-	if err != nil {
-		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to convert code to int")
-		return &community.ValidateCodeOut{Message: ""}, status.Errorf(codes.Internal, "failed to convert code: %v", err)
-	}
-	if int64(codeInt) != in.Code {
-		return &community.ValidateCodeOut{Message: "Не совпадает код"}, nil
-	}
-	id, err := s.dbR.GetIdFromParticipant(ctx, uuid)
-	if err != nil {
-		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to get user id")
-		return &community.ValidateCodeOut{Message: ""}, status.Errorf(codes.NotFound, "failed to get user id, err: %v", err)
-	}
-	err = s.dbR.InsertLinkEdu(ctx, id, uuid)
-	if err != nil {
-		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to insert link")
-		return &community.ValidateCodeOut{Message: ""}, status.Errorf(codes.NotFound, "failed to insert link edu, err: %v", err)
-	}
-	return nil, nil
 }

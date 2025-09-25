@@ -21,7 +21,6 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	CommunityService_GetPeerSchoolData_FullMethodName = "/CommunityService/GetPeerSchoolData"
 	CommunityService_GetStudentData_FullMethodName    = "/CommunityService/GetStudentData"
-	CommunityService_ValidateCode_FullMethodName      = "/CommunityService/ValidateCode"
 )
 
 // CommunityServiceClient is the client API for CommunityService service.
@@ -33,8 +32,6 @@ type CommunityServiceClient interface {
 	GetPeerSchoolData(ctx context.Context, in *GetSchoolDataIn, opts ...grpc.CallOption) (*GetSchoolDataOut, error)
 	// Ручка получения данных школьников
 	GetStudentData(ctx context.Context, in *GetStudentDataIn, opts ...grpc.CallOption) (*GetStudentDataOut, error)
-	// Ручка подтверждения кода
-	ValidateCode(ctx context.Context, in *ValidateCodeIn, opts ...grpc.CallOption) (*ValidateCodeOut, error)
 }
 
 type communityServiceClient struct {
@@ -65,16 +62,6 @@ func (c *communityServiceClient) GetStudentData(ctx context.Context, in *GetStud
 	return out, nil
 }
 
-func (c *communityServiceClient) ValidateCode(ctx context.Context, in *ValidateCodeIn, opts ...grpc.CallOption) (*ValidateCodeOut, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ValidateCodeOut)
-	err := c.cc.Invoke(ctx, CommunityService_ValidateCode_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // CommunityServiceServer is the server API for CommunityService service.
 // All implementations must embed UnimplementedCommunityServiceServer
 // for forward compatibility.
@@ -84,8 +71,6 @@ type CommunityServiceServer interface {
 	GetPeerSchoolData(context.Context, *GetSchoolDataIn) (*GetSchoolDataOut, error)
 	// Ручка получения данных школьников
 	GetStudentData(context.Context, *GetStudentDataIn) (*GetStudentDataOut, error)
-	// Ручка подтверждения кода
-	ValidateCode(context.Context, *ValidateCodeIn) (*ValidateCodeOut, error)
 	mustEmbedUnimplementedCommunityServiceServer()
 }
 
@@ -101,9 +86,6 @@ func (UnimplementedCommunityServiceServer) GetPeerSchoolData(context.Context, *G
 }
 func (UnimplementedCommunityServiceServer) GetStudentData(context.Context, *GetStudentDataIn) (*GetStudentDataOut, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetStudentData not implemented")
-}
-func (UnimplementedCommunityServiceServer) ValidateCode(context.Context, *ValidateCodeIn) (*ValidateCodeOut, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ValidateCode not implemented")
 }
 func (UnimplementedCommunityServiceServer) mustEmbedUnimplementedCommunityServiceServer() {}
 func (UnimplementedCommunityServiceServer) testEmbeddedByValue()                          {}
@@ -162,24 +144,6 @@ func _CommunityService_GetStudentData_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CommunityService_ValidateCode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ValidateCodeIn)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(CommunityServiceServer).ValidateCode(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: CommunityService_ValidateCode_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CommunityServiceServer).ValidateCode(ctx, req.(*ValidateCodeIn))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // CommunityService_ServiceDesc is the grpc.ServiceDesc for CommunityService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -194,10 +158,6 @@ var CommunityService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetStudentData",
 			Handler:    _CommunityService_GetStudentData_Handler,
-		},
-		{
-			MethodName: "ValidateCode",
-			Handler:    _CommunityService_ValidateCode_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
