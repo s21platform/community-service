@@ -2,11 +2,12 @@ package api
 
 import (
 	"encoding/json"
-	"github.com/s21platform/community-service/internal/model"
 	"math/rand"
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/s21platform/community-service/internal/model"
 
 	logger_lib "github.com/s21platform/logger-lib"
 
