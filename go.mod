@@ -1,15 +1,17 @@
 module github.com/s21platform/community-service
 
-go 1.24
+go 1.24.0
 
 require (
 	github.com/Masterminds/squirrel v1.5.4
+	github.com/go-chi/chi/v5 v5.2.3
 	github.com/golang/mock v1.6.0
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/lib/pq v1.10.9
+	github.com/oapi-codegen/runtime v1.1.2
 	github.com/redis/go-redis/v9 v9.7.0
-	github.com/s21platform/logger-lib v0.0.6
+	github.com/s21platform/logger-lib v1.0.2
 	github.com/s21platform/metrics-lib v0.0.9
 	github.com/s21platform/notification-service v0.0.5
 	github.com/s21platform/school-proto v0.0.5
@@ -20,9 +22,13 @@ require (
 )
 
 require (
+	github.com/apapsch/go-jsonmerge/v2 v2.0.0 // indirect
+	github.com/google/uuid v1.6.0 // indirect
 	github.com/klauspost/compress v1.18.0 // indirect
 	github.com/pierrec/lz4/v4 v4.1.22 // indirect
 	github.com/segmentio/kafka-go v0.4.47 // indirect
+	github.com/soheilhy/cmux v0.1.5 // indirect
+	golang.org/x/sync v0.17.0 // indirect
 )
 
 require (

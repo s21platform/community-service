@@ -2,6 +2,8 @@ package infra
 
 import (
 	"context"
+	"net/http"
+	"strings"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -33,4 +35,18 @@ func AuthInterceptor(
 	ctx = context.WithValue(ctx, config.KeyUUID, userIDs[0])
 
 	return handler(ctx, req)
+}
+
+func AuthRequest(next http.Handler) http.Handler {
+	fn := func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+		requestID := strings.TrimSpace(r.Header.Get("X-User-Uuid"))
+		if requestID == "" {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+		ctx = context.WithValue(ctx, config.KeyUUID, requestID)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	}
+	return http.HandlerFunc(fn)
 }

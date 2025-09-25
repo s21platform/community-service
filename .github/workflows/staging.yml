@@ -20,12 +20,24 @@ jobs:
           go-version: 1.24
 
       - name: Run tests
-        run: go test -coverprofile=coverage.out -tags=test -v ./internal/service/...
+        run: |
+          go test -coverprofile=coverage.out -tags=test -v ./internal/service/...
+          go test -coverprofile=coverage_rest.out -tags=test -v ./internal/api/...
 
-      - name: Check coverage
+      - name: Check coverage RPC
         run: |
           go tool cover -func=coverage.out -o=coverage.txt
           coverage=$(go tool cover -func=coverage.out | grep total | awk '{print substr($3, 1, length($3)-1)}')
+          echo "Coverage is $coverage%"
+          if (( $(echo "$coverage < 80.0" | bc -l) )); then
+            echo "Coverage is below 80%"
+            exit 1
+          fi
+
+      - name: Check coverage REST
+        run: |
+          go tool cover -func=coverage_rest.out -o=coverage.txt
+          coverage=$(go tool cover -func=coverage_rest.out | grep total | awk '{print substr($3, 1, length($3)-1)}')
           echo "Coverage is $coverage%"
           if (( $(echo "$coverage < 80.0" | bc -l) )); then
             echo "Coverage is below 80%"

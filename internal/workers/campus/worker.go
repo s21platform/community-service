@@ -27,8 +27,6 @@ func New(sC SchoolClient, dbR DbRepo, rR RedisRepo) *Worker {
 
 func (w *Worker) Run(ctx context.Context, wg *sync.WaitGroup) {
 	defer wg.Done()
-	logger := logger_lib.FromContext(ctx, config.KeyLogger)
-	logger.AddFuncName("WorkerCampusRun")
 
 	ticker := time.NewTicker(10 * time.Minute)
 	defer ticker.Stop()
@@ -36,12 +34,12 @@ func (w *Worker) Run(ctx context.Context, wg *sync.WaitGroup) {
 	for {
 		select {
 		case <-ctx.Done():
-			logger.Info("campus uploading worker shutting down")
+			logger_lib.Info(ctx, "campus uploading worker shutting down")
 
 		case <-ticker.C:
 			lastUpdate, err := w.rR.GetByKey(ctx, config.KeyCampusesLastUpdated)
 			if err != nil {
-				logger.Error(fmt.Sprintf("failed to get last update time, err: %v", err))
+				logger_lib.Error(logger_lib.WithError(ctx, err), "failed to get last update time")
 				continue
 			}
 			if lastUpdate != "" {
@@ -50,17 +48,17 @@ func (w *Worker) Run(ctx context.Context, wg *sync.WaitGroup) {
 
 			err = w.process(ctx)
 			if err != nil {
-				logger.Error(fmt.Sprintf("cannot upload campuses, err: %v", err))
+				logger_lib.Error(logger_lib.WithError(ctx, err), "failed to process campuses")
 				continue
 			}
 
 			err = w.rR.Set(ctx, config.KeyCampusesLastUpdated, "upd", time.Hour*24*15)
 			if err != nil {
-				logger.Error(fmt.Sprintf("failed to save campuses last updated, err: %v", err))
+				logger_lib.Error(logger_lib.WithError(ctx, err), "failed to set last update time")
 				continue
 			}
 
-			logger.Info("campuses worker done")
+			logger_lib.Info(ctx, "campuses worker done")
 		}
 	}
 }

@@ -1,9 +1,7 @@
 package service
 
 import (
-	"database/sql"
 	"errors"
-	"fmt"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -19,72 +17,6 @@ import (
 )
 
 var env = "prod"
-
-func TestService_IsUserStaff(t *testing.T) {
-	t.Parallel()
-	ctx := context.Background()
-
-	controller := gomock.NewController(t)
-	defer controller.Finish()
-
-	mockRepo := NewMockDbRepo(controller)
-
-	mockLogger := logger_lib.NewMockLoggerInterface(controller)
-	ctx = context.WithValue(ctx, config.KeyLogger, mockLogger)
-
-	t.Run("is_user_staff_ok", func(t *testing.T) {
-		login := "staff_login"
-		var id int64 = 1
-
-		mockLogger.EXPECT().AddFuncName("IsUserStaff")
-		mockRepo.EXPECT().GetStaffId(gomock.Any(), login).Return(id, nil)
-
-		s := New(mockRepo, env, nil, nil, nil)
-		if s == nil {
-			t.Errorf("New returned a nil service object")
-		}
-		if s.dbR == nil {
-			t.Errorf("New did not initialize the dbR field")
-		}
-
-		data, err := s.IsUserStaff(ctx, &community.LoginIn{Login: login})
-		assert.NoError(t, err)
-		assert.True(t, data.IsStaff)
-	})
-
-	t.Run("is_user_staff_false", func(t *testing.T) {
-		login := "not_staff_login"
-		var id int64 = 0
-
-		mockLogger.EXPECT().AddFuncName("IsUserStaff")
-		mockRepo.EXPECT().GetStaffId(gomock.Any(), login).Return(id, sql.ErrNoRows)
-
-		s := New(mockRepo, env, nil, nil, nil)
-
-		data, err := s.IsUserStaff(ctx, &community.LoginIn{Login: login})
-		assert.NoError(t, err)
-		assert.False(t, data.IsStaff)
-	})
-
-	t.Run("is_user_staff_err", func(t *testing.T) {
-		login := "not_staff_login"
-		var id int64 = 0
-		expectedErr := errors.New("select err")
-
-		mockLogger.EXPECT().AddFuncName("IsUserStaff")
-		mockLogger.EXPECT().Error(fmt.Sprintf("cannot check is user staff, err: %v", expectedErr))
-		mockRepo.EXPECT().GetStaffId(gomock.Any(), login).Return(id, expectedErr)
-
-		s := New(mockRepo, env, nil, nil, nil)
-
-		data, err := s.IsUserStaff(ctx, &community.LoginIn{Login: login})
-		assert.Nil(t, data)
-		st, ok := status.FromError(err)
-		assert.True(t, ok)
-		assert.Equal(t, codes.Internal, st.Code())
-		assert.Contains(t, st.Message(), "cannot check is user staff")
-	})
-}
 
 func TestServer_GetPeerSchoolData(t *testing.T) {
 	t.Parallel()
@@ -121,195 +53,6 @@ func TestServer_GetPeerSchoolData(t *testing.T) {
 	})
 }
 
-func TestServer_IsPeerExist(t *testing.T) {
-	t.Parallel()
-	ctx := context.Background()
-
-	controller := gomock.NewController(t)
-	defer controller.Finish()
-	mockRepo := NewMockDbRepo(controller)
-
-	mockLogger := logger_lib.NewMockLoggerInterface(controller)
-	ctx = context.WithValue(ctx, config.KeyLogger, mockLogger)
-
-	t.Run("get_peer_status_ok", func(t *testing.T) {
-		expectedStatus := "ACTIVE"
-		email := "aboba@student.21-school.ru"
-
-		mockRepo.EXPECT().GetPeerStatus(gomock.Any(), email).Return(expectedStatus, nil)
-		mockLogger.EXPECT().AddFuncName("IsPeerExist")
-
-		s := New(mockRepo, env, nil, nil, nil)
-		isExist, err := s.IsPeerExist(ctx, &community.EmailIn{Email: email})
-		assert.NoError(t, err)
-		assert.True(t, isExist.IsExist)
-	})
-
-	t.Run("get_peer_status_stage_ok", func(t *testing.T) {
-		expectedStatus := "ACTIVE"
-		email := "aboba@student.21-school.ru"
-		var id int64 = 5
-
-		mockRepo.EXPECT().GetPeerStatus(gomock.Any(), email).Return(expectedStatus, nil)
-		mockRepo.EXPECT().GetStaffId(gomock.Any(), email).Return(id, nil)
-		mockLogger.EXPECT().AddFuncName("IsPeerExist")
-
-		s := New(mockRepo, "stage", nil, nil, nil)
-		isExist, err := s.IsPeerExist(ctx, &community.EmailIn{Email: email})
-		assert.NoError(t, err)
-		assert.True(t, isExist.IsExist)
-	})
-
-	// user has no permission to stage cfg
-	t.Run("get_peer_status_no_permission_to_stage", func(t *testing.T) {
-		expectedStatus := "ACTIVE"
-		email := "aboba@student.21-school.ru"
-		var id int64 = 0
-
-		mockRepo.EXPECT().GetPeerStatus(gomock.Any(), email).Return(expectedStatus, nil)
-		mockRepo.EXPECT().GetStaffId(gomock.Any(), email).Return(id, sql.ErrNoRows)
-		mockLogger.EXPECT().AddFuncName("IsPeerExist")
-		mockLogger.EXPECT().Info(fmt.Sprintf("user %s is not allowed to the stage enviroment", email))
-
-		s := New(mockRepo, "stage", nil, nil, nil)
-		isExist, err := s.IsPeerExist(ctx, &community.EmailIn{Email: email})
-		assert.Nil(t, isExist)
-		st, ok := status.FromError(err)
-		assert.True(t, ok)
-		assert.Equal(t, codes.PermissionDenied, st.Code())
-		assert.Contains(t, st.Message(), "user aboba@student.21-school.ru is not allowed to the stage environment")
-	})
-
-	t.Run("get_peer_status_stage_err", func(t *testing.T) {
-		expectedStatus := "ACTIVE"
-		email := "aboba@student.21-school.ru"
-		var id int64 = 0
-		expectedErr := errors.New("select err")
-
-		mockRepo.EXPECT().GetPeerStatus(gomock.Any(), email).Return(expectedStatus, nil)
-		mockRepo.EXPECT().GetStaffId(gomock.Any(), email).Return(id, expectedErr)
-		mockLogger.EXPECT().AddFuncName("IsPeerExist")
-		mockLogger.EXPECT().Error(fmt.Sprintf("cannot check is user staff, err: %v", expectedErr))
-
-		s := New(mockRepo, "stage", nil, nil, nil)
-		isExist, err := s.IsPeerExist(ctx, &community.EmailIn{Email: email})
-		assert.Nil(t, isExist)
-		st, ok := status.FromError(err)
-		assert.True(t, ok)
-		assert.Equal(t, codes.Internal, st.Code())
-		assert.Contains(t, st.Message(), "select err")
-	})
-
-	t.Run("get_peer_status_not_found", func(t *testing.T) {
-		expectedStatus := "NOT ACTIVE"
-		email := "aboba@student.21-school.ru"
-
-		mockRepo.EXPECT().GetPeerStatus(gomock.Any(), email).Return(expectedStatus, nil)
-		mockLogger.EXPECT().AddFuncName("IsPeerExist")
-		mockLogger.EXPECT().Info(fmt.Sprintf("peer=%s has status: %s", email, expectedStatus))
-
-		s := New(mockRepo, env, nil, nil, nil)
-		isExist, err := s.IsPeerExist(ctx, &community.EmailIn{Email: email})
-		assert.NoError(t, err)
-		assert.False(t, isExist.IsExist)
-	})
-
-	t.Run("get_peer_status_err", func(t *testing.T) {
-		email := "aboba@student.21-school.ru"
-		expectedErr := errors.New("select err")
-
-		mockRepo.EXPECT().GetPeerStatus(gomock.Any(), email).Return("", expectedErr)
-		mockLogger.EXPECT().AddFuncName("IsPeerExist")
-		mockLogger.EXPECT().Error(fmt.Sprintf("cannot get peer status, err: %v", expectedErr))
-
-		s := New(mockRepo, env, nil, nil, nil)
-		isExist, err := s.IsPeerExist(ctx, &community.EmailIn{Email: email})
-
-		assert.Nil(t, isExist)
-		st, ok := status.FromError(err)
-		assert.True(t, ok)
-		assert.Equal(t, codes.Internal, st.Code())
-		assert.Contains(t, st.Message(), "select err")
-	})
-}
-
-// limit и offset сейчас не используются
-func TestServer_SearchPeers(t *testing.T) {
-	t.Parallel()
-	ctx := context.Background()
-
-	controller := gomock.NewController(t)
-	defer controller.Finish()
-	mockRepo := NewMockDbRepo(controller)
-
-	t.Run("search_peers_ok", func(t *testing.T) {
-		expectedData := []*community.SearchPeer{
-			{Login: "aboba"},
-			{Login: "abobaoba"},
-			{Login: "aboo"},
-		}
-		substring := "ab"
-		mockRepo.EXPECT().SearchPeersBySubstring(gomock.Any(), substring).Return(expectedData, nil)
-
-		s := New(mockRepo, env, nil, nil, nil)
-		data, err := s.SearchPeers(ctx, &community.SearchPeersIn{Substring: substring})
-		assert.NoError(t, err)
-		assert.Equal(t, data, &community.SearchPeersOut{SearchPeers: expectedData})
-	})
-
-	t.Run("search_peers_err", func(t *testing.T) {
-		expectedErr := errors.New("select err")
-		substring := "ab"
-		mockRepo.EXPECT().SearchPeersBySubstring(gomock.Any(), substring).Return(nil, expectedErr)
-		s := New(mockRepo, env, nil, nil, nil)
-
-		data, err := s.SearchPeers(ctx, &community.SearchPeersIn{Substring: substring})
-		assert.Nil(t, data)
-		st, ok := status.FromError(err)
-		assert.True(t, ok)
-		assert.Equal(t, codes.Internal, st.Code())
-		assert.Contains(t, st.Message(), "select err")
-	})
-}
-
-func TestServer_SendEduLinkingCode(t *testing.T) {
-	t.Parallel()
-	ctx := context.Background()
-
-	controller := gomock.NewController(t)
-	defer controller.Finish()
-	mockRepo := NewMockDbRepo(controller)
-	mockRedisRepo := NewMockRedisRepo(controller)
-	mockLogger := logger_lib.NewMockLoggerInterface(controller)
-	mockNotCl := NewMockNotificationS(controller)
-	ctx = context.WithValue(ctx, config.KeyLogger, mockLogger)
-
-	t.Run("send_code_email_ok", func(t *testing.T) {
-		login := "aboba"
-		mockRepo.EXPECT().GetPeerStatus(gomock.Any(), login).Return("ACTIVE", nil)
-		mockRedisRepo.EXPECT().Set(gomock.Any(), config.Key("code_"+login), gomock.Any(), gomock.Any()).Return(nil)
-		mockLogger.EXPECT().AddFuncName("SendEduLinkingCode")
-		mockNotCl.EXPECT().SendEduCode(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil)
-
-		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil)
-		_, err := s.SendEduLinkingCode(ctx, &community.SendEduLinkingCodeIn{Login: login})
-		assert.NoError(t, err)
-	})
-
-	t.Run("send_code_email_err", func(t *testing.T) {
-		login := "aboba"
-		expectedErr := errors.New("set err")
-		mockRepo.EXPECT().GetPeerStatus(gomock.Any(), login).Return("ACTIVE", nil)
-		mockRedisRepo.EXPECT().Set(gomock.Any(), config.Key("code_"+login), gomock.Any(), gomock.Any()).Return(expectedErr)
-		mockLogger.EXPECT().AddFuncName("SendEduLinkingCode")
-		mockLogger.EXPECT().Error(fmt.Sprintf("failed to set code to redis, err: %v", expectedErr))
-
-		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil)
-		_, err := s.SendEduLinkingCode(ctx, &community.SendEduLinkingCodeIn{Login: login})
-		assert.Error(t, err)
-	})
-}
-
 func TestService_GetStudentData(t *testing.T) {
 	t.Parallel()
 	ctx := context.WithValue(context.Background(), config.KeyUUID, "uuid-1")
@@ -322,7 +65,6 @@ func TestService_GetStudentData(t *testing.T) {
 	ctx = context.WithValue(ctx, config.KeyLogger, mockLogger)
 
 	t.Run("success_case", func(t *testing.T) {
-		mockLogger.EXPECT().AddFuncName("GetStudentData")
 		inputUUID := "user-2"
 		ctxUUID := "uuid-1"
 		request := &community.GetStudentDataIn{UserUUID: inputUUID}
@@ -363,6 +105,75 @@ func TestService_GetStudentData(t *testing.T) {
 		_, err := s.GetStudentData(ctx, request)
 		assert.NoError(t, err)
 	})
+
+	t.Run("get_first_id_error", func(t *testing.T) {
+		inputUUID := "user-2"
+		ctxUUID := "uuid-1"
+		request := &community.GetStudentDataIn{UserUUID: inputUUID}
+		expectedErr := errors.New("get id error")
+
+		mockRepo.EXPECT().
+			GetIdPeer(ctx, ctxUUID).
+			Return(int64(0), expectedErr).
+			Times(1)
+
+		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil)
+		data, err := s.GetStudentData(ctx, request)
+		assert.Nil(t, data)
+		st, ok := status.FromError(err)
+		assert.True(t, ok)
+		assert.Equal(t, codes.NotFound, st.Code())
+	})
+
+	t.Run("get_second_id_error", func(t *testing.T) {
+		inputUUID := "user-2"
+		ctxUUID := "uuid-1"
+		request := &community.GetStudentDataIn{UserUUID: inputUUID}
+		expectedErr := errors.New("get id error")
+
+		mockRepo.EXPECT().
+			GetIdPeer(ctx, ctxUUID).
+			Return(int64(1), nil).
+			Times(1)
+		mockRepo.EXPECT().
+			GetIdPeer(ctx, inputUUID).
+			Return(int64(0), expectedErr).
+			Times(1)
+
+		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil)
+		data, err := s.GetStudentData(ctx, request)
+		assert.Nil(t, data)
+		st, ok := status.FromError(err)
+		assert.True(t, ok)
+		assert.Equal(t, codes.NotFound, st.Code())
+	})
+
+	t.Run("get_peer_data_error", func(t *testing.T) {
+		inputUUID := "user-2"
+		ctxUUID := "uuid-1"
+		request := &community.GetStudentDataIn{UserUUID: inputUUID}
+		expectedErr := errors.New("get peer data error")
+
+		mockRepo.EXPECT().
+			GetIdPeer(ctx, ctxUUID).
+			Return(int64(1), nil).
+			Times(1)
+		mockRepo.EXPECT().
+			GetIdPeer(ctx, inputUUID).
+			Return(int64(2), nil).
+			Times(1)
+		mockRepo.EXPECT().
+			GetPeerData(ctx, int64(2)).
+			Return(nil, expectedErr).
+			Times(1)
+
+		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil)
+		data, err := s.GetStudentData(ctx, request)
+		assert.Nil(t, data)
+		st, ok := status.FromError(err)
+		assert.True(t, ok)
+		assert.Equal(t, codes.Internal, st.Code())
+	})
 }
 
 func TestService_ValidateCode(t *testing.T) {
@@ -377,7 +188,6 @@ func TestService_ValidateCode(t *testing.T) {
 	ctx = context.WithValue(ctx, config.KeyLogger, mockLogger)
 
 	t.Run("success_case", func(t *testing.T) {
-		mockLogger.EXPECT().AddFuncName("ValidateCode")
 		key := "15"
 		ctxUUID := "uuid-1"
 		var id int64 = 15
@@ -402,7 +212,6 @@ func TestService_ValidateCode(t *testing.T) {
 	})
 
 	t.Run("GetByKey_err", func(t *testing.T) {
-		mockLogger.EXPECT().AddFuncName("ValidateCode")
 		expectedErr := errors.New("get err")
 		request := &community.ValidateCodeIn{Login: "test1", Code: 15}
 
@@ -410,7 +219,6 @@ func TestService_ValidateCode(t *testing.T) {
 			GetByKey(ctx, gomock.Any()).
 			Return("", expectedErr).
 			Times(1)
-		mockLogger.EXPECT().Error(fmt.Sprintf("failed to get by key, err: %v", expectedErr))
 
 		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil)
 		_, err := s.ValidateCode(ctx, request)
@@ -418,7 +226,6 @@ func TestService_ValidateCode(t *testing.T) {
 	})
 
 	t.Run("code_err", func(t *testing.T) {
-		mockLogger.EXPECT().AddFuncName("ValidateCode")
 		request := &community.ValidateCodeIn{Login: "test1", Code: 15}
 
 		mockRedisRepo.EXPECT().
@@ -432,16 +239,58 @@ func TestService_ValidateCode(t *testing.T) {
 	})
 
 	t.Run("atoi_err", func(t *testing.T) {
-		mockLogger.EXPECT().AddFuncName("ValidateCode")
 		key := "test"
-		expectedErr := errors.New("strconv.Atoi: parsing \"test\": invalid syntax")
 		request := &community.ValidateCodeIn{Login: "test1", Code: 15}
 
 		mockRedisRepo.EXPECT().
 			GetByKey(ctx, gomock.Any()).
 			Return(key, nil).
 			Times(1)
-		mockLogger.EXPECT().Error(fmt.Sprintf("failed to convert code: %v", expectedErr))
+
+		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil)
+		_, err := s.ValidateCode(ctx, request)
+		assert.Error(t, err)
+	})
+
+	t.Run("get_id_from_participant_err", func(t *testing.T) {
+		key := "15"
+		ctxUUID := "uuid-1"
+		request := &community.ValidateCodeIn{Login: "test1", Code: 15}
+		expectedErr := errors.New("get id error")
+
+		mockRedisRepo.EXPECT().
+			GetByKey(ctx, gomock.Any()).
+			Return(key, nil).
+			Times(1)
+		mockRepo.EXPECT().
+			GetIdFromParticipant(ctx, ctxUUID).
+			Return(int64(0), expectedErr).
+			Times(1)
+
+		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil)
+		_, err := s.ValidateCode(ctx, request)
+		assert.Error(t, err)
+	})
+
+	t.Run("insert_link_edu_err", func(t *testing.T) {
+		key := "15"
+		ctxUUID := "uuid-1"
+		var id int64 = 15
+		request := &community.ValidateCodeIn{Login: "test1", Code: 15}
+		expectedErr := errors.New("insert error")
+
+		mockRedisRepo.EXPECT().
+			GetByKey(ctx, gomock.Any()).
+			Return(key, nil).
+			Times(1)
+		mockRepo.EXPECT().
+			GetIdFromParticipant(ctx, ctxUUID).
+			Return(id, nil).
+			Times(1)
+		mockRepo.EXPECT().
+			InsertLinkEdu(ctx, id, ctxUUID).
+			Return(expectedErr).
+			Times(1)
 
 		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil)
 		_, err := s.ValidateCode(ctx, request)
