@@ -19,6 +19,7 @@ type DbRepo interface {
 	GetIdPeer(ctx context.Context, uuid string) (int64, error)
 	GetIdFromParticipant(ctx context.Context, login string) (int64, error)
 	InsertLinkEdu(ctx context.Context, id int64, uuid string) error
+	GetLogin(ctx context.Context, id int64) (string, error)
 }
 
 type RedisRepo interface {
@@ -29,4 +30,8 @@ type RedisRepo interface {
 
 type NotificationS interface {
 	SendEduCode(ctx context.Context, email, code string) error
+}
+
+type UserPostCreatedProduser interface {
+	ProduceMessage(ctx context.Context, message any, key any) error
 }

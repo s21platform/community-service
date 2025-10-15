@@ -61,6 +61,11 @@ type Participant struct {
 	Status   string `db:"status"`
 }
 
+type LinkData struct {
+	UUID  string
+	Login string
+}
+
 const (
 	ParticipantStatusActive   = "ACTIVE"
 	ParticipantStatusBlocked  = "BLOCKED"

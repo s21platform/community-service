@@ -2,6 +2,9 @@ package service
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
+	"github.com/s21platform/community-service/internal/model"
 	"strconv"
 
 	"google.golang.org/grpc/codes"
@@ -19,14 +22,16 @@ type Service struct {
 	env   string
 	rR    RedisRepo
 	notCl NotificationS
+	upcP  UserPostCreatedProduser
 }
 
-func New(dbR DbRepo, env string, rR RedisRepo, notCl NotificationS, cfg *config.Config) *Service {
+func New(dbR DbRepo, env string, rR RedisRepo, notCl NotificationS, upcP UserPostCreatedProduser, cfg *config.Config) *Service {
 	return &Service{
 		dbR:   dbR,
 		env:   env,
 		rR:    rR,
 		notCl: notCl,
+		upcP:  upcP,
 	}
 }
 
@@ -130,5 +135,28 @@ func (s *Service) ValidateCode(ctx context.Context, in *community.ValidateCodeIn
 		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to insert link")
 		return &community.ValidateCodeOut{Message: ""}, status.Errorf(codes.NotFound, "failed to insert link edu, err: %v", err)
 	}
+
+	login, err := s.dbR.GetLogin(ctx, id)
+	if err != nil {
+		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to get login")
+	}
+
+	userLink := model.LinkData{
+		UUID:  uuid,
+		Login: login,
+	}
+	rawMessage, err := json.Marshal(userLink)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal user: %v", err)
+	}
+	err = s.upcP.ProduceMessage(ctx, community.UserCreatedMessage{
+		UserUuid:   uuid,
+		Login:      login,
+		RawMessage: rawMessage,
+	}, uuid)
+	if err != nil {
+		return nil, fmt.Errorf("failed to produce message: %v", err)
+	}
+
 	return nil, nil
 }

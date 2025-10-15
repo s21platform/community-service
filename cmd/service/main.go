@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	kafkalib "github.com/s21platform/kafka-lib"
 	"log"
 	"net"
 	"net/http"
@@ -40,7 +41,10 @@ func main() {
 
 	notificationClient := notification.New(cfg)
 
-	thisService := service.New(dbRepo, cfg.Platform.Env, redisRepo, notificationClient, cfg)
+	UserPostCreatedProducerConfig := kafkalib.DefaultProducerConfig(cfg.Kafka.Host, cfg.Kafka.Port, cfg.Kafka.UserPostCreated)
+	UserPostCreatedProducer := kafkalib.NewProducer(UserPostCreatedProducerConfig)
+
+	thisService := service.New(dbRepo, cfg.Platform.Env, redisRepo, notificationClient, UserPostCreatedProducer, cfg)
 
 	metrics, err := pkg.NewMetrics(cfg.Metrics.Host, cfg.Metrics.Port, cfg.Service.Name, cfg.Platform.Env)
 	if err != nil {
