@@ -22,16 +22,16 @@ type Service struct {
 	env   string
 	rR    RedisRepo
 	notCl NotificationS
-	upcP  UserPostCreatedProduser
+	ulE   UserLinkingEdu
 }
 
-func New(dbR DbRepo, env string, rR RedisRepo, notCl NotificationS, upcP UserPostCreatedProduser, cfg *config.Config) *Service {
+func New(dbR DbRepo, env string, rR RedisRepo, notCl NotificationS, ulE UserLinkingEdu, cfg *config.Config) *Service {
 	return &Service{
 		dbR:   dbR,
 		env:   env,
 		rR:    rR,
 		notCl: notCl,
-		upcP:  upcP,
+		ulE:   ulE,
 	}
 }
 
@@ -130,8 +130,16 @@ func (s *Service) ValidateCode(ctx context.Context, in *community.ValidateCodeIn
 		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to get user id")
 		return &community.ValidateCodeOut{Message: ""}, status.Errorf(codes.NotFound, "failed to get user id, err: %v", err)
 	}
+
+	tx, err := s.dbR.Conn().Beginx()
+	if err != nil {
+		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to begin transaction")
+		return nil, status.Error(codes.Internal, "failed to start transaction")
+	}
+
 	err = s.dbR.InsertLinkEdu(ctx, id, uuid)
 	if err != nil {
+		_ = tx.Rollback()
 		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to insert link")
 		return &community.ValidateCodeOut{Message: ""}, status.Errorf(codes.NotFound, "failed to insert link edu, err: %v", err)
 	}
@@ -149,12 +157,13 @@ func (s *Service) ValidateCode(ctx context.Context, in *community.ValidateCodeIn
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal user: %v", err)
 	}
-	err = s.upcP.ProduceMessage(ctx, community.UserCreatedMessage{
+	err = s.ulE.ProduceMessage(ctx, community.UserCreatedMessage{
 		UserUuid:   uuid,
 		Login:      login,
 		RawMessage: rawMessage,
 	}, uuid)
 	if err != nil {
+		_ = tx.Rollback()
 		return nil, fmt.Errorf("failed to produce message: %v", err)
 	}
 

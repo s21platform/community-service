@@ -3,6 +3,7 @@ package service
 
 import (
 	"context"
+	"github.com/jmoiron/sqlx"
 	"time"
 
 	"github.com/s21platform/community-service/internal/config"
@@ -11,6 +12,7 @@ import (
 )
 
 type DbRepo interface {
+	Conn() *sqlx.DB
 	SearchPeersBySubstring(ctx context.Context, substring string) ([]*community.SearchPeer, error)
 	GetPeerStatus(ctx context.Context, login string) (string, error)
 	GetPeerSchoolData(ctx context.Context, nickName string) (model.PeerSchoolData, error)
@@ -32,6 +34,6 @@ type NotificationS interface {
 	SendEduCode(ctx context.Context, email, code string) error
 }
 
-type UserPostCreatedProduser interface {
+type UserLinkingEdu interface {
 	ProduceMessage(ctx context.Context, message any, key any) error
 }

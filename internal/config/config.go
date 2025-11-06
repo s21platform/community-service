@@ -66,7 +66,7 @@ type Kafka struct {
 	LevelChangeTopic string `env:"PARTICIPANT_LEVEL_CHANGED"`
 	ExpLevelChanged  string `env:"PARTICIPANT_EXP_LEVEL_CHANGED"`
 	StatusChanged    string `env:"PARTICIPANT_STATUS_CHANGED"`
-	UserPostCreated  string `env:"USER_POST_CREATED"`
+	UserLinkingEdu   string `env:"USER_LINKING_EDU"`
 }
 
 func MustLoad() *Config {
