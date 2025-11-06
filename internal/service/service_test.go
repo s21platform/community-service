@@ -31,7 +31,7 @@ func TestServer_GetPeerSchoolData(t *testing.T) {
 		nickName := "aboba"
 		mockRepo.EXPECT().GetPeerSchoolData(gomock.Any(), nickName).Return(expectedData, nil)
 
-		s := New(mockRepo, env, nil, nil, nil)
+		s := New(mockRepo, env, nil, nil, nil, nil)
 		data, err := s.GetPeerSchoolData(ctx, &community.GetSchoolDataIn{NickName: nickName})
 		assert.NoError(t, err)
 		assert.Equal(t, data, &community.GetSchoolDataOut{ClassName: expectedData.ClassName, ParallelName: expectedData.ParallelName})
@@ -42,7 +42,7 @@ func TestServer_GetPeerSchoolData(t *testing.T) {
 		expectedErr := errors.New("select err")
 		mockRepo.EXPECT().GetPeerSchoolData(gomock.Any(), nickName).Return(model.PeerSchoolData{}, expectedErr)
 
-		s := New(mockRepo, env, nil, nil, nil)
+		s := New(mockRepo, env, nil, nil, nil, nil)
 
 		data, err := s.GetPeerSchoolData(ctx, &community.GetSchoolDataIn{NickName: nickName})
 		assert.Nil(t, data)
@@ -101,7 +101,7 @@ func TestService_GetStudentData(t *testing.T) {
 			Return(mockData, nil).
 			Times(1)
 
-		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil)
+		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil, nil)
 		_, err := s.GetStudentData(ctx, request)
 		assert.NoError(t, err)
 	})
@@ -117,7 +117,7 @@ func TestService_GetStudentData(t *testing.T) {
 			Return(int64(0), expectedErr).
 			Times(1)
 
-		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil)
+		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil, nil)
 		data, err := s.GetStudentData(ctx, request)
 		assert.Nil(t, data)
 		st, ok := status.FromError(err)
@@ -140,7 +140,7 @@ func TestService_GetStudentData(t *testing.T) {
 			Return(int64(0), expectedErr).
 			Times(1)
 
-		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil)
+		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil, nil)
 		data, err := s.GetStudentData(ctx, request)
 		assert.Nil(t, data)
 		st, ok := status.FromError(err)
@@ -167,7 +167,7 @@ func TestService_GetStudentData(t *testing.T) {
 			Return(nil, expectedErr).
 			Times(1)
 
-		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil)
+		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil, nil)
 		data, err := s.GetStudentData(ctx, request)
 		assert.Nil(t, data)
 		st, ok := status.FromError(err)
@@ -205,8 +205,12 @@ func TestService_ValidateCode(t *testing.T) {
 			InsertLinkEdu(ctx, id, ctxUUID).
 			Return(nil).
 			Times(1)
+		mockRepo.EXPECT().
+			Conn().
+			Return(nil).
+			AnyTimes()
 
-		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil)
+		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil, nil)
 		_, err := s.ValidateCode(ctx, request)
 		assert.NoError(t, err)
 	})
@@ -220,7 +224,7 @@ func TestService_ValidateCode(t *testing.T) {
 			Return("", expectedErr).
 			Times(1)
 
-		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil)
+		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil, nil)
 		_, err := s.ValidateCode(ctx, request)
 		assert.Error(t, err)
 	})
@@ -233,7 +237,7 @@ func TestService_ValidateCode(t *testing.T) {
 			Return("", nil).
 			Times(1)
 
-		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil)
+		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil, nil)
 		_, err := s.ValidateCode(ctx, request)
 		assert.NoError(t, err)
 	})
@@ -247,7 +251,7 @@ func TestService_ValidateCode(t *testing.T) {
 			Return(key, nil).
 			Times(1)
 
-		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil)
+		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil, nil)
 		_, err := s.ValidateCode(ctx, request)
 		assert.Error(t, err)
 	})
@@ -267,7 +271,7 @@ func TestService_ValidateCode(t *testing.T) {
 			Return(int64(0), expectedErr).
 			Times(1)
 
-		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil)
+		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil, nil)
 		_, err := s.ValidateCode(ctx, request)
 		assert.Error(t, err)
 	})
@@ -292,7 +296,7 @@ func TestService_ValidateCode(t *testing.T) {
 			Return(expectedErr).
 			Times(1)
 
-		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil)
+		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil, nil)
 		_, err := s.ValidateCode(ctx, request)
 		assert.Error(t, err)
 	})
