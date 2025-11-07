@@ -148,6 +148,7 @@ func (s *Service) ValidateCode(ctx context.Context, in *community.ValidateCodeIn
 
 	login, err := s.dbR.GetLogin(ctx, id)
 	if err != nil {
+		_ = tx.Rollback()
 		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to get login")
 		return nil, status.Error(codes.Internal, "failed to get login")
 
@@ -159,6 +160,7 @@ func (s *Service) ValidateCode(ctx context.Context, in *community.ValidateCodeIn
 	}
 	rawMessage, err := json.Marshal(userLink)
 	if err != nil {
+		_ = tx.Rollback()
 		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to marshal user")
 		return nil, fmt.Errorf("failed to marshal user: %v", err)
 	}
@@ -173,6 +175,7 @@ func (s *Service) ValidateCode(ctx context.Context, in *community.ValidateCodeIn
 		return nil, fmt.Errorf("failed to produce message: %v", err)
 	}
 	if err = tx.Commit(); err != nil {
+		_ = tx.Rollback()
 		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to commit transaction")
 		return nil, fmt.Errorf("failed to commit transaction: %v", err)
 	}
