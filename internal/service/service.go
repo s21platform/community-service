@@ -115,7 +115,7 @@ func (s *Service) ValidateCode(ctx context.Context, in *community.ValidateCodeIn
 		return &community.ValidateCodeOut{Message: ""}, status.Errorf(codes.Internal, "failed to get by key: %v", err)
 	}
 	if code == "" {
-		logger_lib.Error(logger_lib.WithError(ctx, err), "code is not found")
+		logger_lib.Error(ctx, "code is not found")
 		return &community.ValidateCodeOut{Message: "Код не найден"}, nil
 	}
 	codeInt, err := strconv.Atoi(code)
@@ -124,7 +124,7 @@ func (s *Service) ValidateCode(ctx context.Context, in *community.ValidateCodeIn
 		return &community.ValidateCodeOut{Message: ""}, status.Errorf(codes.Internal, "failed to convert code: %v", err)
 	}
 	if int64(codeInt) != in.Code {
-		logger_lib.Error(logger_lib.WithError(ctx, err), "failed equal code")
+		logger_lib.Error(ctx, "failed equal code")
 		return &community.ValidateCodeOut{Message: "Не совпадает код"}, nil
 	}
 	id, err := s.dbR.GetIdFromParticipant(ctx, uuid)

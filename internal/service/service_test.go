@@ -8,6 +8,7 @@ import (
 	"github.com/s21platform/community-service/pkg/community"
 	logger_lib "github.com/s21platform/logger-lib"
 	"github.com/stretchr/testify/assert"
+	sqlmock "github.com/zhashkevych/go-sqlxmock"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -191,7 +192,18 @@ func TestService_ValidateCode(t *testing.T) {
 		key := "15"
 		ctxUUID := "uuid-1"
 		var id int64 = 15
-		request := &community.ValidateCodeIn{Login: "test1", Code: 15}
+		login := "test1"
+		request := &community.ValidateCodeIn{Login: login, Code: 15}
+
+		mockDB, sqlMock, err := sqlmock.Newx()
+		if err != nil {
+			t.Fatalf("failed to create sqlxmock: %v", err)
+		}
+		defer mockDB.Close()
+
+		sqlMock.ExpectBegin()
+		sqlMock.ExpectCommit()
+
 		mockRedisRepo.EXPECT().
 			GetByKey(ctx, gomock.Any()).
 			Return(key, nil).
@@ -202,15 +214,25 @@ func TestService_ValidateCode(t *testing.T) {
 			Times(1)
 		mockRepo.EXPECT().
 			Conn().
+			Return(mockDB).
+			Times(1)
+		mockRepo.EXPECT().
+			InsertLinkEdu(ctx, id, ctxUUID, gomock.Any()).
 			Return(nil).
 			Times(1)
 		mockRepo.EXPECT().
-			InsertLinkEdu(ctx, id, ctxUUID, nil).
+			GetLogin(ctx, id).
+			Return(login, nil).
+			Times(1)
+
+		mockUlE := NewMockUserLinkingEdu(controller)
+		mockUlE.EXPECT().
+			ProduceMessage(ctx, gomock.Any(), ctxUUID).
 			Return(nil).
 			Times(1)
 
-		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil, nil)
-		_, err := s.ValidateCode(ctx, request)
+		s := New(mockRepo, env, mockRedisRepo, mockNotCl, mockUlE, nil)
+		_, err = s.ValidateCode(ctx, request)
 		assert.NoError(t, err)
 	})
 
@@ -282,6 +304,15 @@ func TestService_ValidateCode(t *testing.T) {
 		request := &community.ValidateCodeIn{Login: "test1", Code: 15}
 		expectedErr := errors.New("insert error")
 
+		mockDB, sqlMock, err := sqlmock.Newx()
+		if err != nil {
+			t.Fatalf("failed to create sqlxmock: %v", err)
+		}
+		defer mockDB.Close()
+
+		sqlMock.ExpectBegin()
+		sqlMock.ExpectRollback()
+
 		mockRedisRepo.EXPECT().
 			GetByKey(ctx, gomock.Any()).
 			Return(key, nil).
@@ -292,15 +323,15 @@ func TestService_ValidateCode(t *testing.T) {
 			Times(1)
 		mockRepo.EXPECT().
 			Conn().
-			Return(nil).
-			AnyTimes()
+			Return(mockDB).
+			Times(1)
 		mockRepo.EXPECT().
-			InsertLinkEdu(ctx, id, ctxUUID, nil).
+			InsertLinkEdu(ctx, id, ctxUUID, gomock.Any()).
 			Return(expectedErr).
 			Times(1)
 
 		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil, nil)
-		_, err := s.ValidateCode(ctx, request)
+		_, err = s.ValidateCode(ctx, request)
 		assert.Error(t, err)
 	})
 }

@@ -34,3 +34,7 @@ func New(cfg *config.Config) *Repository {
 func (r *Repository) Close() {
 	_ = r.conn.Close()
 }
+
+func (r *Repository) Conn() *sqlx.DB {
+	return r.conn
+}

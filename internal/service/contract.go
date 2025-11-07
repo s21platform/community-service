@@ -3,8 +3,9 @@ package service
 
 import (
 	"context"
-	"github.com/jmoiron/sqlx"
 	"time"
+
+	"github.com/jmoiron/sqlx"
 
 	"github.com/s21platform/community-service/internal/config"
 	"github.com/s21platform/community-service/internal/model"
