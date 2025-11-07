@@ -115,6 +115,7 @@ func (s *Service) ValidateCode(ctx context.Context, in *community.ValidateCodeIn
 		return &community.ValidateCodeOut{Message: ""}, status.Errorf(codes.Internal, "failed to get by key: %v", err)
 	}
 	if code == "" {
+		logger_lib.Error(logger_lib.WithError(ctx, err), "code is not found")
 		return &community.ValidateCodeOut{Message: "Код не найден"}, nil
 	}
 	codeInt, err := strconv.Atoi(code)
@@ -123,6 +124,7 @@ func (s *Service) ValidateCode(ctx context.Context, in *community.ValidateCodeIn
 		return &community.ValidateCodeOut{Message: ""}, status.Errorf(codes.Internal, "failed to convert code: %v", err)
 	}
 	if int64(codeInt) != in.Code {
+		logger_lib.Error(logger_lib.WithError(ctx, err), "failed equal code")
 		return &community.ValidateCodeOut{Message: "Не совпадает код"}, nil
 	}
 	id, err := s.dbR.GetIdFromParticipant(ctx, uuid)
@@ -137,7 +139,7 @@ func (s *Service) ValidateCode(ctx context.Context, in *community.ValidateCodeIn
 		return nil, status.Error(codes.Internal, "failed to start transaction")
 	}
 
-	err = s.dbR.InsertLinkEdu(ctx, id, uuid)
+	err = s.dbR.InsertLinkEdu(ctx, id, uuid, tx)
 	if err != nil {
 		_ = tx.Rollback()
 		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to insert link")
@@ -147,6 +149,8 @@ func (s *Service) ValidateCode(ctx context.Context, in *community.ValidateCodeIn
 	login, err := s.dbR.GetLogin(ctx, id)
 	if err != nil {
 		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to get login")
+		return nil, status.Error(codes.Internal, "failed to get login")
+
 	}
 
 	userLink := model.LinkData{
@@ -155,6 +159,7 @@ func (s *Service) ValidateCode(ctx context.Context, in *community.ValidateCodeIn
 	}
 	rawMessage, err := json.Marshal(userLink)
 	if err != nil {
+		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to marshal user")
 		return nil, fmt.Errorf("failed to marshal user: %v", err)
 	}
 	err = s.ulE.ProduceMessage(ctx, community.UserCreatedMessage{
@@ -164,7 +169,12 @@ func (s *Service) ValidateCode(ctx context.Context, in *community.ValidateCodeIn
 	}, uuid)
 	if err != nil {
 		_ = tx.Rollback()
+		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to produce message")
 		return nil, fmt.Errorf("failed to produce message: %v", err)
+	}
+	if err = tx.Commit(); err != nil {
+		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to commit transaction")
+		return nil, fmt.Errorf("failed to commit transaction: %v", err)
 	}
 
 	return nil, nil

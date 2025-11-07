@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"fmt"
+	"github.com/jmoiron/sqlx"
 
 	sq "github.com/Masterminds/squirrel"
 )
@@ -25,7 +26,7 @@ func (r *Repository) GetIdPeer(ctx context.Context, uuid string) (int64, error) 
 	return id, nil
 }
 
-func (r *Repository) InsertLinkEdu(ctx context.Context, id int64, uuid string) error {
+func (r *Repository) InsertLinkEdu(ctx context.Context, id int64, uuid string, tx *sqlx.Tx) error {
 	query, args, err := sq.Insert("link_edu").
 		Columns("edu_id", "user_uuid").
 		Values(id, uuid).
@@ -35,7 +36,7 @@ func (r *Repository) InsertLinkEdu(ctx context.Context, id int64, uuid string) e
 		return fmt.Errorf("failed to build insert query: %v", err)
 	}
 
-	_, err = r.conn.ExecContext(ctx, query, args...)
+	_, err = tx.ExecContext(ctx, query, args...)
 	if err != nil {
 		return fmt.Errorf("failed to insert link edu: %v", err)
 	}

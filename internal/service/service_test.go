@@ -192,7 +192,6 @@ func TestService_ValidateCode(t *testing.T) {
 		ctxUUID := "uuid-1"
 		var id int64 = 15
 		request := &community.ValidateCodeIn{Login: "test1", Code: 15}
-
 		mockRedisRepo.EXPECT().
 			GetByKey(ctx, gomock.Any()).
 			Return(key, nil).
@@ -202,13 +201,13 @@ func TestService_ValidateCode(t *testing.T) {
 			Return(id, nil).
 			Times(1)
 		mockRepo.EXPECT().
-			InsertLinkEdu(ctx, id, ctxUUID).
+			Conn().
 			Return(nil).
 			Times(1)
 		mockRepo.EXPECT().
-			Conn().
+			InsertLinkEdu(ctx, id, ctxUUID, nil).
 			Return(nil).
-			AnyTimes()
+			Times(1)
 
 		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil, nil)
 		_, err := s.ValidateCode(ctx, request)
@@ -292,7 +291,11 @@ func TestService_ValidateCode(t *testing.T) {
 			Return(id, nil).
 			Times(1)
 		mockRepo.EXPECT().
-			InsertLinkEdu(ctx, id, ctxUUID).
+			Conn().
+			Return(nil).
+			AnyTimes()
+		mockRepo.EXPECT().
+			InsertLinkEdu(ctx, id, ctxUUID, nil).
 			Return(expectedErr).
 			Times(1)
 
