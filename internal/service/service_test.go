@@ -334,4 +334,56 @@ func TestService_ValidateCode(t *testing.T) {
 		_, err = s.ValidateCode(ctx, request)
 		assert.Error(t, err)
 	})
+
+	t.Run("get_login_err", func(t *testing.T) {
+		key := "15"
+		ctxUUID := "uuid-1"
+		var id int64 = 15
+		request := &community.ValidateCodeIn{Login: "test1", Code: 15}
+		expectedErr := errors.New("failed to get login")
+
+		mockDB, sqlMock, err := sqlmock.Newx()
+		if err != nil {
+			t.Fatalf("failed to create sqlxmock: %v", err)
+		}
+		defer mockDB.Close()
+
+		sqlMock.ExpectBegin()
+		sqlMock.ExpectRollback()
+
+		mockRedisRepo.EXPECT().
+			GetByKey(ctx, gomock.Any()).
+			Return(key, nil).
+			Times(1)
+		mockRepo.EXPECT().
+			GetIdFromParticipant(ctx, ctxUUID).
+			Return(id, nil).
+			Times(1)
+		mockRepo.EXPECT().
+			Conn().
+			Return(mockDB).
+			Times(1)
+		mockRepo.EXPECT().
+			InsertLinkEdu(ctx, id, ctxUUID, gomock.Any()).
+			Return(nil).
+			Times(1)
+		mockRepo.EXPECT().
+			GetLogin(ctx, id).
+			Return("", expectedErr).
+			Times(1)
+
+		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil, nil)
+		_, err = s.ValidateCode(ctx, request)
+		assert.Error(t, err)
+	})
+
+	t.Run("ctx_err", func(t *testing.T) {
+		ctx = context.Background()
+		request := &community.ValidateCodeIn{Login: "test1", Code: 15}
+
+		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil, nil)
+		_, err := s.ValidateCode(ctx, request)
+		assert.Error(t, err)
+	})
+
 }
