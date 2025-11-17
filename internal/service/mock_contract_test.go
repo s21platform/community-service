@@ -159,17 +159,17 @@ func (mr *MockDbRepoMockRecorder) GetStaffId(ctx, login interface{}) *gomock.Cal
 }
 
 // InsertLinkEdu mocks base method.
-func (m *MockDbRepo) InsertLinkEdu(ctx context.Context, id int64, uuid string, tx *sqlx.Tx) error {
+func (m *MockDbRepo) InsertLinkEdu(ctx context.Context, id int64, uuid string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "InsertLinkEdu", ctx, id, uuid, tx)
+	ret := m.ctrl.Call(m, "InsertLinkEdu", ctx, id, uuid)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // InsertLinkEdu indicates an expected call of InsertLinkEdu.
-func (mr *MockDbRepoMockRecorder) InsertLinkEdu(ctx, id, uuid, tx interface{}) *gomock.Call {
+func (mr *MockDbRepoMockRecorder) InsertLinkEdu(ctx, id, uuid interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertLinkEdu", reflect.TypeOf((*MockDbRepo)(nil).InsertLinkEdu), ctx, id, uuid, tx)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertLinkEdu", reflect.TypeOf((*MockDbRepo)(nil).InsertLinkEdu), ctx, id, uuid)
 }
 
 // SearchPeersBySubstring mocks base method.

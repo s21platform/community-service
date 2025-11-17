@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/s21platform/community-service/internal/model"
+	"github.com/s21platform/community-service/internal/pkg/tx"
 	"strconv"
 
 	"google.golang.org/grpc/codes"
@@ -133,52 +134,38 @@ func (s *Service) ValidateCode(ctx context.Context, in *community.ValidateCodeIn
 		return &community.ValidateCodeOut{Message: ""}, status.Errorf(codes.NotFound, "failed to get user id, err: %v", err)
 	}
 
-	tx, err := s.dbR.Conn().Beginx()
-	if err != nil {
-		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to begin transaction")
-		return nil, status.Error(codes.Internal, "failed to start transaction")
-	}
+	err = tx.TxExecute(ctx, func(ctx context.Context) error {
 
-	err = s.dbR.InsertLinkEdu(ctx, id, uuid, tx)
-	if err != nil {
-		_ = tx.Rollback()
-		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to insert link")
-		return &community.ValidateCodeOut{Message: ""}, status.Errorf(codes.NotFound, "failed to insert link edu, err: %v", err)
-	}
+		err = s.dbR.InsertLinkEdu(ctx, id, uuid)
+		if err != nil {
+			return status.Error(codes.NotFound, "failed to insert link edu, err")
+		}
 
-	login, err := s.dbR.GetLogin(ctx, id)
-	if err != nil {
-		_ = tx.Rollback()
-		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to get login")
-		return nil, status.Error(codes.Internal, "failed to get login")
+		login, err := s.dbR.GetLogin(ctx, id)
+		if err != nil {
+			return status.Error(codes.Internal, "failed to get login")
+		}
 
-	}
-
-	userLink := model.LinkData{
-		UUID:  uuid,
-		Login: login,
-	}
-	rawMessage, err := json.Marshal(userLink)
+		userLink := model.LinkData{
+			UUID:  uuid,
+			Login: login,
+		}
+		rawMessage, err := json.Marshal(userLink)
+		if err != nil {
+			return fmt.Errorf("failed to marshal user: %v", err)
+		}
+		err = s.ulE.ProduceMessage(ctx, community.UserCreatedMessage{
+			UserUuid:   uuid,
+			Login:      login,
+			RawMessage: rawMessage,
+		}, uuid)
+		if err != nil {
+			return fmt.Errorf("failed to produce message: %v", err)
+		}
+		return nil
+	})
 	if err != nil {
-		_ = tx.Rollback()
-		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to marshal user")
-		return nil, fmt.Errorf("failed to marshal user: %v", err)
+		return nil, status.Errorf(codes.Internal, "failed to validate code: %v", err)
 	}
-	err = s.ulE.ProduceMessage(ctx, community.UserCreatedMessage{
-		UserUuid:   uuid,
-		Login:      login,
-		RawMessage: rawMessage,
-	}, uuid)
-	if err != nil {
-		_ = tx.Rollback()
-		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to produce message")
-		return nil, fmt.Errorf("failed to produce message: %v", err)
-	}
-	if err = tx.Commit(); err != nil {
-		_ = tx.Rollback()
-		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to commit transaction")
-		return nil, fmt.Errorf("failed to commit transaction: %v", err)
-	}
-
-	return nil, nil
+	return &community.ValidateCodeOut{Message: ""}, nil
 }

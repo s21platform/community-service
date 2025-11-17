@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/s21platform/community-service/internal/pkg/tx"
 	kafkalib "github.com/s21platform/kafka-lib"
 	"log"
 	"net"
@@ -57,6 +58,7 @@ func main() {
 			infra.LoggerRPC(logger),
 			infra.AuthInterceptor,
 			infra.MetricsInterceptor(metrics),
+			tx.TxMiddleWire(dbRepo),
 		),
 	)
 	community.RegisterCommunityServiceServer(grpcSrv, thisService)

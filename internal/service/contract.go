@@ -21,7 +21,7 @@ type DbRepo interface {
 	GetPeerData(ctx context.Context, id int64) (*model.ParticipantData, error)
 	GetIdPeer(ctx context.Context, uuid string) (int64, error)
 	GetIdFromParticipant(ctx context.Context, login string) (int64, error)
-	InsertLinkEdu(ctx context.Context, id int64, uuid string, tx *sqlx.Tx) error
+	InsertLinkEdu(ctx context.Context, id int64, uuid string) error
 	GetLogin(ctx context.Context, id int64) (string, error)
 }
 
