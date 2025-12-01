@@ -4,8 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/s21platform/community-service/internal/model"
-	"github.com/s21platform/community-service/internal/pkg/tx"
 	"strconv"
 
 	"google.golang.org/grpc/codes"
@@ -14,6 +12,8 @@ import (
 	logger_lib "github.com/s21platform/logger-lib"
 
 	"github.com/s21platform/community-service/internal/config"
+	"github.com/s21platform/community-service/internal/model"
+	"github.com/s21platform/community-service/internal/pkg/tx"
 	"github.com/s21platform/community-service/pkg/community"
 )
 
@@ -135,7 +135,6 @@ func (s *Service) ValidateCode(ctx context.Context, in *community.ValidateCodeIn
 	}
 
 	err = tx.TxExecute(ctx, func(ctx context.Context) error {
-
 		err = s.dbR.InsertLinkEdu(ctx, id, uuid)
 		if err != nil {
 			return status.Error(codes.NotFound, "failed to insert link edu, err")
@@ -167,5 +166,5 @@ func (s *Service) ValidateCode(ctx context.Context, in *community.ValidateCodeIn
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to validate code: %v", err)
 	}
-	return &community.ValidateCodeOut{Message: ""}, nil
+	return &community.ValidateCodeOut{}, nil
 }

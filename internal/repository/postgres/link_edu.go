@@ -35,10 +35,9 @@ func (r *Repository) InsertLinkEdu(ctx context.Context, id int64, uuid string) e
 		return fmt.Errorf("failed to build insert query: %v", err)
 	}
 
-	_, err = r.conn.ExecContext(ctx, query, args...)
+	_, err = r.Chk(ctx).ExecContext(ctx, query, args...)
 	if err != nil {
 		return fmt.Errorf("failed to insert link edu: %v", err)
 	}
-
 	return nil
 }

@@ -153,9 +153,9 @@ func (r *Repository) GetLogin(ctx context.Context, id int64) (string, error) {
 		return "", fmt.Errorf("failed to build exists query: %v", err)
 	}
 
-	err = r.conn.GetContext(ctx, &login, query, args...)
+	err = r.Chk(ctx).GetContext(ctx, &login, query, args...)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to execute query: %v", err)
 	}
 	return login, nil
 }

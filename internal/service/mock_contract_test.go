@@ -10,7 +10,6 @@ import (
 	time "time"
 
 	gomock "github.com/golang/mock/gomock"
-	sqlx "github.com/jmoiron/sqlx"
 	config "github.com/s21platform/community-service/internal/config"
 	model "github.com/s21platform/community-service/internal/model"
 	community "github.com/s21platform/community-service/pkg/community"
@@ -37,20 +36,6 @@ func NewMockDbRepo(ctrl *gomock.Controller) *MockDbRepo {
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockDbRepo) EXPECT() *MockDbRepoMockRecorder {
 	return m.recorder
-}
-
-// Conn mocks base method.
-func (m *MockDbRepo) Conn() *sqlx.DB {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Conn")
-	ret0, _ := ret[0].(*sqlx.DB)
-	return ret0
-}
-
-// Conn indicates an expected call of Conn.
-func (mr *MockDbRepoMockRecorder) Conn() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Conn", reflect.TypeOf((*MockDbRepo)(nil).Conn))
 }
 
 // GetIdFromParticipant mocks base method.

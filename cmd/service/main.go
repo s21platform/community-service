@@ -4,8 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/s21platform/community-service/internal/pkg/tx"
-	kafkalib "github.com/s21platform/kafka-lib"
 	"log"
 	"net"
 	"net/http"
@@ -16,6 +14,7 @@ import (
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc"
 
+	kafkalib "github.com/s21platform/kafka-lib"
 	logger_lib "github.com/s21platform/logger-lib"
 	"github.com/s21platform/metrics-lib/pkg"
 
@@ -24,6 +23,7 @@ import (
 	"github.com/s21platform/community-service/internal/config"
 	apigen "github.com/s21platform/community-service/internal/generated"
 	"github.com/s21platform/community-service/internal/infra"
+	"github.com/s21platform/community-service/internal/pkg/tx"
 	"github.com/s21platform/community-service/internal/repository/postgres"
 	"github.com/s21platform/community-service/internal/repository/redis"
 	"github.com/s21platform/community-service/internal/service"

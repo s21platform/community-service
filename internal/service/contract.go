@@ -5,15 +5,12 @@ import (
 	"context"
 	"time"
 
-	"github.com/jmoiron/sqlx"
-
 	"github.com/s21platform/community-service/internal/config"
 	"github.com/s21platform/community-service/internal/model"
 	"github.com/s21platform/community-service/pkg/community"
 )
 
 type DbRepo interface {
-	Conn() *sqlx.DB
 	SearchPeersBySubstring(ctx context.Context, substring string) ([]*community.SearchPeer, error)
 	GetPeerStatus(ctx context.Context, login string) (string, error)
 	GetPeerSchoolData(ctx context.Context, nickName string) (model.PeerSchoolData, error)
