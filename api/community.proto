@@ -110,3 +110,18 @@ message ValidateCodeOut {
   // Сообщение
   string message = 2;
 }
+
+message UserLinked {
+  // UUID пользователя (по space-21)
+  string uuid = 1;
+  // школьный логин
+  string login = 2;
+}
+
+// ------ kafka messages
+
+message UserCreatedMessage {
+  string user_uuid = 1;
+  string login = 2;
+  bytes raw_message = 3;
+}

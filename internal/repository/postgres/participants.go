@@ -140,3 +140,22 @@ func (r *Repository) GetIdFromParticipant(ctx context.Context, login string) (in
 	}
 	return id, nil
 }
+
+func (r *Repository) GetLogin(ctx context.Context, id int64) (string, error) {
+	var login string
+
+	query, args, err := sq.Select("login").
+		From("participant").
+		Where(sq.Eq{"id": id}).
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
+	if err != nil {
+		return "", fmt.Errorf("failed to build exists query: %v", err)
+	}
+
+	err = r.Chk(ctx).GetContext(ctx, &login, query, args...)
+	if err != nil {
+		return "", fmt.Errorf("failed to execute query: %v", err)
+	}
+	return login, nil
+}

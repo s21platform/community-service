@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"strconv"
 
 	"google.golang.org/grpc/codes"
@@ -10,6 +12,8 @@ import (
 	logger_lib "github.com/s21platform/logger-lib"
 
 	"github.com/s21platform/community-service/internal/config"
+	"github.com/s21platform/community-service/internal/model"
+	"github.com/s21platform/community-service/internal/pkg/tx"
 	"github.com/s21platform/community-service/pkg/community"
 )
 
@@ -19,14 +23,16 @@ type Service struct {
 	env   string
 	rR    RedisRepo
 	notCl NotificationS
+	ulE   UserLinkingEdu
 }
 
-func New(dbR DbRepo, env string, rR RedisRepo, notCl NotificationS, cfg *config.Config) *Service {
+func New(dbR DbRepo, env string, rR RedisRepo, notCl NotificationS, ulE UserLinkingEdu, cfg *config.Config) *Service {
 	return &Service{
 		dbR:   dbR,
 		env:   env,
 		rR:    rR,
 		notCl: notCl,
+		ulE:   ulE,
 	}
 }
 
@@ -110,6 +116,7 @@ func (s *Service) ValidateCode(ctx context.Context, in *community.ValidateCodeIn
 		return &community.ValidateCodeOut{Message: ""}, status.Errorf(codes.Internal, "failed to get by key: %v", err)
 	}
 	if code == "" {
+		logger_lib.Error(ctx, "code is not found")
 		return &community.ValidateCodeOut{Message: "Код не найден"}, nil
 	}
 	codeInt, err := strconv.Atoi(code)
@@ -118,6 +125,7 @@ func (s *Service) ValidateCode(ctx context.Context, in *community.ValidateCodeIn
 		return &community.ValidateCodeOut{Message: ""}, status.Errorf(codes.Internal, "failed to convert code: %v", err)
 	}
 	if int64(codeInt) != in.Code {
+		logger_lib.Error(ctx, "failed equal code")
 		return &community.ValidateCodeOut{Message: "Не совпадает код"}, nil
 	}
 	id, err := s.dbR.GetIdFromParticipant(ctx, uuid)
@@ -125,10 +133,38 @@ func (s *Service) ValidateCode(ctx context.Context, in *community.ValidateCodeIn
 		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to get user id")
 		return &community.ValidateCodeOut{Message: ""}, status.Errorf(codes.NotFound, "failed to get user id, err: %v", err)
 	}
-	err = s.dbR.InsertLinkEdu(ctx, id, uuid)
+
+	err = tx.TxExecute(ctx, func(ctx context.Context) error {
+		err = s.dbR.InsertLinkEdu(ctx, id, uuid)
+		if err != nil {
+			return status.Error(codes.NotFound, "failed to insert link edu, err")
+		}
+
+		login, err := s.dbR.GetLogin(ctx, id)
+		if err != nil {
+			return status.Error(codes.Internal, "failed to get login")
+		}
+
+		userLink := model.LinkData{
+			UUID:  uuid,
+			Login: login,
+		}
+		rawMessage, err := json.Marshal(userLink)
+		if err != nil {
+			return fmt.Errorf("failed to marshal user: %v", err)
+		}
+		err = s.ulE.ProduceMessage(ctx, community.UserCreatedMessage{
+			UserUuid:   uuid,
+			Login:      login,
+			RawMessage: rawMessage,
+		}, uuid)
+		if err != nil {
+			return fmt.Errorf("failed to produce message: %v", err)
+		}
+		return nil
+	})
 	if err != nil {
-		logger_lib.Error(logger_lib.WithError(ctx, err), "failed to insert link")
-		return &community.ValidateCodeOut{Message: ""}, status.Errorf(codes.NotFound, "failed to insert link edu, err: %v", err)
+		return nil, status.Errorf(codes.Internal, "failed to validate code: %v", err)
 	}
-	return nil, nil
+	return &community.ValidateCodeOut{}, nil
 }

@@ -12,6 +12,8 @@
     - [ParticipantChangeEvent](#-ParticipantChangeEvent)
     - [SearchPeer](#-SearchPeer)
     - [Skill](#-Skill)
+    - [UserCreatedMessage](#-UserCreatedMessage)
+    - [UserLinked](#-UserLinked)
     - [ValidateCodeIn](#-ValidateCodeIn)
     - [ValidateCodeOut](#-ValidateCodeOut)
   
@@ -165,6 +167,39 @@
 | ----- | ---- | ----- | ----------- |
 | name | [string](#string) |  | Название навыка |
 | points | [int32](#int32) |  | Кол-во очков, по данному навыку |
+
+
+
+
+
+
+<a name="-UserCreatedMessage"></a>
+
+### UserCreatedMessage
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| user_uuid | [string](#string) |  |  |
+| login | [string](#string) |  |  |
+| raw_message | [bytes](#bytes) |  |  |
+
+
+
+
+
+
+<a name="-UserLinked"></a>
+
+### UserLinked
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| uuid | [string](#string) |  | UUID пользователя (по space-21) |
+| login | [string](#string) |  | школьный логин |
 
 
 

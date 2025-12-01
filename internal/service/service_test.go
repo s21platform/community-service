@@ -14,9 +14,16 @@ import (
 
 	"github.com/s21platform/community-service/internal/config"
 	"github.com/s21platform/community-service/internal/model"
+	"github.com/s21platform/community-service/internal/pkg/tx"
 )
 
 var env = "prod"
+
+type noopTxRepo struct{}
+
+func (noopTxRepo) WithTx(ctx context.Context, cb func(ctx context.Context) error) error {
+	return cb(ctx)
+}
 
 func TestServer_GetPeerSchoolData(t *testing.T) {
 	t.Parallel()
@@ -31,7 +38,7 @@ func TestServer_GetPeerSchoolData(t *testing.T) {
 		nickName := "aboba"
 		mockRepo.EXPECT().GetPeerSchoolData(gomock.Any(), nickName).Return(expectedData, nil)
 
-		s := New(mockRepo, env, nil, nil, nil)
+		s := New(mockRepo, env, nil, nil, nil, nil)
 		data, err := s.GetPeerSchoolData(ctx, &community.GetSchoolDataIn{NickName: nickName})
 		assert.NoError(t, err)
 		assert.Equal(t, data, &community.GetSchoolDataOut{ClassName: expectedData.ClassName, ParallelName: expectedData.ParallelName})
@@ -42,7 +49,7 @@ func TestServer_GetPeerSchoolData(t *testing.T) {
 		expectedErr := errors.New("select err")
 		mockRepo.EXPECT().GetPeerSchoolData(gomock.Any(), nickName).Return(model.PeerSchoolData{}, expectedErr)
 
-		s := New(mockRepo, env, nil, nil, nil)
+		s := New(mockRepo, env, nil, nil, nil, nil)
 
 		data, err := s.GetPeerSchoolData(ctx, &community.GetSchoolDataIn{NickName: nickName})
 		assert.Nil(t, data)
@@ -101,7 +108,7 @@ func TestService_GetStudentData(t *testing.T) {
 			Return(mockData, nil).
 			Times(1)
 
-		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil)
+		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil, nil)
 		_, err := s.GetStudentData(ctx, request)
 		assert.NoError(t, err)
 	})
@@ -117,7 +124,7 @@ func TestService_GetStudentData(t *testing.T) {
 			Return(int64(0), expectedErr).
 			Times(1)
 
-		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil)
+		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil, nil)
 		data, err := s.GetStudentData(ctx, request)
 		assert.Nil(t, data)
 		st, ok := status.FromError(err)
@@ -140,7 +147,7 @@ func TestService_GetStudentData(t *testing.T) {
 			Return(int64(0), expectedErr).
 			Times(1)
 
-		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil)
+		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil, nil)
 		data, err := s.GetStudentData(ctx, request)
 		assert.Nil(t, data)
 		st, ok := status.FromError(err)
@@ -167,7 +174,7 @@ func TestService_GetStudentData(t *testing.T) {
 			Return(nil, expectedErr).
 			Times(1)
 
-		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil)
+		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil, nil)
 		data, err := s.GetStudentData(ctx, request)
 		assert.Nil(t, data)
 		st, ok := status.FromError(err)
@@ -178,20 +185,23 @@ func TestService_GetStudentData(t *testing.T) {
 
 func TestService_ValidateCode(t *testing.T) {
 	t.Parallel()
-	ctx := context.WithValue(context.Background(), config.KeyUUID, "uuid-1")
+	baseCtx := context.WithValue(context.Background(), config.KeyUUID, "uuid-1")
 	controller := gomock.NewController(t)
 	defer controller.Finish()
 	mockRepo := NewMockDbRepo(controller)
 	mockRedisRepo := NewMockRedisRepo(controller)
 	mockNotCl := NewMockNotificationS(controller)
 	mockLogger := logger_lib.NewMockLoggerInterface(controller)
-	ctx = context.WithValue(ctx, config.KeyLogger, mockLogger)
+	baseCtx = context.WithValue(baseCtx, config.KeyLogger, mockLogger)
+	baseCtx = context.WithValue(baseCtx, tx.KeyTx, tx.Tx{DbRepo: noopTxRepo{}})
 
 	t.Run("success_case", func(t *testing.T) {
+		ctx := baseCtx
 		key := "15"
 		ctxUUID := "uuid-1"
 		var id int64 = 15
-		request := &community.ValidateCodeIn{Login: "test1", Code: 15}
+		login := "test1"
+		request := &community.ValidateCodeIn{Login: login, Code: 15}
 
 		mockRedisRepo.EXPECT().
 			GetByKey(ctx, gomock.Any()).
@@ -205,13 +215,24 @@ func TestService_ValidateCode(t *testing.T) {
 			InsertLinkEdu(ctx, id, ctxUUID).
 			Return(nil).
 			Times(1)
+		mockRepo.EXPECT().
+			GetLogin(ctx, id).
+			Return(login, nil).
+			Times(1)
 
-		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil)
+		mockUlE := NewMockUserLinkingEdu(controller)
+		mockUlE.EXPECT().
+			ProduceMessage(ctx, gomock.Any(), ctxUUID).
+			Return(nil).
+			Times(1)
+
+		s := New(mockRepo, env, mockRedisRepo, mockNotCl, mockUlE, nil)
 		_, err := s.ValidateCode(ctx, request)
 		assert.NoError(t, err)
 	})
 
 	t.Run("GetByKey_err", func(t *testing.T) {
+		ctx := baseCtx
 		expectedErr := errors.New("get err")
 		request := &community.ValidateCodeIn{Login: "test1", Code: 15}
 
@@ -220,12 +241,13 @@ func TestService_ValidateCode(t *testing.T) {
 			Return("", expectedErr).
 			Times(1)
 
-		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil)
+		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil, nil)
 		_, err := s.ValidateCode(ctx, request)
 		assert.Error(t, err)
 	})
 
 	t.Run("code_err", func(t *testing.T) {
+		ctx := baseCtx
 		request := &community.ValidateCodeIn{Login: "test1", Code: 15}
 
 		mockRedisRepo.EXPECT().
@@ -233,12 +255,13 @@ func TestService_ValidateCode(t *testing.T) {
 			Return("", nil).
 			Times(1)
 
-		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil)
+		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil, nil)
 		_, err := s.ValidateCode(ctx, request)
 		assert.NoError(t, err)
 	})
 
 	t.Run("atoi_err", func(t *testing.T) {
+		ctx := baseCtx
 		key := "test"
 		request := &community.ValidateCodeIn{Login: "test1", Code: 15}
 
@@ -247,12 +270,13 @@ func TestService_ValidateCode(t *testing.T) {
 			Return(key, nil).
 			Times(1)
 
-		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil)
+		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil, nil)
 		_, err := s.ValidateCode(ctx, request)
 		assert.Error(t, err)
 	})
 
 	t.Run("get_id_from_participant_err", func(t *testing.T) {
+		ctx := baseCtx
 		key := "15"
 		ctxUUID := "uuid-1"
 		request := &community.ValidateCodeIn{Login: "test1", Code: 15}
@@ -267,12 +291,13 @@ func TestService_ValidateCode(t *testing.T) {
 			Return(int64(0), expectedErr).
 			Times(1)
 
-		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil)
+		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil, nil)
 		_, err := s.ValidateCode(ctx, request)
 		assert.Error(t, err)
 	})
 
 	t.Run("insert_link_edu_err", func(t *testing.T) {
+		ctx := baseCtx
 		key := "15"
 		ctxUUID := "uuid-1"
 		var id int64 = 15
@@ -292,8 +317,48 @@ func TestService_ValidateCode(t *testing.T) {
 			Return(expectedErr).
 			Times(1)
 
-		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil)
+		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil, nil)
 		_, err := s.ValidateCode(ctx, request)
 		assert.Error(t, err)
 	})
+
+	t.Run("get_login_err", func(t *testing.T) {
+		ctx := baseCtx
+		key := "15"
+		ctxUUID := "uuid-1"
+		var id int64 = 15
+		request := &community.ValidateCodeIn{Login: "test1", Code: 15}
+		expectedErr := errors.New("failed to get login")
+
+		mockRedisRepo.EXPECT().
+			GetByKey(ctx, gomock.Any()).
+			Return(key, nil).
+			Times(1)
+		mockRepo.EXPECT().
+			GetIdFromParticipant(ctx, ctxUUID).
+			Return(id, nil).
+			Times(1)
+		mockRepo.EXPECT().
+			InsertLinkEdu(ctx, id, ctxUUID).
+			Return(nil).
+			Times(1)
+		mockRepo.EXPECT().
+			GetLogin(ctx, id).
+			Return("", expectedErr).
+			Times(1)
+
+		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil, nil)
+		_, err := s.ValidateCode(ctx, request)
+		assert.Error(t, err)
+	})
+
+	t.Run("ctx_err", func(t *testing.T) {
+		ctx := context.Background()
+		request := &community.ValidateCodeIn{Login: "test1", Code: 15}
+
+		s := New(mockRepo, env, mockRedisRepo, mockNotCl, nil, nil)
+		_, err := s.ValidateCode(ctx, request)
+		assert.Error(t, err)
+	})
+
 }

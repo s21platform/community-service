@@ -68,6 +68,21 @@ func (mr *MockDbRepoMockRecorder) GetIdPeer(ctx, uuid interface{}) *gomock.Call 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetIdPeer", reflect.TypeOf((*MockDbRepo)(nil).GetIdPeer), ctx, uuid)
 }
 
+// GetLogin mocks base method.
+func (m *MockDbRepo) GetLogin(ctx context.Context, id int64) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetLogin", ctx, id)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetLogin indicates an expected call of GetLogin.
+func (mr *MockDbRepoMockRecorder) GetLogin(ctx, id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLogin", reflect.TypeOf((*MockDbRepo)(nil).GetLogin), ctx, id)
+}
+
 // GetPeerData mocks base method.
 func (m *MockDbRepo) GetPeerData(ctx context.Context, id int64) (*model.ParticipantData, error) {
 	m.ctrl.T.Helper()
@@ -256,4 +271,41 @@ func (m *MockNotificationS) SendEduCode(ctx context.Context, email, code string)
 func (mr *MockNotificationSMockRecorder) SendEduCode(ctx, email, code interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendEduCode", reflect.TypeOf((*MockNotificationS)(nil).SendEduCode), ctx, email, code)
+}
+
+// MockUserLinkingEdu is a mock of UserLinkingEdu interface.
+type MockUserLinkingEdu struct {
+	ctrl     *gomock.Controller
+	recorder *MockUserLinkingEduMockRecorder
+}
+
+// MockUserLinkingEduMockRecorder is the mock recorder for MockUserLinkingEdu.
+type MockUserLinkingEduMockRecorder struct {
+	mock *MockUserLinkingEdu
+}
+
+// NewMockUserLinkingEdu creates a new mock instance.
+func NewMockUserLinkingEdu(ctrl *gomock.Controller) *MockUserLinkingEdu {
+	mock := &MockUserLinkingEdu{ctrl: ctrl}
+	mock.recorder = &MockUserLinkingEduMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockUserLinkingEdu) EXPECT() *MockUserLinkingEduMockRecorder {
+	return m.recorder
+}
+
+// ProduceMessage mocks base method.
+func (m *MockUserLinkingEdu) ProduceMessage(ctx context.Context, message, key any) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ProduceMessage", ctx, message, key)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ProduceMessage indicates an expected call of ProduceMessage.
+func (mr *MockUserLinkingEduMockRecorder) ProduceMessage(ctx, message, key interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProduceMessage", reflect.TypeOf((*MockUserLinkingEdu)(nil).ProduceMessage), ctx, message, key)
 }
